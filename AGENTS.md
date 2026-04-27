@@ -27,6 +27,7 @@
   - `Components/` - Reusable UI components (SwiftUI Views)
   - `Scenes/` - Feature modules/scenes with ViewModels
 - UI uses `@Observable` ViewModels for state management.
+- **Dependency Injection**: Pass dependencies via initializers. Use protocols for testability.
 - Tests:
   - `FoundationModelsSandboxTests/` uses **Swift Testing** (`import Testing`, `@Test`), not XCTest.
   - `FoundationModelsSandboxUITests/` uses XCTest UI testing and launches the app via `XCUIApplication()`.
