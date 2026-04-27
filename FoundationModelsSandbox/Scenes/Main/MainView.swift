@@ -12,14 +12,19 @@ struct MainView: View {
                 systemPrompt: $viewModel.systemPrompt,
                 userPrompt: $viewModel.userPrompt,
                 selectedModel: $viewModel.selectedModel,
-                isLoading: $viewModel.isLoading
+                isLoading: viewModel.isLoading,
+                onSubmit: {
+                    Task {
+                        await viewModel.submitPrompt()
+                    }
+                }
             )
             .frame(minWidth: 380)
         } detail: {
             AIResponseView(
-                response: viewModel.sampleResponse,
-                code: viewModel.sampleCode,
-                footer: viewModel.responseFooter,
+                response: viewModel.aiResponse,
+                code: viewModel.aiCode,
+                footer: viewModel.error ?? "Enter a prompt to generate an AI response.",
                 isLoading: viewModel.isLoading
             )
             .frame(minWidth: 380)

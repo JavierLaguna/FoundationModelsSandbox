@@ -5,7 +5,8 @@ struct PromptPanelView: View {
     @Binding var systemPrompt: String
     @Binding var userPrompt: String
     @Binding var selectedModel: String
-    @Binding var isLoading: Bool
+    let isLoading: Bool
+    let onSubmit: () -> Void
     
     private let models = ["GPT-4-TURBO", "GPT-4", "GPT-3.5-TURBO", "Claude 3 Opus"]
     
@@ -117,15 +118,7 @@ struct PromptPanelView: View {
             .frame(width: 160)
             
             // Send Button
-            Button {
-                withAnimation {
-                    isLoading = true
-                }
-                // Simulate loading
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    isLoading = false
-                }
-            } label: {
+            Button(action: onSubmit) {
                 HStack(spacing: Spacing.xxs) {
                     if isLoading {
                         ProgressView()
@@ -150,7 +143,8 @@ struct PromptPanelView: View {
         systemPrompt: .constant("You are a helpful assistant."),
         userPrompt: .constant("Hello, world!"),
         selectedModel: .constant("GPT-4-TURBO"),
-        isLoading: .constant(false)
+        isLoading: false,
+        onSubmit: {}
     )
     .frame(width: 450, height: 700)
 }

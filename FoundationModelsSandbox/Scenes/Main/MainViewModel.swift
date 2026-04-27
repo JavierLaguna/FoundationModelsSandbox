@@ -3,7 +3,11 @@ import SwiftUI
 
 // MARK: - Main ViewModel
 @Observable
+@MainActor
 final class MainViewModel {
+    
+    // MARK: - Dependencies
+    private let interactor: FoundationModelsInteractor
     
     // MARK: - Navigation State
     var selectedSection: String = "Playground"
@@ -12,7 +16,12 @@ final class MainViewModel {
     var systemPrompt: String = ""
     var userPrompt: String = ""
     var selectedModel: String = "GPT-4-TURBO"
+    
+    // MARK: - Response State
+    private(set) var aiResponse: String = ""
+    private(set) var aiCode: String = ""
     var isLoading: Bool = false
+    private(set) var error: String?
     
     // MARK: - Available Models
     let availableModels: [String] = [
@@ -22,30 +31,18 @@ final class MainViewModel {
         "Claude 3 Opus"
     ]
     
-    // MARK: - Sample Data (for preview/demo)
-    let sampleResponse: String = """
-    To implement a real-time data stream in your application, you should use WebSockets or Server-Sent Events (SSE). WebSockets provide full-duplex communication channels over a single TCP connection, making them ideal for real-time applications.
-    """
-    
-    let sampleCode: String = """
-    const WebSocket = require('ws');
-    
-    const wss = new WebSocket.Server({ port: 8080 });
-    
-    wss.on('connection', (ws) => {
-      ws.on('message', (message) => {
-        console.log('received: %s', message);
-      });
-      
-      ws.send('Connection established');
-    });
-    """
-    
-    let responseFooter: String = "This implementation creates a WebSocket server that listens on port 8080. When a client connects, it logs incoming messages and sends a confirmation back."
-    
     // MARK: - Computed Properties
     var canSubmitPrompt: Bool {
         !userPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading
+    }
+    
+    var hasResponse: Bool {
+        !aiResponse.isEmpty
+    }
+    
+    // MARK: - Initialization
+    init(interactor: FoundationModelsInteractor = FoundationModelsInteractorDefault()) {
+        self.interactor = interactor
     }
     
     // MARK: - Actions
@@ -53,9 +50,16 @@ final class MainViewModel {
         guard canSubmitPrompt else { return }
         
         isLoading = true
+        error = nil
         
-        // Simulate API call
-        try? await Task.sleep(for: .seconds(2))
+        do {
+            aiResponse = try await interactor.execute(prompt: userPrompt)
+            aiCode = extractCodeBlock(from: aiResponse)
+            userPrompt = ""
+            
+        } catch {
+            self.error = error.localizedDescription
+        }
         
         isLoading = false
     }
@@ -63,9 +67,25 @@ final class MainViewModel {
     func clearPrompts() {
         systemPrompt = ""
         userPrompt = ""
+        aiResponse = ""
+        aiCode = ""
+        error = nil
     }
     
     func selectSection(_ section: String) {
         selectedSection = section
+    }
+    
+    // MARK: - Private Helpers
+    
+    private func extractCodeBlock(from response: String) -> String {
+        // Simple extraction - look for code between ```
+        let pattern = "```(?:\\w+)?\\n([\\s\\S]*?)```"
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: response, range: NSRange(response.startIndex..., in: response)),
+              let range = Range(match.range(at: 1), in: response) else {
+            return ""
+        }
+        return String(response[range]).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
