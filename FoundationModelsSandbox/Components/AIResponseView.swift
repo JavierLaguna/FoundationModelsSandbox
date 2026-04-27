@@ -16,7 +16,12 @@ struct AIResponseView: View {
             
             // MARK: - Content
             if isLoading {
-                loadingView
+                LoadingAppleIntelligence(text: "Generating response...")
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity
+                    )
+                
             } else {
                 responseContent
             }
@@ -47,23 +52,6 @@ struct AIResponseView: View {
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.sm)
         .background(Color.appGroupedBackground)
-    }
-    
-    // MARK: - Loading View
-    private var loadingView: some View {
-        VStack(spacing: Spacing.md) {
-            Spacer()
-            
-            ProgressView()
-                .scaleEffect(1.2)
-            
-            Text("Generating response...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     // MARK: - Response Content
