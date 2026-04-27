@@ -31,10 +31,15 @@
   - `FoundationModelsSandboxTests/` uses **Swift Testing** (`import Testing`, `@Test`), not XCTest.
   - `FoundationModelsSandboxUITests/` uses XCTest UI testing and launches the app via `XCUIApplication()`.
 
-## Async/await priority
+## Async/await + Swift 6 Strict Concurrency
 - All asynchronous flows MUST use `async`/`await`. No completion handlers.
 - Use Swift Concurrency features: `Task`, `@MainActor`, `actor` isolation.
 - Prefer structured concurrency over unstructured `Task`.
+- **Swift 6 Strict Concurrency** (`SWIFT_STRICT_CONCURRENCY = complete`) is enabled:
+  - All types must be `Sendable` unless explicitly marked otherwise.
+  - Use `@MainActor` for UI-bound state and actors for shared mutable state.
+  - `nonisolated` for immutable computed properties in actors.
+  - `@unchecked Sendable` only when truly safe (document why).
 
 ## Repo-specific constraints
 - Deployment target is macOS 26.4 (`MACOSX_DEPLOYMENT_TARGET = 26.4` in project settings), so older local runtimes/toolchains may fail builds.
