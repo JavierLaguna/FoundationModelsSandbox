@@ -43,24 +43,6 @@ struct AIResponseView: View {
                 Image(systemName: "doc.on.doc")
             }
             .buttonStyle(.borderless)
-            
-            // Refresh button
-            Button {
-                // Regenerate
-            } label: {
-                Image(systemName: "arrow.clockwise")
-            }
-            .buttonStyle(.borderless)
-            
-            // Feedback menu
-            Menu {
-                Button("Helpful") {}
-                Button("Not Helpful") {}
-                Button("Report Issue") {}
-            } label: {
-                Image(systemName: "hand.thumbsup")
-            }
-            .buttonStyle(.borderless)
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.sm)
@@ -85,28 +67,50 @@ struct AIResponseView: View {
     }
     
     // MARK: - Response Content
+    @ViewBuilder
     private var responseContent: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                // Response text
-                Text(response)
-                    .font(.body)
-                    .lineSpacing(4)
-                
-                // Code block with native styling
-                codeBlock
-                
-                // Footer text
-                Text(footer)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineSpacing(3)
-                
-                // Metrics
-                metricsRow
+        if response.isEmpty {
+            emptyState
+        } else {
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    // Response text
+                    Text(response)
+                        .font(.body)
+                        .lineSpacing(4)
+                    
+                    // Code block with native styling
+                    if !code.isEmpty {
+                        codeBlock
+                    }
+                    
+                    // Footer text
+                    Text(footer)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineSpacing(3)
+                }
+                .padding(Spacing.lg)
             }
-            .padding(Spacing.lg)
         }
+    }
+    
+    // MARK: - Empty State
+    private var emptyState: some View {
+        VStack(spacing: Spacing.md) {
+            Spacer()
+            
+            Image(systemName: "text.bubble")
+                .font(.system(size: 48))
+                .foregroundStyle(.tertiary)
+            
+            Text("Enter a prompt to generate an AI response")
+                .font(.subheadline)
+                .foregroundStyle(.tertiary)
+            
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     // MARK: - Code Block
@@ -143,17 +147,6 @@ struct AIResponseView: View {
         }
         .liquidGlass(cornerRadius: CornerRadius.medium)
     }
-    
-    // MARK: - Metrics Row
-    private var metricsRow: some View {
-        HStack(spacing: Spacing.sm) {
-            Label("2.4s", systemImage: "speedometer")
-            Label("412 tokens", systemImage: "text.alignleft")
-            Label("Temp: 0.7", systemImage: "thermometer")
-        }
-        .font(.caption)
-        .foregroundStyle(.tertiary)
-    }
 }
 
 #Preview {
@@ -163,12 +156,6 @@ struct AIResponseView: View {
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({ port: 8080 });
-
-wss.on('connection', (ws) => {
-  ws.on('message', (message) => {
-    console.log('received: %s', message);
-  });
-});
 """,
         footer: "This implementation creates a simple WebSocket server that listens on port 8080.",
         isLoading: false

@@ -7,8 +7,6 @@ struct SidebarView: View {
     private let navItems: [(icon: String, label: String)] = [
         ("sparkles", "Playground"),
         ("clock.arrow.circlepath", "History"),
-        ("cpu", "Models"),
-        ("key.viewfinder", "API Keys"),
     ]
     
     var body: some View {
@@ -26,7 +24,6 @@ struct SidebarView: View {
             
             Section {
                 Label("Settings", systemImage: "gearshape")
-                Label("Account", systemImage: "person.circle")
             } header: {
                 Text("System")
                     .font(.caption)

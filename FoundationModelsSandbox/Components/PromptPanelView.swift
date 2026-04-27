@@ -41,20 +41,6 @@ struct PromptPanelView: View {
                 .font(.headline)
             
             Spacer()
-            
-            Menu {
-                Button("Export as JSON") {}
-                Button("Export as Markdown") {}
-            } label: {
-                Label("Export", systemImage: "square.and.arrow.up")
-            }
-            
-            Button {
-                // Deploy action
-            } label: {
-                Label("Deploy", systemImage: "arrow.up.forward.circle")
-            }
-            .buttonStyle(.borderedProminent)
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.sm)
@@ -98,14 +84,6 @@ struct PromptPanelView: View {
     // MARK: - Bottom Bar
     private var bottomBar: some View {
         HStack(spacing: Spacing.md) {
-            // Context attachment
-            Button {
-                // Add context
-            } label: {
-                Label("Add Context", systemImage: "paperclip")
-            }
-            .buttonStyle(.borderless)
-            
             Spacer()
             
             // Model Picker
