@@ -21,11 +21,20 @@
 - Use `-destination 'platform=macOS'` for deterministic local runs.
 
 ## Architecture map (high-signal)
-- App entrypoint: `FoundationModelsSandbox/FoundationModelsSandboxApp.swift` (`@main`, loads `ContentView`).
-- Most UI and local model structs live in one large file: `FoundationModelsSandbox/ContentView.swift` (sidebar/prompt/response panes, color theme, helper views).
+- App entrypoint: `FoundationModelsSandbox/FoundationModelsSandboxApp.swift` (`@main`, loads `MainView`).
+- **Clean Architecture** folder structure:
+  - `Business/` - Interactors (e.g., `FoundationModelsInteractor`), Use Cases, Error types
+  - `Components/` - Reusable UI components (SwiftUI Views)
+  - `Scenes/` - Feature modules/scenes with ViewModels
+- UI uses `@Observable` ViewModels for state management.
 - Tests:
   - `FoundationModelsSandboxTests/` uses **Swift Testing** (`import Testing`, `@Test`), not XCTest.
   - `FoundationModelsSandboxUITests/` uses XCTest UI testing and launches the app via `XCUIApplication()`.
+
+## Async/await priority
+- All asynchronous flows MUST use `async`/`await`. No completion handlers.
+- Use Swift Concurrency features: `Task`, `@MainActor`, `actor` isolation.
+- Prefer structured concurrency over unstructured `Task`.
 
 ## Repo-specific constraints
 - Deployment target is macOS 26.4 (`MACOSX_DEPLOYMENT_TARGET = 26.4` in project settings), so older local runtimes/toolchains may fail builds.
