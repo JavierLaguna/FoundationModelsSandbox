@@ -1,68 +1,55 @@
 import SwiftUI
 
-// MARK: - Main App View
+// MARK: - Main View (Apple HIG compliant with NavigationSplitView)
 struct MainView: View {
     @State private var selectedSection: String = "Playground"
     @State private var systemPrompt: String = ""
     @State private var userPrompt: String = ""
     @State private var isLoading: Bool = false
-    @State private var aiResponse: String = "To implement a real-time data stream in your application, you should be using WebSockets or Server-Sent Events (SSE). Here is a basic example of a server implementation using Node.js and a client-side listener."
-    @State private var showCode: Bool = true
     @State private var selectedModel: String = "GPT-4-TURBO"
-    @State private var temperature: Double = 0.7
-
-    let sampleCode = """
+    
+    private let sampleResponse = "To implement a real-time data stream in your application, you should use WebSockets or Server-Sent Events (SSE). WebSockets provide full-duplex communication channels over a single TCP connection, making them ideal for real-time applications."
+    
+    private let sampleCode = """
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({ port: 8080 });
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
     console.log('received: %s', message);
   });
-
-  ws.send('something');
+  
+  ws.send('Connection established');
 });
 """
-
-    let responseFooter = "This implementation creates a simple WebSocket server that listens on port 8080. When a client connects, it logs incoming messages and sends a confirmation back. Ensure you handle reconnection logic on the client side for a production-ready application."
-
+    
+    private let responseFooter = "This implementation creates a WebSocket server that listens on port 8080. When a client connects, it logs incoming messages and sends a confirmation back."
+    
     var body: some View {
-        HStack(spacing: 0) {
-            // MARK: Sidebar
+        NavigationSplitView {
             SidebarView(selectedSection: $selectedSection)
-                .frame(width: 250)
-
-            Divider()
-                .background(Color.nexusBorder)
-
-            // MARK: Center Panel
+        } content: {
             PromptPanelView(
                 systemPrompt: $systemPrompt,
                 userPrompt: $userPrompt,
                 selectedModel: $selectedModel,
                 isLoading: $isLoading
             )
-            .frame(minWidth: 400)
-
-            Divider()
-                .background(Color.nexusBorder)
-
-            // MARK: Right Panel - AI Response
+            .frame(minWidth: 380)
+        } detail: {
             AIResponseView(
-                response: aiResponse,
+                response: sampleResponse,
                 code: sampleCode,
                 footer: responseFooter,
                 isLoading: isLoading
             )
-            .frame(minWidth: 400)
+            .frame(minWidth: 380)
         }
-        .background(Color.nexusBackground)
-        .preferredColorScheme(.dark)
+        .navigationSplitViewStyle(.balanced)
     }
 }
 
-// MARK: - Preview
 #Preview {
     MainView()
         .frame(width: 1200, height: 800)
