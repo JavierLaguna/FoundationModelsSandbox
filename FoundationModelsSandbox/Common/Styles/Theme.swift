@@ -14,19 +14,6 @@ extension Color {
     static let appGroupedBackground = Color(NSColor.controlBackgroundColor)
     static let appSecondaryBackground = Color(NSColor.textBackgroundColor)
     
-    // MARK: - Glass Effect Colors
-    
-    /// Frosted glass overlay
-    static let glassBackground = Color.adaptive(
-        Color.white.opacity(0.08),
-        Color.white.opacity(0.5)
-    )
-    
-    static let glassBorder = Color.adaptive(
-        Color.white.opacity(0.18),
-        Color.black.opacity(0.08)
-    )
-    
     // MARK: - Text Colors
     
     static let primaryText = Color(NSColor.labelColor)
@@ -79,28 +66,38 @@ extension Color {
     }
 }
 
-// MARK: - Liquid Glass Modifier
+// MARK: - Liquid Glass Modifier (Apple Liquid Glass API)
 struct LiquidGlass: ViewModifier {
     let cornerRadius: CGFloat
     
     func body(content: Content) -> some View {
         content
-            .background(.ultraThinMaterial)
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(.ultraThinMaterial)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Color.glassBorder, lineWidth: 0.5)
-            )
+            .padding()
+            .glassEffect(in: .rect(cornerRadius: cornerRadius))
     }
 }
 
 extension View {
+    /// Applies Apple Liquid Glass effect to the view
     func liquidGlass(cornerRadius: CGFloat = 16) -> some View {
         modifier(LiquidGlass(cornerRadius: cornerRadius))
+    }
+    
+    /// Applies Apple Liquid Glass effect with custom glass configuration
+    func liquidGlass(_ glass: Glass, cornerRadius: CGFloat = 16) -> some View {
+        self
+            .padding()
+            .glassEffect(glass, in: .rect(cornerRadius: cornerRadius))
+    }
+}
+
+// MARK: - GlassEffectContainer for multiple glass views
+extension View {
+    /// Groups multiple glass-effect views for optimal rendering and morphing
+    func glassEffectContainer(spacing: CGFloat = 8) -> some View {
+        GlassEffectContainer(spacing: spacing) {
+            self
+        }
     }
 }
 

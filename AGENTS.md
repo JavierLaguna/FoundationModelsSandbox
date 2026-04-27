@@ -42,6 +42,19 @@
   - `nonisolated` for immutable computed properties in actors.
   - `@unchecked Sendable` only when truly safe (document why).
 
+## UI Design Guidelines
+- Follow **Apple Human Interface Guidelines** for all UI elements.
+- Use **Liquid Glass** styling with the official Apple API:
+  - `.glassEffect()` modifier on views (from `SwiftUI.View`)
+  - `.glassEffect(_:in:)` for custom glass config with shape
+  - `GlassEffectContainer` for grouping multiple glass-effect views
+  - See `Common/Styles/Theme.swift` for `liquidGlass()` convenience wrapper
+- Use native SwiftUI components: `List` with `.listStyle(.sidebar)`, `.buttonStyle(.bordered)`, `.buttonStyle(.borderedProminent)`.
+- Use `NavigationSplitView` for three-column layouts.
+- Use SF Symbols for all icons (system images).
+- Spacing constants defined in `Theme.swift` via `Spacing` enum (8pt grid system).
+- Corner radius constants via `CornerRadius` enum.
+
 ## Repo-specific constraints
 - Deployment target is macOS 26.4 (`MACOSX_DEPLOYMENT_TARGET = 26.4` in project settings), so older local runtimes/toolchains may fail builds.
 - Project uses Xcode file-system synchronized groups (`PBXFileSystemSynchronizedRootGroup`): add/move source files through Xcode (or verify project references carefully) to avoid missing-file/build-graph drift.
