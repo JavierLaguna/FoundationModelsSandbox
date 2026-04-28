@@ -12,8 +12,8 @@ final class MainViewModel {
     // MARK: - Navigation State
     var selectedSection: String = "Playground"
     
-    // MARK: - Prompt State
-    var systemPrompt: String = ""
+    // MARK: - Instructions State
+    var instructions: String = ""
     var userPrompt: String = ""
     var selectedModel: String = "GPT-4-TURBO"
     
@@ -52,8 +52,10 @@ final class MainViewModel {
         isLoading = true
         error = nil
         
+        let fullPrompt = buildPrompt()
+        
         do {
-            aiResponse = try await interactor.execute(prompt: userPrompt)
+            aiResponse = try await interactor.execute(prompt: fullPrompt)
             aiCode = extractCodeBlock(from: aiResponse)
             userPrompt = ""
             
@@ -65,7 +67,7 @@ final class MainViewModel {
     }
     
     func clearPrompts() {
-        systemPrompt = ""
+        instructions = ""
         userPrompt = ""
         aiResponse = ""
         aiCode = ""
@@ -77,6 +79,13 @@ final class MainViewModel {
     }
     
     // MARK: - Private Helpers
+    
+    private func buildPrompt() -> String {
+        if instructions.isEmpty {
+            return userPrompt
+        }
+        return "Instructions: \(instructions)\n\nUser: \(userPrompt)"
+    }
     
     private func extractCodeBlock(from response: String) -> String {
         // Simple extraction - look for code between ```

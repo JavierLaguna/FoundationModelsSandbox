@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Native Prompt Panel (Apple HIG compliant)
 struct PromptPanelView: View {
-    @Binding var systemPrompt: String
+    @Binding var instructions: String
     @Binding var userPrompt: String
     @Binding var selectedModel: String
     let isLoading: Bool
@@ -20,7 +20,7 @@ struct PromptPanelView: View {
             // MARK: - Content
             ScrollView {
                 VStack(spacing: Spacing.lg) {
-                    systemPromptSection
+                    instructionsSection
                     userPromptSection
                 }
                 .padding(Spacing.lg)
@@ -47,20 +47,20 @@ struct PromptPanelView: View {
         .background(Color.appGroupedBackground)
     }
     
-    // MARK: - System Prompt Section
-    private var systemPromptSection: some View {
+    // MARK: - Instructions Section
+    private var instructionsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            Label("System Prompt", systemImage: "cpu")
+            Label("Instructions", systemImage: "cpu")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
             
-            TextEditor(text: $systemPrompt)
+            TextEditor(text: $instructions)
                 .font(.body)
                 .scrollContentBackground(.hidden)
                 .frame(minHeight: 120)
                 .liquidGlass(cornerRadius: CornerRadius.medium)
             
-            Text("Defines the AI's personality and constraints")
+            Text("Defines the AI assistant behavior and context")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
@@ -118,7 +118,7 @@ struct PromptPanelView: View {
 
 #Preview {
     PromptPanelView(
-        systemPrompt: .constant("You are a helpful assistant."),
+        instructions: .constant("You are a helpful assistant."),
         userPrompt: .constant("Hello, world!"),
         selectedModel: .constant("GPT-4-TURBO"),
         isLoading: false,

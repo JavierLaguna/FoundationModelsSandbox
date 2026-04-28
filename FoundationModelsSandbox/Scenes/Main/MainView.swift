@@ -9,7 +9,7 @@ struct MainView: View {
             SidebarView(selectedSection: $viewModel.selectedSection)
         } content: {
             PromptPanelView(
-                systemPrompt: $viewModel.systemPrompt,
+                instructions: $viewModel.instructions,
                 userPrompt: $viewModel.userPrompt,
                 selectedModel: $viewModel.selectedModel,
                 isLoading: viewModel.isLoading,
