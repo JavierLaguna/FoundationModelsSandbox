@@ -1,13 +1,11 @@
 import FoundationModels
 
-
 /// Lists the available Foundation Models on the device.
-public protocol ListAvailableModelsInteractor: Sendable {
+protocol ListAvailableModelsInteractor: Sendable {
     func execute() -> [SystemLanguageModel]
 }
 
-
-public struct ListAvailableModelsInteractorDefault: ListAvailableModelsInteractor {
+struct ListAvailableModelsInteractorDefault: ListAvailableModelsInteractor {
     
     public init() {}
     

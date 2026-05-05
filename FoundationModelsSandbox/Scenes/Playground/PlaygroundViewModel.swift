@@ -10,6 +10,7 @@ final class PlaygroundViewModel {
     // MARK: - Dependencies
     private let interactor: FoundationModelsInteractor
     private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
+    private let modelsLister: ListAvailableModelsInteractor
     
     // MARK: - Availability State
     private(set) var isFoundationModelsAvailable: Bool = false
@@ -41,27 +42,21 @@ final class PlaygroundViewModel {
     // MARK: - Initialization
     init(
         interactor: FoundationModelsInteractor = FoundationModelsInteractorDefault(),
-        availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault()
+        availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault(),
+        modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault()
     ) {
         self.interactor = interactor
         self.availabilityChecker = availabilityChecker
+        self.modelsLister = modelsLister
         loadModels()
         checkAvailability()
     }
     
     // MARK: - Actions
     private func loadModels() {
-        // Get available models from FoundationModels
-        let defaultModel = SystemLanguageModel.default
-        if defaultModel.isAvailable {
-            // Use default model identifier
-            let modelId = String(describing: defaultModel)
-            availableModelNames = [modelId]
-            selectedModelName = modelId
-        } else {
-            availableModelNames = []
-            selectedModelName = ""
-        }
+        let models = modelsLister.execute()
+        availableModelNames = models.map { String(describing: $0) }
+        selectedModelName = availableModelNames.first ?? ""
     }
     
     private func checkAvailability() {
