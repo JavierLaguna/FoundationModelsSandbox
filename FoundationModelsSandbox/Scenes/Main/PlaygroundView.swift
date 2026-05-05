@@ -1,8 +1,8 @@
 import FoundationModels
 import SwiftUI
 
-// MARK: - Playground View
-struct PlaygroundView: View {
+// MARK: - Playground Content View
+struct PlaygroundContentView: View {
     
     @State private var viewModel = PlaygroundViewModel()
     
@@ -25,8 +25,6 @@ struct PlaygroundView: View {
     
     var body: some View {
         NavigationSplitView {
-            SidebarView(selectedSection: $viewModel.selectedSection)
-        } content: {
             PromptPanelView(
                 instructions: $viewModel.instructions,
                 userPrompt: $viewModel.userPrompt,
@@ -48,6 +46,6 @@ struct PlaygroundView: View {
 }
 
 #Preview {
-    PlaygroundView()
+    PlaygroundContentView()
         .frame(width: 1200, height: 800)
 }

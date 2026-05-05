@@ -15,9 +15,6 @@ final class PlaygroundViewModel {
     private(set) var isFoundationModelsAvailable: Bool = false
     private(set) var availabilityReason: SystemLanguageModel.Availability?
     
-    // MARK: - Navigation State
-    var selectedSection: String = "Playground"
-    
     // MARK: - Instructions State
     var instructions: String = ""
     var userPrompt: String = ""
