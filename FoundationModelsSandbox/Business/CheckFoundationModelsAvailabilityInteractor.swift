@@ -7,19 +7,17 @@ protocol CheckFoundationModelsAvailabilityInteractor: Sendable {
 
 struct CheckFoundationModelsAvailabilityInteractorDefault: CheckFoundationModelsAvailabilityInteractor {
 
-    public static let model = SystemLanguageModel.default
+    static let model = SystemLanguageModel.default
 
-    public static var isAvailable: Bool {
+    static var isAvailable: Bool {
         Self.model.isAvailable
     }
 
-    public static var availabilityReason: SystemLanguageModel.Availability {
+    static var availabilityReason: SystemLanguageModel.Availability {
         Self.model.availability
     }
 
-    public init() {}
-
-    public func execute() -> SystemLanguageModel.Availability {
+    func execute() -> SystemLanguageModel.Availability {
         Self.availabilityReason
     }
 }

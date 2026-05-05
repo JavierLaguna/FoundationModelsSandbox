@@ -6,15 +6,15 @@ protocol ListAvailableModelsInteractor: Sendable {
 }
 
 struct ListAvailableModelsInteractorDefault: ListAvailableModelsInteractor {
-    
+
     func execute() -> [SystemLanguageModel] {
         var models: [SystemLanguageModel] = []
-        
+
         let defaultModel = SystemLanguageModel.default
         if defaultModel.isAvailable {
             models.append(defaultModel)
         }
-        
+
         return models
     }
 }
