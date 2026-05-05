@@ -2,6 +2,7 @@ import SwiftUI
 
 // MARK: - Native Sidebar (Apple HIG compliant)
 struct SidebarView: View {
+    
     @Binding var selectedSection: String
     
     private let navItems: [(icon: String, label: String)] = [
