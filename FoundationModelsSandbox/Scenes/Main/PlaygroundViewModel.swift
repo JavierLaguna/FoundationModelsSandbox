@@ -2,10 +2,10 @@ import Foundation
 import FoundationModels
 import SwiftUI
 
-// MARK: - Main ViewModel
+// MARK: - Playground ViewModel
 @Observable
 @MainActor
-final class MainViewModel {
+final class PlaygroundViewModel {
     
     // MARK: - Dependencies
     private let interactor: FoundationModelsInteractor
@@ -91,10 +91,6 @@ final class MainViewModel {
         error = nil
     }
     
-    func selectSection(_ section: String) {
-        selectedSection = section
-    }
-    
     // MARK: - Private Helpers
     
     private func buildPrompt() -> String {
@@ -105,7 +101,6 @@ final class MainViewModel {
     }
     
     private func extractCodeBlock(from response: String) -> String {
-        // Simple extraction - look for code between ```
         let pattern = "```(?:\\w+)?\\n([\\s\\S]*?)```"
         guard let regex = try? NSRegularExpression(pattern: pattern),
               let match = regex.firstMatch(in: response, range: NSRange(response.startIndex..., in: response)),

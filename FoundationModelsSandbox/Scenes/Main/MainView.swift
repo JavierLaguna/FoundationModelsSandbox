@@ -1,49 +1,28 @@
-import FoundationModels
 import SwiftUI
 
-// MARK: - Main View (Apple HIG compliant with NavigationSplitView)
+// MARK: - Main View (Root Navigation)
 struct MainView: View {
     
-    @State private var viewModel = MainViewModel()
-    
-    @ViewBuilder
-    private var detailView: some View {
-        if viewModel.isFoundationModelsAvailable {
-            AIResponseView(
-                response: viewModel.aiResponse,
-                code: viewModel.aiCode,
-                footer: viewModel.error ?? "Enter a prompt to generate an AI response.",
-                isLoading: viewModel.isLoading
-            )
-            
-        } else {
-            FoundationModelsNotAvailableView(
-                availabilityReason: viewModel.availabilityReason
-            )
-        }
-    }
+    @State private var selectedSection: String = "Playground"
     
     var body: some View {
         NavigationSplitView {
-            SidebarView(selectedSection: $viewModel.selectedSection)
-        } content: {
-            PromptPanelView(
-                instructions: $viewModel.instructions,
-                userPrompt: $viewModel.userPrompt,
-                selectedModel: $viewModel.selectedModel,
-                isLoading: viewModel.isLoading,
-                onSubmit: {
-                    Task {
-                        await viewModel.submitPrompt()
-                    }
-                }
-            )
-            .frame(minWidth: 380)
+            SidebarView(selectedSection: $selectedSection)
         } detail: {
             detailView
-                .frame(minWidth: 380)
         }
         .navigationSplitViewStyle(.balanced)
+    }
+    
+    @ViewBuilder
+    private var detailView: some View {
+        switch selectedSection {
+        case "Playground":
+            PlaygroundView()
+        default:
+            Text("Select a section from the sidebar")
+                .foregroundStyle(.secondary)
+        }
     }
 }
 
