@@ -1,8 +1,27 @@
+import FoundationModels
 import SwiftUI
 
 // MARK: - Main View (Apple HIG compliant with NavigationSplitView)
 struct MainView: View {
+    
     @State private var viewModel = MainViewModel()
+    
+    @ViewBuilder
+    private var detailView: some View {
+        if viewModel.isFoundationModelsAvailable {
+            AIResponseView(
+                response: viewModel.aiResponse,
+                code: viewModel.aiCode,
+                footer: viewModel.error ?? "Enter a prompt to generate an AI response.",
+                isLoading: viewModel.isLoading
+            )
+            
+        } else {
+            FoundationModelsNotAvailableView(
+                availabilityReason: viewModel.availabilityReason
+            )
+        }
+    }
     
     var body: some View {
         NavigationSplitView {
@@ -21,13 +40,8 @@ struct MainView: View {
             )
             .frame(minWidth: 380)
         } detail: {
-            AIResponseView(
-                response: viewModel.aiResponse,
-                code: viewModel.aiCode,
-                footer: viewModel.error ?? "Enter a prompt to generate an AI response.",
-                isLoading: viewModel.isLoading
-            )
-            .frame(minWidth: 380)
+            detailView
+                .frame(minWidth: 380)
         }
         .navigationSplitViewStyle(.balanced)
     }

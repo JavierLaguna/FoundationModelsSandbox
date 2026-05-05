@@ -7,34 +7,25 @@ protocol FoundationModelsInteractor: Sendable {
 
 struct FoundationModelsInteractorDefault: FoundationModelsInteractor {
 
-    static private let model = SystemLanguageModel.default
-    static private let instructions = ""
-
-    static var isAvailable: Bool {
-        Self.model.isAvailable
-    }
-
-    static var availabilityReason: SystemLanguageModel.Availability {
-        Self.model.availability
-    }
-
     private let session: LanguageModelSession
+    private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
 
-    init() {
-        self.session = LanguageModelSession(
-            model: Self.model,
-//            instructions: Self.instructions
-        )
+    init(
+        availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault(),
+        model: SystemLanguageModel = CheckFoundationModelsAvailabilityInteractorDefault.model
+    ) {
+        self.availabilityChecker = availabilityChecker
+        self.session = LanguageModelSession(model: model)
     }
 
     func execute(prompt: String) async throws -> String {
-        guard Self.isAvailable else {
-            throw AppleIntelligenceNotAvailableError(from: Self.availabilityReason)
+        let reason = availabilityChecker.execute()
+        guard CheckFoundationModelsAvailabilityInteractorDefault.isAvailable else {
+            throw AppleIntelligenceNotAvailableError(from: reason)
         }
 
         let response = try await session.respond(
             to: prompt,
-//            generating: CharacterDescription.self,
             options: GenerationOptions(
                 sampling: .greedy
             )

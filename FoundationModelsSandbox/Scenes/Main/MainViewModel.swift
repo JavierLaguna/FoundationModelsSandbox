@@ -1,4 +1,5 @@
 import Foundation
+import FoundationModels
 import SwiftUI
 
 // MARK: - Main ViewModel
@@ -8,6 +9,11 @@ final class MainViewModel {
     
     // MARK: - Dependencies
     private let interactor: FoundationModelsInteractor
+    private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
+    
+    // MARK: - Availability State
+    private(set) var isFoundationModelsAvailable: Bool = false
+    private(set) var availabilityReason: SystemLanguageModel.Availability?
     
     // MARK: - Navigation State
     var selectedSection: String = "Playground"
@@ -41,11 +47,22 @@ final class MainViewModel {
     }
     
     // MARK: - Initialization
-    init(interactor: FoundationModelsInteractor = FoundationModelsInteractorDefault()) {
+    init(
+        interactor: FoundationModelsInteractor = FoundationModelsInteractorDefault(),
+        availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault()
+    ) {
         self.interactor = interactor
+        self.availabilityChecker = availabilityChecker
+        checkAvailability()
     }
     
     // MARK: - Actions
+    private func checkAvailability() {
+        let reason = availabilityChecker.execute()
+        availabilityReason = reason
+        isFoundationModelsAvailable = CheckFoundationModelsAvailabilityInteractorDefault.isAvailable
+    }
+    
     func submitPrompt() async {
         guard canSubmitPrompt else { return }
         
