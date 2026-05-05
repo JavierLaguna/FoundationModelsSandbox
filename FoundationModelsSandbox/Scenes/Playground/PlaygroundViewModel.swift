@@ -18,7 +18,7 @@ final class PlaygroundViewModel {
     // MARK: - Instructions State
     var instructions: String = ""
     var userPrompt: String = ""
-    var selectedModel: String = "GPT-4-TURBO"
+    var selectedModelName: String = ""
     
     // MARK: - Response State
     private(set) var aiResponse: String = ""
@@ -27,16 +27,11 @@ final class PlaygroundViewModel {
     private(set) var error: String?
     
     // MARK: - Available Models
-    let availableModels: [String] = [
-        "GPT-4-TURBO",
-        "GPT-4",
-        "GPT-3.5-TURBO",
-        "Claude 3 Opus"
-    ]
+    private(set) var availableModelNames: [String] = []
     
     // MARK: - Computed Properties
     var canSubmitPrompt: Bool {
-        !userPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading
+        !userPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !selectedModelName.isEmpty
     }
     
     var hasResponse: Bool {
@@ -50,10 +45,25 @@ final class PlaygroundViewModel {
     ) {
         self.interactor = interactor
         self.availabilityChecker = availabilityChecker
+        loadModels()
         checkAvailability()
     }
     
     // MARK: - Actions
+    private func loadModels() {
+        // Get available models from FoundationModels
+        let defaultModel = SystemLanguageModel.default
+        if defaultModel.isAvailable {
+            // Use default model identifier
+            let modelId = String(describing: defaultModel)
+            availableModelNames = [modelId]
+            selectedModelName = modelId
+        } else {
+            availableModelNames = []
+            selectedModelName = ""
+        }
+    }
+    
     private func checkAvailability() {
         let reason = availabilityChecker.execute()
         availabilityReason = reason

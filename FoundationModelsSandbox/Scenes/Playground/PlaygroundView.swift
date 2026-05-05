@@ -28,7 +28,8 @@ struct PlaygroundContentView: View {
             PromptPanelView(
                 instructions: $viewModel.instructions,
                 userPrompt: $viewModel.userPrompt,
-                selectedModel: $viewModel.selectedModel,
+                selectedModelName: $viewModel.selectedModelName,
+                availableModelNames: viewModel.availableModelNames,
                 isLoading: viewModel.isLoading,
                 onSubmit: {
                     Task {

@@ -1,14 +1,14 @@
+import FoundationModels
 import SwiftUI
 
 // MARK: - Native Prompt Panel (Apple HIG compliant)
 struct PromptPanelView: View {
     @Binding var instructions: String
     @Binding var userPrompt: String
-    @Binding var selectedModel: String
+    @Binding var selectedModelName: String
+    let availableModelNames: [String]
     let isLoading: Bool
     let onSubmit: () -> Void
-    
-    private let models = ["GPT-4-TURBO", "GPT-4", "GPT-3.5-TURBO", "Claude 3 Opus"]
     
     var body: some View {
         VStack(spacing: 0) {
@@ -87,9 +87,9 @@ struct PromptPanelView: View {
             Spacer()
             
             // Model Picker
-            Picker("Model", selection: $selectedModel) {
-                ForEach(models, id: \.self) { model in
-                    Text(model).tag(model)
+            Picker("Model", selection: $selectedModelName) {
+                ForEach(availableModelNames, id: \.self) { name in
+                    Text(name).tag(name)
                 }
             }
             .pickerStyle(.menu)
@@ -114,15 +114,4 @@ struct PromptPanelView: View {
         .padding(.vertical, Spacing.md)
         .background(Color.appGroupedBackground)
     }
-}
-
-#Preview {
-    PromptPanelView(
-        instructions: .constant("You are a helpful assistant."),
-        userPrompt: .constant("Hello, world!"),
-        selectedModel: .constant("GPT-4-TURBO"),
-        isLoading: false,
-        onSubmit: {}
-    )
-    .frame(width: 450, height: 700)
 }
