@@ -10,30 +10,6 @@ struct PromptPanelView: View {
     let isLoading: Bool
     let onSubmit: () -> Void
     
-    var body: some View {
-        VStack(spacing: 0) {
-            // MARK: - Toolbar
-            toolbar
-            
-            Divider()
-            
-            // MARK: - Content
-            ScrollView {
-                VStack(spacing: Spacing.lg) {
-                    instructionsSection
-                    userPromptSection
-                }
-                .padding(Spacing.lg)
-            }
-            
-            Divider()
-            
-            // MARK: - Bottom Bar
-            bottomBar
-        }
-        .background(Color.appBackground)
-    }
-    
     // MARK: - Toolbar
     private var toolbar: some View {
         HStack {
@@ -113,5 +89,29 @@ struct PromptPanelView: View {
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.md)
         .background(Color.appGroupedBackground)
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // MARK: - Toolbar
+            toolbar
+            
+            Divider()
+            
+            // MARK: - Content
+            ScrollView {
+                VStack(spacing: Spacing.lg) {
+                    instructionsSection
+                    userPromptSection
+                }
+                .padding(Spacing.lg)
+            }
+            
+            Divider()
+            
+            // MARK: - Bottom Bar
+            bottomBar
+        }
+        .background(Color.appBackground)
     }
 }

@@ -7,28 +7,6 @@ struct AIResponseView: View {
     let footer: String
     let isLoading: Bool
     
-    var body: some View {
-        VStack(spacing: 0) {
-            // MARK: - Header
-            header
-            
-            Divider()
-            
-            // MARK: - Content
-            if isLoading {
-                LoadingAppleIntelligence(text: "Generating response...")
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity
-                    )
-                
-            } else {
-                responseContent
-            }
-        }
-        .background(Color.appBackground)
-    }
-    
     // MARK: - Header
     private var header: some View {
         HStack {
@@ -134,6 +112,28 @@ struct AIResponseView: View {
             .background(Color.codeBackground)
         }
         .liquidGlass(cornerRadius: CornerRadius.medium)
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // MARK: - Header
+            header
+            
+            Divider()
+            
+            // MARK: - Content
+            if isLoading {
+                LoadingAppleIntelligence(text: "Generating response...")
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity
+                    )
+                
+            } else {
+                responseContent
+            }
+        }
+        .background(Color.appBackground)
     }
 }
 
