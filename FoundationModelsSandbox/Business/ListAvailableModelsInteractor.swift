@@ -7,19 +7,12 @@ protocol ListAvailableModelsInteractor: Sendable {
 
 struct ListAvailableModelsInteractorDefault: ListAvailableModelsInteractor {
     
-    public init() {}
-    
-    public func execute() -> [SystemLanguageModel] {
-        // Get available models from the system
+    func execute() -> [SystemLanguageModel] {
         var models: [SystemLanguageModel] = []
         
-        // Find all models that are available on the device
-        if #available(macOS 26.0, *) {
-            // Use the default model as reference and check availability
-            let defaultModel = SystemLanguageModel.default
-            if defaultModel.isAvailable {
-                models.append(defaultModel)
-            }
+        let defaultModel = SystemLanguageModel.default
+        if defaultModel.isAvailable {
+            models.append(defaultModel)
         }
         
         return models
