@@ -24,7 +24,7 @@ struct PlaygroundContentView: View {
     }
     
     var body: some View {
-        NavigationSplitView {
+        HSplitView {
             PromptPanelView(
                 instructions: $viewModel.instructions,
                 userPrompt: $viewModel.userPrompt,
@@ -37,11 +37,10 @@ struct PlaygroundContentView: View {
                 }
             )
             .frame(minWidth: 380)
-        } detail: {
+            
             detailView
                 .frame(minWidth: 380)
         }
-        .navigationSplitViewStyle(.balanced)
     }
 }
 
