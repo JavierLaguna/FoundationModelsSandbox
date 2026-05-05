@@ -35,6 +35,9 @@ struct PlaygroundContentView: View {
                     Task {
                         await viewModel.submitPrompt()
                     }
+                },
+                onModelChanged: { modelName in
+                    viewModel.modelSelectionChanged(to: modelName)
                 }
             )
             .frame(minWidth: 380)

@@ -29,6 +29,8 @@ final class PlaygroundViewModel {
     
     // MARK: - Available Models
     private(set) var availableModelNames: [String] = []
+    private(set) var availableModels: [SystemLanguageModel] = []
+    private(set) var selectedModel: SystemLanguageModel?
     
     // MARK: - Computed Properties
     var canSubmitPrompt: Bool {
@@ -56,14 +58,25 @@ final class PlaygroundViewModel {
     private func loadModels() {
         let models = modelsLister.execute()
         // Use "default" as the display name for SystemLanguageModel
+        availableModels = models
         availableModelNames = models.isEmpty ? [] : ["default"]
         selectedModelName = availableModelNames.first ?? ""
+        selectedModel = models.first
     }
     
     private func checkAvailability() {
-        let reason = availabilityChecker.execute()
+        let reason = availabilityChecker.execute(model: selectedModel)
         availabilityReason = reason
-        isFoundationModelsAvailable = CheckFoundationModelsAvailabilityInteractorDefault.isAvailable
+        isFoundationModelsAvailable = selectedModel?.isAvailable ?? false
+    }
+    
+    func modelSelectionChanged(to modelName: String) {
+        selectedModelName = modelName
+        // Find the corresponding model - since we only have "default" as name,
+        // we use the first available model
+        selectedModel = availableModels.first
+        // Re-check availability for the newly selected model
+        checkAvailability()
     }
     
     func submitPrompt() async {

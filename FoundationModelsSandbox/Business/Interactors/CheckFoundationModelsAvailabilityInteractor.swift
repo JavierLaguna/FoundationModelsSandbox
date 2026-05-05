@@ -2,7 +2,7 @@ import FoundationModels
 
 /// Checks the availability status of Foundation Models on the device.
 protocol CheckFoundationModelsAvailabilityInteractor: Sendable {
-    func execute() -> SystemLanguageModel.Availability
+    func execute(model: SystemLanguageModel?) -> SystemLanguageModel.Availability
 }
 
 struct CheckFoundationModelsAvailabilityInteractorDefault: CheckFoundationModelsAvailabilityInteractor {
@@ -17,7 +17,11 @@ struct CheckFoundationModelsAvailabilityInteractorDefault: CheckFoundationModels
         Self.model.availability
     }
 
-    func execute() -> SystemLanguageModel.Availability {
-        Self.availabilityReason
+    func execute(model: SystemLanguageModel?) -> SystemLanguageModel.Availability {
+        // If no model provided, return not available
+        guard let model = model else {
+            return .unavailable(.deviceNotEligible)
+        }
+        return model.availability
     }
 }

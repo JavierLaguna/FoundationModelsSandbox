@@ -9,6 +9,7 @@ struct PromptPanelView: View {
     let availableModelNames: [String]
     let isLoading: Bool
     let onSubmit: () -> Void
+    let onModelChanged: ((String) -> Void)?
     
     @ViewBuilder
     private var toolbar: some View {
@@ -70,6 +71,9 @@ struct PromptPanelView: View {
             }
             .pickerStyle(.menu)
             .frame(width: 160)
+            .onChange(of: selectedModelName) { _, newValue in
+                onModelChanged?(newValue)
+            }
             
             // Send Button
             Button(action: onSubmit) {

@@ -8,6 +8,7 @@ protocol FoundationModelsInteractor: Sendable {
 struct FoundationModelsInteractorDefault: FoundationModelsInteractor {
 
     private let session: LanguageModelSession
+    private let model: SystemLanguageModel
     private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
 
     init(
@@ -15,12 +16,13 @@ struct FoundationModelsInteractorDefault: FoundationModelsInteractor {
         model: SystemLanguageModel = CheckFoundationModelsAvailabilityInteractorDefault.model
     ) {
         self.availabilityChecker = availabilityChecker
+        self.model = model
         self.session = LanguageModelSession(model: model)
     }
 
     func execute(prompt: String) async throws -> String {
-        let reason = availabilityChecker.execute()
-        guard CheckFoundationModelsAvailabilityInteractorDefault.isAvailable else {
+        let reason = availabilityChecker.execute(model: model)
+        guard model.isAvailable else {
             throw AppleIntelligenceNotAvailableError(from: reason)
         }
 
