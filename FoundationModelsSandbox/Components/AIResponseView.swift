@@ -7,7 +7,7 @@ struct AIResponseView: View {
     let footer: String
     let isLoading: Bool
     
-    // MARK: - Header
+    @ViewBuilder
     private var header: some View {
         HStack {
             Circle()
@@ -32,7 +32,6 @@ struct AIResponseView: View {
         .background(Color.appGroupedBackground)
     }
     
-    // MARK: - Response Content
     @ViewBuilder
     private var responseContent: some View {
         if response.isEmpty {
@@ -61,7 +60,7 @@ struct AIResponseView: View {
         }
     }
     
-    // MARK: - Empty State
+    @ViewBuilder
     private var emptyState: some View {
         VStack(spacing: Spacing.md) {
             Spacer()
@@ -79,7 +78,7 @@ struct AIResponseView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    // MARK: - Code Block
+    @ViewBuilder
     private var codeBlock: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
@@ -116,12 +115,10 @@ struct AIResponseView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: - Header
             header
             
             Divider()
             
-            // MARK: - Content
             if isLoading {
                 LoadingAppleIntelligence(text: "Generating response...")
                     .frame(

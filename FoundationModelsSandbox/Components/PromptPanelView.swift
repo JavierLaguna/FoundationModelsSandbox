@@ -10,7 +10,7 @@ struct PromptPanelView: View {
     let isLoading: Bool
     let onSubmit: () -> Void
     
-    // MARK: - Toolbar
+    @ViewBuilder
     private var toolbar: some View {
         HStack {
             Text("Prompt Editor")
@@ -23,7 +23,7 @@ struct PromptPanelView: View {
         .background(Color.appGroupedBackground)
     }
     
-    // MARK: - Instructions Section
+    @ViewBuilder
     private var instructionsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Label("Instructions", systemImage: "cpu")
@@ -42,7 +42,7 @@ struct PromptPanelView: View {
         }
     }
     
-    // MARK: - User Prompt Section
+    @ViewBuilder
     private var userPromptSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Label("User Prompt", systemImage: "bubble.left")
@@ -57,7 +57,7 @@ struct PromptPanelView: View {
         }
     }
     
-    // MARK: - Bottom Bar
+    @ViewBuilder
     private var bottomBar: some View {
         HStack(spacing: Spacing.md) {
             Spacer()

@@ -2,13 +2,8 @@ import SwiftUI
 
 // MARK: - Syntax Highlighted Code (Native Style)
 struct SyntaxHighlightedCode: View {
-    let code: String
     
-    var body: some View {
-        Text(attributedCode)
-            .font(.system(.body, design: .monospaced))
-            .lineSpacing(4)
-    }
+    let code: String
     
     private var attributedCode: AttributedString {
         var result = AttributedString(code)
@@ -52,6 +47,12 @@ struct SyntaxHighlightedCode: View {
         }
         
         return result
+    }
+    
+    var body: some View {
+        Text(attributedCode)
+            .font(.system(.body, design: .monospaced))
+            .lineSpacing(4)
     }
 }
 
