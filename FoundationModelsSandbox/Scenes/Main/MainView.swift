@@ -5,15 +5,6 @@ struct MainView: View {
     
     @State private var selectedSection: String = "Playground"
     
-    var body: some View {
-        NavigationSplitView {
-            SidebarView(selectedSection: $selectedSection)
-        } detail: {
-            detailView
-        }
-        .navigationSplitViewStyle(.balanced)
-    }
-    
     @ViewBuilder
     private var detailView: some View {
         switch selectedSection {
@@ -23,6 +14,15 @@ struct MainView: View {
             Text("Select a section from the sidebar")
                 .foregroundStyle(.secondary)
         }
+    }
+    
+    var body: some View {
+        NavigationSplitView {
+            SidebarView(selectedSection: $selectedSection)
+        } detail: {
+            detailView
+        }
+        .navigationSplitViewStyle(.balanced)
     }
 }
 
