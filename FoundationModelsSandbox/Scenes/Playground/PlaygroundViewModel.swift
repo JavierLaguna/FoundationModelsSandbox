@@ -55,7 +55,8 @@ final class PlaygroundViewModel {
     // MARK: - Actions
     private func loadModels() {
         let models = modelsLister.execute()
-        availableModelNames = models.map { String(describing: $0) }
+        // Use "default" as the display name for SystemLanguageModel
+        availableModelNames = models.isEmpty ? [] : ["default"]
         selectedModelName = availableModelNames.first ?? ""
     }
     
