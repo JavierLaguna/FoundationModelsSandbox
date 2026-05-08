@@ -109,6 +109,7 @@ struct PromptPanelView: View {
                     userPromptSection
                 }
                 .padding(Spacing.lg)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             
             Divider()
@@ -116,6 +117,7 @@ struct PromptPanelView: View {
             // MARK: - Bottom Bar
             bottomBar
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.appBackground)
     }
 }

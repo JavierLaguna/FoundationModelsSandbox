@@ -40,10 +40,10 @@ struct PlaygroundContentView: View {
                     viewModel.modelSelectionChanged(to: modelName)
                 }
             )
-            .frame(minWidth: 380)
+            .frame(minWidth: 380, maxHeight: .infinity)
             
             detailView
-                .frame(minWidth: 380)
+                .frame(minWidth: 380, maxHeight: .infinity)
         }
     }
 }

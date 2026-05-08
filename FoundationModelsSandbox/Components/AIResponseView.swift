@@ -130,6 +130,7 @@ struct AIResponseView: View {
                 responseContent
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.appBackground)
     }
 }
