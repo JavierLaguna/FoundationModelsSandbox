@@ -9,7 +9,7 @@ struct MainView: View {
     private var detailView: some View {
         switch selectedSection {
         case "Playground":
-            PlaygroundContentView()
+            PlaygroundView()
         default:
             Text("Select a section from the sidebar")
                 .foregroundStyle(.secondary)

@@ -1,8 +1,8 @@
 import FoundationModels
 import SwiftUI
 
-// MARK: - Playground Content View
-struct PlaygroundContentView: View {
+// MARK: - Playground View
+struct PlaygroundView: View {
     
     @State private var viewModel = PlaygroundViewModel()
     
@@ -49,6 +49,6 @@ struct PlaygroundContentView: View {
 }
 
 #Preview {
-    PlaygroundContentView()
+    PlaygroundView()
         .frame(width: 1200, height: 800)
 }
