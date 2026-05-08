@@ -4,7 +4,6 @@ protocol FoundationModelsInteractor: Sendable {
     func execute(prompt: String) async throws -> String
 }
 
-
 struct FoundationModelsInteractorDefault: FoundationModelsInteractor {
 
     private let session: LanguageModelSession

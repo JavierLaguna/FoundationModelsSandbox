@@ -35,3 +35,20 @@ enum AppleIntelligenceNotAvailableError: Error, LocalizedError {
         }
     }
 }
+
+// TODO: REUSE
+extension SystemLanguageModel.Availability.UnavailableReason {
+    
+    var errorDescription: String {
+            switch self {
+            case .deviceNotEligible:
+                "Your device is not eligible to use this feature."
+            case .appleIntelligenceNotEnabled:
+                "Please enable Apple Intelligence to access this feature."
+            case .modelNotReady:
+                "Model isn't ready yet. It may be downloading or initializing. Please try again later."
+            @unknown default:
+                "Model unavailable. Reason: unknown"
+            }
+        }
+}

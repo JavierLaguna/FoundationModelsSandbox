@@ -12,13 +12,17 @@ struct ErrorAppleIntelligenceView: View {
     init(error: any Error) {
         self.text = error.localizedDescription
     }
+    
+    init(error: AppleIntelligenceNotAvailableError) {
+        self.text = error.errorDescription ?? ""
+    }
 
     init(reason: SystemLanguageModel.Availability) {
         switch reason {
         case .available:
             self.text = "Foundation Models are available."
         case .unavailable(let reason):
-            self.text = String(describing: reason)
+            self.text = reason.errorDescription
         }
     }
 
