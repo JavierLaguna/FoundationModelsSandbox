@@ -20,6 +20,7 @@ struct PlaygroundView: View {
             FoundationModelsNotAvailableView(
                 availabilityReason: viewModel.availabilityReason
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
     

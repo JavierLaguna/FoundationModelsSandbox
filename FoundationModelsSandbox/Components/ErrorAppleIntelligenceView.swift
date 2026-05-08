@@ -36,6 +36,7 @@ struct ErrorAppleIntelligenceView: View {
                 .foregroundStyle(.gray)
                 .multilineTextAlignment(.center)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
