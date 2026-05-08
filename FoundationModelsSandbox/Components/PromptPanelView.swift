@@ -65,11 +65,11 @@ struct PromptPanelView: View {
             // Send Button
             Button(action: onSubmit) {
                 HStack(spacing: Spacing.xxs) {
+                    Text("Send")
+                    
                     if isLoading {
-                        ProgressView()
-                            .scaleEffect(0.7)
+                        AppleIntelligenceAnimation(size: 14)
                     } else {
-                        Text("Send")
                         Image(systemName: "arrow.up.circle.fill")
                     }
                 }
