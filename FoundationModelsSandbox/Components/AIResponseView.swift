@@ -45,12 +45,12 @@ struct AIResponseView: View {
             Spacer()
             
             Image(systemName: "text.bubble")
-                .font(.system(size: 48))
-                .foregroundStyle(.tertiary)
+                .font(.system(size: 64))
+                .foregroundStyle(.secondary)
             
             Text("Enter a prompt to generate an AI response")
-                .font(.subheadline)
-                .foregroundStyle(.tertiary)
+                .font(.title3)
+                .foregroundStyle(.secondary)
             
             Spacer()
         }

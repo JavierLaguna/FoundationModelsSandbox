@@ -33,7 +33,7 @@ struct ErrorAppleIntelligenceView: View {
                 .foregroundStyle(.secondary)
 
             Text(text)
-                .font(.subheadline)
+                .font(.title3)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }

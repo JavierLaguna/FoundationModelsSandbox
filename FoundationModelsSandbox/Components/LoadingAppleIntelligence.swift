@@ -9,10 +9,10 @@ struct LoadingAppleIntelligence: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Spacing.md) {
             KeyframeAnimator(initialValue: 0.0, repeating: true) { rotation in
                 Image(systemName: "apple.intelligence")
-                    .font(.largeTitle)
+                    .font(.system(size: 64))
                     .rotationEffect(.init(degrees: rotation))
 
             } keyframes: { _ in
@@ -22,8 +22,8 @@ struct LoadingAppleIntelligence: View {
 
             if let text {
                 Text(text)
-                    .font(.caption)
-                    .foregroundStyle(.gray)
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
         }
