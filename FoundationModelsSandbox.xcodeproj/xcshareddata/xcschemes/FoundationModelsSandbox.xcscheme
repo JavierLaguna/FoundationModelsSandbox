@@ -64,7 +64,8 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
-      queueDebuggingEnableBacktraceRecording = "Yes">
+      queueDebuggingEnableBacktraceRecording = "Yes"
+      foundationModelsAvailabilityOverride = "modelNotReady">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference

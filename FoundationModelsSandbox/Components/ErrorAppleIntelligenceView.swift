@@ -27,13 +27,14 @@ struct ErrorAppleIntelligenceView: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Spacing.md) {
             Image(systemName: "apple.intelligence.badge.xmark")
-                .font(.largeTitle)
+                .font(.system(size: 64))
+                .foregroundStyle(.secondary)
 
             Text(text)
-                .font(.caption)
-                .foregroundStyle(.gray)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
