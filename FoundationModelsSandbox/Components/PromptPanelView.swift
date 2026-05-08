@@ -34,13 +34,13 @@ struct PromptPanelView: View {
             TextEditor(text: $instructions)
                 .font(.body)
                 .scrollContentBackground(.hidden)
-                .frame(minHeight: 120)
                 .liquidGlass(cornerRadius: CornerRadius.medium)
             
             Text("Defines the AI assistant behavior and context")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
+        .frame(maxHeight: .infinity)
     }
     
     @ViewBuilder
@@ -53,9 +53,9 @@ struct PromptPanelView: View {
             TextEditor(text: $userPrompt)
                 .font(.body)
                 .scrollContentBackground(.hidden)
-                .frame(minHeight: 180)
                 .liquidGlass(cornerRadius: CornerRadius.medium)
         }
+        .frame(maxHeight: .infinity)
     }
     
     @ViewBuilder
@@ -103,14 +103,15 @@ struct PromptPanelView: View {
             Divider()
             
             // MARK: - Content
-            ScrollView {
-                VStack(spacing: Spacing.lg) {
-                    instructionsSection
-                    userPromptSection
-                }
-                .padding(Spacing.lg)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: Spacing.lg) {
+                instructionsSection
+                
+                Divider()
+                
+                userPromptSection
             }
+            .frame(maxWidth: .infinity)
+            .padding(Spacing.lg)
             
             Divider()
             

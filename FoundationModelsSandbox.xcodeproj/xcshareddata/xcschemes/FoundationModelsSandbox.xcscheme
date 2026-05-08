@@ -64,8 +64,7 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
-      queueDebuggingEnableBacktraceRecording = "Yes"
-      foundationModelsAvailabilityOverride = "appleIntelligenceNotEnabled">
+      queueDebuggingEnableBacktraceRecording = "Yes">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
