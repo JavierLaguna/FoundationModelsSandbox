@@ -12,19 +12,6 @@ struct PromptPanelView: View {
     let onModelChanged: ((String) -> Void)?
     
     @ViewBuilder
-    private var toolbar: some View {
-        HStack {
-            Text("Prompt Editor")
-                .font(.headline)
-            
-            Spacer()
-        }
-        .padding(.horizontal, Spacing.lg)
-        .padding(.vertical, Spacing.sm)
-        .background(Color.appGroupedBackground)
-    }
-    
-    @ViewBuilder
     private var instructionsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Label("Instructions", systemImage: "cpu")
@@ -98,7 +85,7 @@ struct PromptPanelView: View {
     var body: some View {
         VStack(spacing: 0) {
             // MARK: - Toolbar
-            toolbar
+            ToolbarView(title: "Prompt Editor")
             
             Divider()
             

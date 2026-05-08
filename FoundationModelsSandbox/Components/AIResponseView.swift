@@ -8,31 +8,6 @@ struct AIResponseView: View {
     let isLoading: Bool
     
     @ViewBuilder
-    private var header: some View {
-        HStack {
-            Circle()
-                .fill(Color.successGreen)
-                .frame(width: 8, height: 8)
-            
-            Text("AI Response")
-                .font(.headline)
-            
-            Spacer()
-            
-            // Copy button
-            Button {
-                // Copy to clipboard
-            } label: {
-                Image(systemName: "doc.on.doc")
-            }
-            .buttonStyle(.borderless)
-        }
-        .padding(.horizontal, Spacing.lg)
-        .padding(.vertical, Spacing.sm)
-        .background(Color.appGroupedBackground)
-    }
-    
-    @ViewBuilder
     private var responseContent: some View {
         if response.isEmpty {
             emptyState
@@ -115,7 +90,15 @@ struct AIResponseView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            header
+            ToolbarView(
+                title: "AI Response",
+                statusColor: Color.successGreen
+            ) {
+                Button(action: {}) {
+                    Image(systemName: "doc.on.doc")
+                }
+                .buttonStyle(.borderless)
+            }
             
             Divider()
             
