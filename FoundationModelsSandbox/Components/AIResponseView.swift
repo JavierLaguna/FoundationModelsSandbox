@@ -11,6 +11,7 @@ struct AIResponseView: View {
     private var responseContent: some View {
         if response.isEmpty {
             emptyState
+            
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
@@ -18,6 +19,7 @@ struct AIResponseView: View {
                     Text(response)
                         .font(.body)
                         .lineSpacing(4)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     
                     // Code block with native styling
                     if !code.isEmpty {
@@ -29,7 +31,9 @@ struct AIResponseView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineSpacing(3)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Spacing.lg)
             }
         }
