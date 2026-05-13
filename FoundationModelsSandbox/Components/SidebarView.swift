@@ -3,31 +3,17 @@ import SwiftUI
 // MARK: - Native Sidebar (Apple HIG compliant)
 struct SidebarView: View {
     
-    @Binding var selectedSection: String
-    
-    private let navItems: [(icon: String, label: String)] = [
-        ("sparkles", "Playground"),
-        ("clock.arrow.circlepath", "History"),
-    ]
+    @Binding var selectedSection: NavigationRoute
     
     var body: some View {
         List(selection: $selectedSection) {
             Section {
-                ForEach(navItems, id: \.label) { item in
-                    Label(item.label, systemImage: item.icon)
-                        .tag(item.label)
+                ForEach(NavigationRoute.allCases, id: \.self) { route in
+                    Label(route.label, systemImage: route.icon)
+                        .tag(route)
                 }
             } header: {
                 Text("Navigation")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            
-            Section {
-                Label("Settings", systemImage: "gearshape")
-                    .tag("Settings")
-            } header: {
-                Text("System")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -48,6 +34,6 @@ struct SidebarView: View {
 }
 
 #Preview {
-    SidebarView(selectedSection: .constant("Playground"))
+    SidebarView(selectedSection: .constant(.playground))
         .frame(width: 280)
 }
