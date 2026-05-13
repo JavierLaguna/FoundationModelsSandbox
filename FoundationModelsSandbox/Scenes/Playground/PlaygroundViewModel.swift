@@ -84,11 +84,9 @@ final class PlaygroundViewModel {
         
         isLoading = true
         error = nil
-        
-        let fullPrompt = buildPrompt()
-        
+                
         do {
-            aiResponse = try await interactor.execute(prompt: fullPrompt)
+            aiResponse = try await interactor.execute(prompt: userPrompt, instructions: instructions)
             aiCode = extractCodeBlock(from: aiResponse)
             userPrompt = ""
             
@@ -108,13 +106,6 @@ final class PlaygroundViewModel {
     }
     
     // MARK: - Private Helpers
-    
-    private func buildPrompt() -> String {
-        if instructions.isEmpty {
-            return userPrompt
-        }
-        return "Instructions: \(instructions)\n\nUser: \(userPrompt)"
-    }
     
     private func extractCodeBlock(from response: String) -> String {
         let pattern = "```(?:\\w+)?\\n([\\s\\S]*?)```"
