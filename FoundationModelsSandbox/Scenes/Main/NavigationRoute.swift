@@ -8,9 +8,9 @@ enum NavigationRoute: String, CaseIterable, Hashable {
 
     var icon: String {
         switch self {
-        case .playground: return "sparkles"
-        case .history: return "clock.arrow.circlepath"
-        case .settings: return "gearshape"
+        case .playground: "sparkles"
+        case .history: "clock.arrow.circlepath"
+        case .settings: "gearshape"
         }
     }
 
