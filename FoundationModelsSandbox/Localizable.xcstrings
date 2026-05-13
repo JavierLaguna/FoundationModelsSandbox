@@ -8,6 +8,12 @@
             "state" : "translated",
             "value" : "AI Response"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuesta de IA"
+          }
         }
       }
     },
@@ -17,6 +23,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please enable Apple Intelligence to access this feature."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por favor, habilita Apple Intelligence para acceder a esta función."
           }
         }
       }
@@ -28,6 +40,12 @@
             "state" : "translated",
             "value" : "Copy"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar"
+          }
         }
       }
     },
@@ -37,6 +55,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Defines the AI assistant behavior and context"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Define el comportamiento y contexto del asistente de IA"
           }
         }
       }
@@ -48,6 +72,12 @@
             "state" : "translated",
             "value" : "Your device is not eligible to use this feature."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dispositivo no es compatible con esta función."
+          }
         }
       }
     },
@@ -57,6 +87,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a prompt to generate an AI response"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe un prompt para generar una respuesta de IA"
           }
         }
       }
@@ -68,6 +104,12 @@
             "state" : "translated",
             "value" : "Foundation Models are available"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los Foundation Models están disponibles"
+          }
         }
       }
     },
@@ -77,6 +119,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Generating response..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generando respuesta..."
           }
         }
       }
@@ -88,6 +136,12 @@
             "state" : "translated",
             "value" : "History"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historial"
+          }
         }
       }
     },
@@ -98,12 +152,24 @@
             "state" : "translated",
             "value" : "Instructions"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instrucciones"
+          }
         }
       }
     },
     "JavaScript" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "JavaScript"
@@ -118,6 +184,12 @@
             "state" : "translated",
             "value" : "Model"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo"
+          }
         }
       }
     },
@@ -127,6 +199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model isn't ready yet. It may be downloading or initializing. Please try again later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modelo aún no está listo. Puede estar descargándose o inicializándose. Inténtalo más tarde."
           }
         }
       }
@@ -138,6 +216,12 @@
             "state" : "translated",
             "value" : "Model unavailable. Reason: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo no disponible. Razón: %@"
+          }
         }
       }
     },
@@ -147,6 +231,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model unavailable. Reason: unknown"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo no disponible. Razón: desconocido"
           }
         }
       }
@@ -158,12 +248,24 @@
             "state" : "translated",
             "value" : "Navigation"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navegación"
+          }
         }
       }
     },
     "Nexus AI" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nexus AI"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nexus AI"
@@ -178,6 +280,12 @@
             "state" : "translated",
             "value" : "Playground"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patio de juegos"
+          }
         }
       }
     },
@@ -187,6 +295,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prompt Editor"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor de prompts"
           }
         }
       }
@@ -198,6 +312,12 @@
             "state" : "translated",
             "value" : "Send"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
         }
       }
     },
@@ -207,6 +327,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
           }
         }
       }
@@ -218,6 +344,12 @@
             "state" : "translated",
             "value" : "User Prompt"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prompt del usuario"
+          }
         }
       }
     },
@@ -227,6 +359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Work in progress"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trabajo en progreso"
           }
         }
       }
