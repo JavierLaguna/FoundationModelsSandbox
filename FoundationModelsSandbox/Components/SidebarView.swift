@@ -25,6 +25,7 @@ struct SidebarView: View {
             
             Section {
                 Label("Settings", systemImage: "gearshape")
+                    .tag("Settings")
             } header: {
                 Text("System")
                     .font(.caption)

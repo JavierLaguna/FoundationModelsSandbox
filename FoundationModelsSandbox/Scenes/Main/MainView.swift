@@ -10,6 +10,10 @@ struct MainView: View {
         switch selectedSection {
         case "Playground":
             PlaygroundView()
+        case "History":
+            HistoryView()
+        case "Settings":
+            SettingsView()
         default:
             Text("Select a section from the sidebar")
                 .foregroundStyle(.secondary)
