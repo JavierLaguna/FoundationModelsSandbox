@@ -40,12 +40,12 @@ struct ToolbarView<TrailingContent: View>: View {
 
 #Preview {
     VStack(spacing: 0) {
-        ToolbarView(title: "Prompt Editor")
+        ToolbarView(title: String(localized: "Prompt Editor"))
         
         Divider()
         
         ToolbarView(
-            title: "AI Response",
+            title: String(localized: "AI Response"),
             statusColor: .green
         ) {
             Button(action: {}) {

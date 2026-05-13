@@ -2,9 +2,9 @@ import SwiftUI
 
 // MARK: - Navigation Route
 enum NavigationRoute: String, CaseIterable, Hashable {
-    case playground = "Playground"
-    case history = "History"
-    case settings = "Settings"
+    case playground
+    case history
+    case settings
 
     var icon: String {
         switch self {
@@ -15,7 +15,11 @@ enum NavigationRoute: String, CaseIterable, Hashable {
     }
 
     var label: String {
-        rawValue
+        switch self {
+        case .playground: String(localized: "Playground")
+        case .history: String(localized: "History")
+        case .settings: String(localized: "Settings")
+        }
     }
 
     @ViewBuilder

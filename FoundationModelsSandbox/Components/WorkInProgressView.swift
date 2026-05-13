@@ -4,7 +4,7 @@ struct WorkInProgressView: View {
 
     private let message: String
 
-    init(message: String = "Work in progress") {
+    init(message: String = String(localized: "Work in progress")) {
         self.message = message
     }
 

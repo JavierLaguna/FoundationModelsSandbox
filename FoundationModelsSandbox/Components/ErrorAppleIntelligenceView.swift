@@ -20,7 +20,7 @@ struct ErrorAppleIntelligenceView: View {
     init(reason: SystemLanguageModel.Availability) {
         switch reason {
         case .available:
-            self.text = "Foundation Models are available."
+            self.text = String(localized: "Foundation Models are available")
         case .unavailable(let reason):
             self.text = reason.errorDescription
         }

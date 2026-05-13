@@ -12,7 +12,7 @@ struct PlaygroundView: View {
             AIResponseView(
                 response: viewModel.aiResponse,
                 code: viewModel.aiCode,
-                footer: viewModel.error ?? "Enter a prompt to generate an AI response.",
+                footer: viewModel.error ?? String(localized: "Enter a prompt to generate an AI response"),
                 isLoading: viewModel.isLoading
             )
             

@@ -10,13 +10,13 @@ enum AppleIntelligenceNotAvailableError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .deviceNotEligible:
-            "Your device is not eligible to use this feature."
+            String(localized: "Device not eligible")
         case .appleIntelligenceNotEnabled:
-            "Please enable Apple Intelligence to access this feature."
+            String(localized: "Apple Intelligence not enabled")
         case .modelNotReady:
-            "Model isn't ready yet. It may be downloading or initializing. Please try again later."
+            String(localized: "Model not ready")
         case .other(let reason):
-            "Model unavailable. Reason: \(reason)"
+            String(localized: "Model unavailable. Reason: \(reason)")
         }
     }
     
@@ -42,13 +42,13 @@ extension SystemLanguageModel.Availability.UnavailableReason {
     var errorDescription: String {
             switch self {
             case .deviceNotEligible:
-                "Your device is not eligible to use this feature."
+                String(localized: "Device not eligible")
             case .appleIntelligenceNotEnabled:
-                "Please enable Apple Intelligence to access this feature."
+                String(localized: "Apple Intelligence not enabled")
             case .modelNotReady:
-                "Model isn't ready yet. It may be downloading or initializing. Please try again later."
+                String(localized: "Model not ready")
             @unknown default:
-                "Model unavailable. Reason: unknown"
+                String(localized: "Model unavailable. Reason: unknown")
             }
         }
 }
