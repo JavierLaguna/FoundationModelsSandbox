@@ -14,7 +14,7 @@ struct PromptPanelView: View {
     @ViewBuilder
     private var instructionsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            Label(String(localized: "Instructions"), systemImage: "cpu")
+            Label("Instructions", systemImage: "cpu")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
             
@@ -23,7 +23,7 @@ struct PromptPanelView: View {
                 .scrollContentBackground(.hidden)
                 .liquidGlass(cornerRadius: CornerRadius.medium)
             
-            Text(String(localized: "Defines the AI assistant behavior and context"))
+            Text("Defines the AI assistant behavior and context")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
@@ -33,7 +33,7 @@ struct PromptPanelView: View {
     @ViewBuilder
     private var userPromptSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            Label(String(localized: "User Prompt"), systemImage: "bubble.left")
+            Label("User Prompt", systemImage: "bubble.left")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
             
@@ -51,7 +51,7 @@ struct PromptPanelView: View {
             Spacer()
             
             // Model Picker
-            Picker(String(localized: "Model"), selection: $selectedModelName) {
+            Picker("Model", selection: $selectedModelName) {
                 ForEach(availableModelNames, id: \.self) { name in
                     Text(name).tag(name)
                 }
@@ -65,7 +65,7 @@ struct PromptPanelView: View {
             // Send Button
             Button(action: onSubmit) {
                 HStack(spacing: Spacing.xxs) {
-                    Text(String(localized: "Send"))
+                    Text("Send")
                     
                     if isLoading {
                         AppleIntelligenceAnimation(size: 14)
@@ -85,7 +85,7 @@ struct PromptPanelView: View {
     var body: some View {
         VStack(spacing: 0) {
             // MARK: - Toolbar
-            ToolbarView(title: String(localized: "Prompt Editor"))
+            ToolbarView(title: "Prompt Editor")
             
             Divider()
             

@@ -13,7 +13,7 @@ struct SidebarView: View {
                         .tag(route)
                 }
             } header: {
-                Text(String(localized: "Navigation"))
+                Text("Navigation")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -29,7 +29,7 @@ struct SidebarView: View {
                 .buttonStyle(.bordered)
             }
         }
-        .navigationTitle(String(localized: "Nexus AI"))
+        .navigationTitle("Nexus AI")
     }
 }
 

@@ -14,11 +14,11 @@ enum NavigationRoute: String, CaseIterable, Hashable {
         }
     }
 
-    var label: String {
+    var label: LocalizedStringKey {
         switch self {
-        case .playground: String(localized: "Playground")
-        case .history: String(localized: "History")
-        case .settings: String(localized: "Settings")
+        case .playground: "Playground"
+        case .history: "History"
+        case .settings: "Settings"
         }
     }
 

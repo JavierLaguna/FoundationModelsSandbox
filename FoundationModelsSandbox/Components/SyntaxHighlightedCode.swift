@@ -21,7 +21,6 @@ struct SyntaxHighlightedCode: View {
         }
         
         // Color strings (simple approach)
-        let stringPattern = "\""
         var stringStart: String.Index? = nil
         
         for (index, char) in code.enumerated() {

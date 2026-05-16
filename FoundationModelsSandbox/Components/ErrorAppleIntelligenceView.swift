@@ -3,26 +3,26 @@ import SwiftUI
 
 struct ErrorAppleIntelligenceView: View {
 
-    private let text: String
+    private let textKey: LocalizedStringKey
 
-    init(text: String) {
-        self.text = text
+    init(text: LocalizedStringKey) {
+        self.textKey = text
     }
 
     init(error: any Error) {
-        self.text = error.localizedDescription
+        self.textKey = LocalizedStringKey(error.localizedDescription)
     }
-    
+
     init(error: AppleIntelligenceNotAvailableError) {
-        self.text = error.errorDescription ?? ""
+        self.textKey = LocalizedStringKey(error.errorDescription ?? "")
     }
 
     init(reason: SystemLanguageModel.Availability) {
         switch reason {
         case .available:
-            self.text = String(localized: "Foundation Models are available")
+            self.textKey = "Foundation Models are available"
         case .unavailable(let reason):
-            self.text = reason.errorDescription
+            self.textKey = LocalizedStringKey(reason.errorDescription)
         }
     }
 
@@ -32,7 +32,7 @@ struct ErrorAppleIntelligenceView: View {
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
 
-            Text(text)
+            Text(textKey)
                 .font(.title3)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

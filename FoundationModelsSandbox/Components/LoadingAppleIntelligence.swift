@@ -2,18 +2,18 @@ import SwiftUI
 
 struct LoadingAppleIntelligence: View {
 
-    private let text: String?
+    private let textKey: LocalizedStringKey?
 
-    init(text: String? = nil) {
-        self.text = text
+    init(text: LocalizedStringKey? = nil) {
+        self.textKey = text
     }
 
     var body: some View {
         VStack(spacing: Spacing.md) {
             AppleIntelligenceAnimation(size: 64)
 
-            if let text {
-                Text(text)
+            if let textKey {
+                Text(textKey)
                     .font(.title3)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

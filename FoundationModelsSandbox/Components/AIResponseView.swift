@@ -48,7 +48,7 @@ struct AIResponseView: View {
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
             
-            Text(String(localized: "Enter a prompt to generate an AI response"))
+            Text("Enter a prompt to generate an AI response")
                 .font(.title3)
                 .foregroundStyle(.secondary)
             
@@ -62,7 +62,7 @@ struct AIResponseView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
-                Text(String(localized: "JavaScript"))
+                Text("JavaScript")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                 
@@ -71,7 +71,7 @@ struct AIResponseView: View {
                 Button {
                     // Copy code
                 } label: {
-                    Label(String(localized: "Copy"), systemImage: "doc.on.doc")
+                    Label("Copy", systemImage: "doc.on.doc")
                         .font(.caption)
                 }
                 .buttonStyle(.borderless)
@@ -95,7 +95,7 @@ struct AIResponseView: View {
     var body: some View {
         VStack(spacing: 0) {
             ToolbarView(
-                title: String(localized: "AI Response"),
+                title: "AI Response",
                 statusColor: Color.successGreen
             ) {
                 Button(action: {}) {
@@ -107,7 +107,7 @@ struct AIResponseView: View {
             Divider()
             
             if isLoading {
-                LoadingAppleIntelligence(text: String(localized: "Generating response..."))
+                LoadingAppleIntelligence(text: "Generating response...")
                     .frame(
                         maxWidth: .infinity,
                         maxHeight: .infinity

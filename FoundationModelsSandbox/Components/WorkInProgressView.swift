@@ -2,10 +2,10 @@ import SwiftUI
 
 struct WorkInProgressView: View {
 
-    private let message: String
+    private let messageKey: LocalizedStringKey
 
-    init(message: String = String(localized: "Work in progress")) {
-        self.message = message
+    init(message: LocalizedStringKey = "Work in progress") {
+        self.messageKey = message
     }
 
     var body: some View {
@@ -14,7 +14,7 @@ struct WorkInProgressView: View {
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
 
-            Text(message)
+            Text(messageKey)
                 .font(.title3)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

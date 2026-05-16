@@ -2,13 +2,13 @@ import SwiftUI
 
 // MARK: - Toolbar View (Reusable header component)
 struct ToolbarView<TrailingContent: View>: View {
-    
-    let title: String
+
+    let title: LocalizedStringKey
     var statusColor: Color? = nil
     @ViewBuilder let trailing: TrailingContent
-    
+
     init(
-        title: String,
+        title: LocalizedStringKey,
         statusColor: Color? = nil,
         @ViewBuilder trailing: () -> TrailingContent = { EmptyView() }
     ) {
@@ -40,12 +40,12 @@ struct ToolbarView<TrailingContent: View>: View {
 
 #Preview {
     VStack(spacing: 0) {
-        ToolbarView(title: String(localized: "Prompt Editor"))
+        ToolbarView(title: "Prompt Editor")
         
         Divider()
         
         ToolbarView(
-            title: String(localized: "AI Response"),
+            title: "AI Response",
             statusColor: .green
         ) {
             Button(action: {}) {
