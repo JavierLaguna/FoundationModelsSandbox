@@ -1,4 +1,5 @@
 import SwiftUI
+import FoundationModels
 
 // MARK: - Main View (Root Navigation)
 struct MainView: View {
@@ -6,7 +7,7 @@ struct MainView: View {
     /// The real system locale captured at startup, used when System is selected.
     let systemLocale: Locale
     
-    @AppStorage("app_language_preference")
+    @AppStorage(UserDefaultsKeys.appLanguagePreference)
     private var languagePreference: String = AppLanguage.system.rawValue
     
     @State private var selectedSection: NavigationRoute = .playground

@@ -7,7 +7,7 @@ import SwiftUI
 @MainActor
 final class SettingsViewModel: Sendable {
 
-    private let interactor: any SettingsInteractor
+    private let interactor: any AppLanguageInteractor
 
     var selectedLanguage: AppLanguage {
         didSet {
@@ -18,7 +18,7 @@ final class SettingsViewModel: Sendable {
     let availableLanguages: [AppLanguage]
 
     init(
-        interactor: any SettingsInteractor = SettingsInteractorDefault()
+        interactor: any AppLanguageInteractor = AppLanguageInteractorDefault()
     ) {
         self.interactor = interactor
         self.selectedLanguage = interactor.getCurrentLanguage()

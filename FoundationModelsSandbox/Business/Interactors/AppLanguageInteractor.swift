@@ -1,13 +1,13 @@
 import Foundation
 
-/// Handles language preference persistence
-protocol SettingsInteractor: Sendable {
+/// Handles app language preference persistence
+protocol AppLanguageInteractor: Sendable {
     func getCurrentLanguage() -> AppLanguage
     func setLanguage(_ language: AppLanguage)
     func getAvailableLanguages() -> [AppLanguage]
 }
 
-final class SettingsInteractorDefault: SettingsInteractor {
+final class AppLanguageInteractorDefault: AppLanguageInteractor {
 
     private let userDefaults: UserDefaults
 
@@ -16,18 +16,18 @@ final class SettingsInteractorDefault: SettingsInteractor {
     }
 
     func getCurrentLanguage() -> AppLanguage {
-        let storedValue = userDefaults.string(forKey: "app_language_preference")
+        let storedValue = userDefaults.string(forKey: UserDefaultsKeys.appLanguagePreference)
         return AppLanguage(rawValue: storedValue ?? "") ?? .system
     }
 
     func setLanguage(_ language: AppLanguage) {
-        userDefaults.set(language.rawValue, forKey: "app_language_preference")
+        userDefaults.set(language.rawValue, forKey: UserDefaultsKeys.appLanguagePreference)
         
         // Keep AppleLanguages in sync so Locale.current reflects the selection
         if let identifier = language.localeIdentifier {
-            userDefaults.set([identifier], forKey: "AppleLanguages")
+            userDefaults.set([identifier], forKey: UserDefaultsKeys.appleLanguages)
         } else {
-            userDefaults.removeObject(forKey: "AppleLanguages")
+            userDefaults.removeObject(forKey: UserDefaultsKeys.appleLanguages)
         }
     }
 
