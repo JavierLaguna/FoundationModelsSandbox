@@ -7,6 +7,8 @@ struct AIResponseView: View {
     let metrics: AIResponse?
     let error: String?
     let isLoading: Bool
+    let isCopied: Bool
+    let onCopy: () -> Void
 
     @ViewBuilder
     private var responseContent: some View {
@@ -148,8 +150,8 @@ struct AIResponseView: View {
                 title: "AI Response",
                 statusColor: Color.successGreen
             ) {
-                Button(action: {}) {
-                    Image(systemName: "doc.on.doc")
+                Button(action: onCopy) {
+                    Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
                 }
                 .buttonStyle(.borderless)
             }
@@ -188,7 +190,9 @@ const wss = new WebSocket.Server({ port: 8080 });
             contextSize: 4096
         ),
         error: nil,
-        isLoading: false
+        isLoading: false,
+        isCopied: false,
+        onCopy: {}
     )
     .frame(width: 450, height: 700)
 }
@@ -199,7 +203,9 @@ const wss = new WebSocket.Server({ port: 8080 });
         code: "",
         metrics: nil,
         error: "Apple Intelligence is not available on this device",
-        isLoading: false
+        isLoading: false,
+        isCopied: false,
+        onCopy: {}
     )
     .frame(width: 450, height: 700)
 }
@@ -210,7 +216,9 @@ const wss = new WebSocket.Server({ port: 8080 });
         code: "",
         metrics: nil,
         error: nil,
-        isLoading: true
+        isLoading: true,
+        isCopied: false,
+        onCopy: {}
     )
     .frame(width: 450, height: 700)
 }

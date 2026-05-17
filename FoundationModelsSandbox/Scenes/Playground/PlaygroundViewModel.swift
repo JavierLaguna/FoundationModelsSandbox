@@ -11,6 +11,7 @@ final class PlaygroundViewModel {
     private let interactor: FoundationModelsInteractor
     private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
     private let modelsLister: ListAvailableModelsInteractor
+    private let clipboard: ClipboardInteractor
 
     // MARK: - Availability State
     private(set) var isFoundationModelsAvailable: Bool = false
@@ -25,6 +26,9 @@ final class PlaygroundViewModel {
     private(set) var aiResponse: AIResponse?
     var isLoading: Bool = false
     private(set) var error: String?
+
+    // MARK: - Copy State
+    var isCopied: Bool = false
 
     // MARK: - Available Models
     private(set) var availableModelNames: [String] = []
@@ -61,11 +65,13 @@ final class PlaygroundViewModel {
     init(
         interactor: FoundationModelsInteractor = FoundationModelsInteractorDefault(),
         availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault(),
-        modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault()
+        modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault(),
+        clipboard: ClipboardInteractor = ClipboardInteractorDefault()
     ) {
         self.interactor = interactor
         self.availabilityChecker = availabilityChecker
         self.modelsLister = modelsLister
+        self.clipboard = clipboard
         loadModels()
         checkAvailability()
     }
@@ -118,6 +124,20 @@ final class PlaygroundViewModel {
         userPrompt = ""
         aiResponse = nil
         error = nil
+    }
+
+    func copyResponseToClipboard() {
+        guard !responseContent.isEmpty else { return }
+
+        clipboard.copy(responseContent)
+
+        isCopied = true
+
+        // Reset the copied state after 2 seconds
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            isCopied = false
+        }
     }
 
     // MARK: - Private Helpers

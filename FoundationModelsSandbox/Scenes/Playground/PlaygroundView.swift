@@ -14,7 +14,9 @@ struct PlaygroundView: View {
                 code: viewModel.responseCode,
                 metrics: viewModel.aiResponse,
                 error: viewModel.error,
-                isLoading: viewModel.isLoading
+                isLoading: viewModel.isLoading,
+                isCopied: viewModel.isCopied,
+                onCopy: { viewModel.copyResponseToClipboard() }
             )
             
         } else {
