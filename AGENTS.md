@@ -117,3 +117,16 @@ MyTextField(placeholder: Text("Enter your prompt..."))
   - "Playground" → "Laboratorio" (not "Patio de juegos")
   - "Prompt" → Keep as "Prompt" or use context-appropriate term
 - **Never hardcode user-facing strings** in SwiftUI views - always use `Text("key")` with the translation key.
+
+## File Header Requirements
+- **NEVER add Xcode-generated boilerplate headers** to new files. This includes:
+  ```swift
+  //
+  //  FileName.swift
+  //  FoundationModelsSandboxTests
+  //
+  //  Created by Javier Laguna on DD/MM/YYYY.
+  //
+  ```
+- New files should start directly with imports and code.
+- This applies to all new Swift files (app code, tests, etc.).
