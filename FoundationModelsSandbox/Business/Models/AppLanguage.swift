@@ -11,9 +11,12 @@ enum AppLanguage: String, CaseIterable, Sendable {
 
     var displayName: String {
         switch self {
-        case .system: String(localized: "system_language")
-        case .english: String(localized: "english_language")
-        case .spanish: String(localized: "spanish_language")
+        case .system:
+            NSLocalizedString("system_language", comment: "System language option")
+        case .english:
+            NSLocalizedString("english_language", comment: "English language option")
+        case .spanish:
+            NSLocalizedString("spanish_language", comment: "Spanish language option")
         }
     }
 
