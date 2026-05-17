@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		49306D872FB9E76D009AD561 /* FoundationModelsSandbox.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 49306D862FB9E76D009AD561 /* FoundationModelsSandbox.xctestplan */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		49E8B9932F9F9B35002F1EE2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,7 +17,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		49306D862FB9E76D009AD561 /* FoundationModelsSandbox.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = FoundationModelsSandbox.xctestplan; sourceTree = "<group>"; };
 		49E8B9852F9F9B33002F1EE2 /* FoundationModelsSandbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoundationModelsSandbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49E8B9922F9F9B35002F1EE2 /* FoundationModelsSandboxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FoundationModelsSandboxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -60,7 +55,6 @@
 		49E8B97C2F9F9B33002F1EE2 = {
 			isa = PBXGroup;
 			children = (
-				49306D862FB9E76D009AD561 /* FoundationModelsSandbox.xctestplan */,
 				49E8B9872F9F9B33002F1EE2 /* FoundationModelsSandbox */,
 				49E8B9952F9F9B35002F1EE2 /* FoundationModelsSandboxTests */,
 				49E8B9862F9F9B33002F1EE2 /* Products */,
@@ -169,7 +163,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				49306D872FB9E76D009AD561 /* FoundationModelsSandbox.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
