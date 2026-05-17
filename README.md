@@ -1,5 +1,7 @@
 # 🤖 FoundationModelsSandbox
 
+![Playground Example](./.readme_resources/Playground_example.png)
+
 ## 📝 Description
 
 macOS application for exploring and learning **Apple's Foundation Models framework** (`FoundationModels`). This project serves as a sandbox to understand and experiment with Apple's native AI/ML capabilities, particularly the `SystemLanguageModel` and on-device AI processing.
@@ -7,16 +9,6 @@ macOS application for exploring and learning **Apple's Foundation Models framewo
 The app provides a clean interface to send prompts to Apple's Intelligence models and receive responses, serving as a practical learning tool for understanding how to integrate Foundation Models into your own applications.
 
 > Project used for learn **Apple Foundation Models framework** + **Clean Architecture** + **SwiftUI**
-
-## 📷 Screenshots
-
-*The app features a native macOS three-column layout using NavigationSplitView:*
-
-- **Sidebar**: Navigation (Playground, History, Settings)
-- **Content**: Prompt Editor with Instructions and User Prompt fields
-- **Detail**: AI Response panel with syntax-highlighted code blocks
-
-The UI follows **Apple Human Interface Guidelines** with **Liquid Glass** styling for a native Apple experience.
 
 ## 📋 Requirements
 
