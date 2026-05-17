@@ -58,3 +58,46 @@
 ## Repo-specific constraints
 - Deployment target is macOS 26.4 (`MACOSX_DEPLOYMENT_TARGET = 26.4` in project settings), so older local runtimes/toolchains may fail builds.
 - Project uses Xcode file-system synchronized groups (`PBXFileSystemSynchronizedRootGroup`): add/move source files through Xcode (or verify project references carefully) to avoid missing-file/build-graph drift.
+
+## Localization System
+- Translations are stored in `FoundationModelsSandbox/Localizable.xcstrings` (JSON format).
+- Supported languages: English (en), Spanish (es).
+- The app has a language switcher in Settings that changes the UI language at runtime.
+
+### How to add new translations
+1. Add the key with translations in `Localizable.xcstrings`:
+   ```json
+   "Your key" : {
+     "localizations" : {
+       "en" : { "stringUnit" : { "state" : "translated", "value" : "English text" } },
+       "es" : { "stringUnit" : { "state" : "translated", "value" : "Texto en español" } }
+     }
+   }
+   ```
+
+### How to use translations in SwiftUI (CORRECT WAY)
+- **For reactive language updates**: Use `Text("key")` directly. This creates a `Text` view that automatically updates when the language changes.
+  ```swift
+  Text("Your key")
+  ```
+- **WRONG way**: Using `String(localized: "Your key")` or storing in a `String` variable - these evaluate once and won't update reactively.
+- **For non-reactive cases** (e.g., button labels in alerts): You can use `String(localized: "Your key")` if the value is read once at creation time.
+
+### Example: Placeholder in custom text field
+```swift
+// ✅ CORRECT - reactive to language changes
+struct MyTextField: View {
+    var placeholder: Text  // Use Text, not String
+    var body: some View {
+        // ...
+        .overlay {
+            if text.isEmpty {
+                placeholder.foregroundStyle(.tertiary)
+            }
+        }
+    }
+}
+
+// Usage:
+MyTextField(placeholder: Text("Enter your prompt..."))
+```
