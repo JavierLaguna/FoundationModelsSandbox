@@ -20,6 +20,20 @@ struct SettingsView: View {
                     .foregroundStyle(Color.secondaryText)
             }
 
+            Section("Model") {
+                Picker("Default Model", selection: $viewModel.selectedModelName) {
+                    ForEach(Array(viewModel.availableModels.enumerated()), id: \.offset) { index, model in
+                        Text("default")
+                            .tag("default")
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Text("Model selected by default in Playground")
+                    .font(.caption)
+                    .foregroundStyle(Color.secondaryText)
+            }
+
             Section("About") {
                 LabeledContent("Version", value: viewModel.appVersion)
                 LabeledContent("Platform", value: "macOS")

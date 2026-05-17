@@ -1,4 +1,5 @@
 import Foundation
+import FoundationModels
 import SwiftUI
 
 /// ViewModel for the Settings scene.
@@ -7,15 +8,23 @@ import SwiftUI
 @MainActor
 final class SettingsViewModel: Sendable {
 
-    private let interactor: any AppLanguageInteractor
+    private let languageInteractor: any AppLanguageInteractor
+    private let modelInteractor: any DefaultModelInteractor
 
     var selectedLanguage: AppLanguage {
         didSet {
-            interactor.setLanguage(selectedLanguage)
+            languageInteractor.setLanguage(selectedLanguage)
+        }
+    }
+
+    var selectedModelName: String {
+        didSet {
+            modelInteractor.setDefaultModelName(selectedModelName)
         }
     }
 
     let availableLanguages: [AppLanguage]
+    let availableModels: [SystemLanguageModel]
 
     /// App version from Info.plist
     var appVersion: String {
@@ -23,10 +32,14 @@ final class SettingsViewModel: Sendable {
     }
 
     init(
-        interactor: any AppLanguageInteractor = AppLanguageInteractorDefault()
+        languageInteractor: any AppLanguageInteractor = AppLanguageInteractorDefault(),
+        modelInteractor: any DefaultModelInteractor = DefaultModelInteractorDefault()
     ) {
-        self.interactor = interactor
-        self.selectedLanguage = interactor.getCurrentLanguage()
-        self.availableLanguages = interactor.getAvailableLanguages()
+        self.languageInteractor = languageInteractor
+        self.modelInteractor = modelInteractor
+        self.selectedLanguage = languageInteractor.getCurrentLanguage()
+        self.availableLanguages = languageInteractor.getAvailableLanguages()
+        self.selectedModelName = modelInteractor.getDefaultModelName()
+        self.availableModels = modelInteractor.getAvailableModels()
     }
 }

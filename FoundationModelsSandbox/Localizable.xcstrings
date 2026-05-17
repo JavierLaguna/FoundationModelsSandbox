@@ -81,6 +81,12 @@
         }
       }
     },
+    "default" : {
+
+    },
+    "Default Model" : {
+
+    },
     "Defines the AI assistant behavior and context" : {
       "localizations" : {
         "en" : {
@@ -308,6 +314,9 @@
           }
         }
       }
+    },
+    "Model selected by default in Playground" : {
+
     },
     "Model unavailable. Reason: %@" : {
       "localizations" : {

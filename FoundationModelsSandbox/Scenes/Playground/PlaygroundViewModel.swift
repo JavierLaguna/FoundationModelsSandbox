@@ -12,6 +12,7 @@ final class PlaygroundViewModel {
     private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
     private let modelsLister: ListAvailableModelsInteractor
     private let clipboard: ClipboardInteractor
+    private let defaultModelInteractor: DefaultModelInteractor
 
     // MARK: - Availability State
     private(set) var isFoundationModelsAvailable: Bool = false
@@ -66,12 +67,14 @@ final class PlaygroundViewModel {
         interactor: FoundationModelsInteractor = FoundationModelsInteractorDefault(),
         availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault(),
         modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault(),
-        clipboard: ClipboardInteractor = ClipboardInteractorDefault()
+        clipboard: ClipboardInteractor = ClipboardInteractorDefault(),
+        defaultModelInteractor: DefaultModelInteractor = DefaultModelInteractorDefault()
     ) {
         self.interactor = interactor
         self.availabilityChecker = availabilityChecker
         self.modelsLister = modelsLister
         self.clipboard = clipboard
+        self.defaultModelInteractor = defaultModelInteractor
         loadModels()
         checkAvailability()
     }
@@ -82,7 +85,10 @@ final class PlaygroundViewModel {
         // Use "default" as the display name for SystemLanguageModel
         availableModels = models
         availableModelNames = models.isEmpty ? [] : ["default"]
-        selectedModelName = availableModelNames.first ?? ""
+
+        // Use the default model from UserDefaults
+        let defaultModelName = defaultModelInteractor.getDefaultModelName()
+        selectedModelName = availableModelNames.contains(defaultModelName) ? defaultModelName : (availableModelNames.first ?? "")
         selectedModel = models.first
     }
 
