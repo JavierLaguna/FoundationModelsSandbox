@@ -4,70 +4,99 @@ import SwiftUI
 struct AIResponseView: View {
     let response: String
     let code: String
-    let footer: String
+    let metrics: AIResponse?
+    let error: String?
     let isLoading: Bool
-    
+
     @ViewBuilder
     private var responseContent: some View {
-        if response.isEmpty {
+        if response.isEmpty && error == nil {
             emptyState
-            
+
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
                     // Response text
-                    Text(response)
-                        .font(.body)
-                        .lineSpacing(4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
+                    if !response.isEmpty {
+                        Text(response)
+                            .font(.body)
+                            .lineSpacing(4)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    // Error message
+                    if let error = error {
+                        errorView(error)
+                    }
+
                     // Code block with native styling
                     if !code.isEmpty {
-                        codeBlock
+                        codeBlock(code)
                     }
-                    
-                    // Footer text
-                    Text(footer)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineSpacing(3)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    // Metrics footer
+                    if let metrics = metrics {
+                        metricsFooter(metrics)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Spacing.lg)
             }
         }
     }
-    
+
     @ViewBuilder
     private var emptyState: some View {
         VStack(spacing: Spacing.md) {
             Spacer()
-            
+
             Image(systemName: "text.bubble")
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
-            
+
             Text("Enter a prompt to generate an AI response")
                 .font(.title3)
                 .foregroundStyle(.secondary)
-            
+
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    
+
     @ViewBuilder
-    private var codeBlock: some View {
+    private func errorView(_ error: String) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            HStack(spacing: Spacing.sm) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
+
+                Text("Error")
+                    .font(.headline)
+                    .foregroundStyle(.red)
+            }
+
+            Text(error)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .lineSpacing(3)
+        }
+        .padding(Spacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.red.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))
+    }
+
+    @ViewBuilder
+    private func codeBlock(_ code: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
                 Text("JavaScript")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
-                
+
                 Spacer()
-                
+
                 Button {
                     // Copy code
                 } label: {
@@ -79,9 +108,9 @@ struct AIResponseView: View {
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)
             .background(Color.appSecondaryBackground)
-            
+
             Divider()
-            
+
             // Code content
             ScrollView(.horizontal, showsIndicators: false) {
                 SyntaxHighlightedCode(code: code)
@@ -91,7 +120,28 @@ struct AIResponseView: View {
         }
         .liquidGlass(cornerRadius: CornerRadius.medium)
     }
-    
+
+    @ViewBuilder
+    private func metricsFooter(_ metrics: AIResponse) -> some View {
+        HStack(spacing: Spacing.md) {
+            // Duration
+            Label(metrics.formattedDuration, systemImage: "clock")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+
+            Divider()
+                .frame(height: 12)
+
+            // Token counts
+            Label(metrics.formattedTokenCounts, systemImage: "text.alignleft")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+
+            Spacer()
+        }
+        .padding(.top, Spacing.sm)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             ToolbarView(
@@ -103,16 +153,16 @@ struct AIResponseView: View {
                 }
                 .buttonStyle(.borderless)
             }
-            
+
             Divider()
-            
+
             if isLoading {
                 LoadingAppleIntelligence(text: "Generating response...")
                     .frame(
                         maxWidth: .infinity,
                         maxHeight: .infinity
                     )
-                
+
             } else {
                 responseContent
             }
@@ -130,8 +180,37 @@ const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({ port: 8080 });
 """,
-        footer: "This implementation creates a simple WebSocket server that listens on port 8080.",
+        metrics: AIResponse(
+            content: "",
+            duration: 1.23,
+            promptTokenCount: 14,
+            responseTokenCount: 42,
+            contextSize: 4096
+        ),
+        error: nil,
         isLoading: false
+    )
+    .frame(width: 450, height: 700)
+}
+
+#Preview("With Error") {
+    AIResponseView(
+        response: "",
+        code: "",
+        metrics: nil,
+        error: "Apple Intelligence is not available on this device",
+        isLoading: false
+    )
+    .frame(width: 450, height: 700)
+}
+
+#Preview("Loading") {
+    AIResponseView(
+        response: "",
+        code: "",
+        metrics: nil,
+        error: nil,
+        isLoading: true
     )
     .frame(width: 450, height: 700)
 }

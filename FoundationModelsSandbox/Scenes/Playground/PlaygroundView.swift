@@ -10,9 +10,10 @@ struct PlaygroundView: View {
     private var detailView: some View {
         if viewModel.isFoundationModelsAvailable {
             AIResponseView(
-                response: viewModel.aiResponse,
-                code: viewModel.aiCode,
-                footer: viewModel.error ?? String(localized: "Enter a prompt to generate an AI response"),
+                response: viewModel.responseContent,
+                code: viewModel.responseCode,
+                metrics: viewModel.aiResponse,
+                error: viewModel.error,
                 isLoading: viewModel.isLoading
             )
             
