@@ -18,10 +18,14 @@ struct PromptPanelView: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
             
-            TextEditor(text: $instructions)
-                .font(.body)
-                .scrollContentBackground(.hidden)
-                .liquidGlass(cornerRadius: CornerRadius.medium)
+            SubmitOnEnterTextEditor(
+                text: $instructions,
+                placeholder: "Enter instructions...",
+                onSubmit: onSubmit
+            )
+            .font(.body)
+            .scrollContentBackground(.hidden)
+            .liquidGlass(cornerRadius: CornerRadius.medium)
             
             Text("Defines the AI assistant behavior and context")
                 .font(.caption)
@@ -37,10 +41,14 @@ struct PromptPanelView: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
             
-            TextEditor(text: $userPrompt)
-                .font(.body)
-                .scrollContentBackground(.hidden)
-                .liquidGlass(cornerRadius: CornerRadius.medium)
+            SubmitOnEnterTextEditor(
+                text: $userPrompt,
+                placeholder: "Enter your prompt...",
+                onSubmit: onSubmit
+            )
+            .font(.body)
+            .scrollContentBackground(.hidden)
+            .liquidGlass(cornerRadius: CornerRadius.medium)
         }
         .frame(maxHeight: .infinity)
     }
