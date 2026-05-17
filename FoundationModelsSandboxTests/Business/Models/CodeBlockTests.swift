@@ -1,10 +1,3 @@
-//
-//  CodeBlockTests.swift
-//  FoundationModelsSandboxTests
-//
-//  Created by Javier Laguna on 17/05/2026.
-//
-
 import Foundation
 import Testing
 @testable import FoundationModelsSandbox
