@@ -39,22 +39,6 @@
     "Choose the language for the app interface" : {
 
     },
-    "english_language" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "English"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inglés"
-          }
-        }
-      }
-    },
     "Copy" : {
       "localizations" : {
         "en" : {
@@ -99,6 +83,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu dispositivo no es compatible con esta función."
+          }
+        }
+      }
+    },
+    "english_language" : {
+      "comment" : "English language option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inglés"
           }
         }
       }
@@ -325,7 +326,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Patio de juegos"
+            "value" : "Laboratorio"
           }
         }
       }
@@ -362,7 +363,24 @@
         }
       }
     },
+    "Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        }
+      }
+    },
     "spanish_language" : {
+      "comment" : "Spanish language option",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -379,6 +397,7 @@
       }
     },
     "system_language" : {
+      "comment" : "System language option",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -390,22 +409,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sistema"
-          }
-        }
-      }
-    },
-    "Settings" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajustes"
           }
         }
       }
