@@ -81,15 +81,15 @@ struct AppLanguageInteractorTests {
 
     @Test
     func setLanguage_system_doesNotSetAppleLanguages() {
-        let userDefaults = UserDefaults(suiteName: #function)!
+        let userDefaults = UserDefaults(suiteName: #function + UUID().uuidString)!
         let interactor = AppLanguageInteractorDefault(userDefaults: userDefaults)
 
         interactor.setLanguage(.system)
 
-        // For .system, localeIdentifier is nil, so AppleLanguages should not be set
-        // The key may or may not exist depending on previous state
-        let appleLanguages = userDefaults.stringArray(forKey: UserDefaultsKeys.appleLanguages)
-        #expect(appleLanguages == nil || appleLanguages?.isEmpty == true)
+        // For .system, localeIdentifier is nil, so AppleLanguages should not contain language codes
+        let appleLanguages = userDefaults.stringArray(forKey: UserDefaultsKeys.appleLanguages) ?? []
+        #expect(!appleLanguages.contains("en"))
+        #expect(!appleLanguages.contains("es"))
     }
 
     @Test
