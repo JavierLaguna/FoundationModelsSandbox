@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "F704754F-0945-418B-976E-BF82C6715C0F",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:FoundationModelsSandbox.xcodeproj",
+      "identifier" : "49E8B9842F9F9B33002F1EE2",
+      "name" : "FoundationModelsSandbox"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:FoundationModelsSandbox.xcodeproj",
+        "identifier" : "49E8B9912F9F9B35002F1EE2",
+        "name" : "FoundationModelsSandboxTests"
+      }
+    }
+  ],
+  "version" : 1
+}

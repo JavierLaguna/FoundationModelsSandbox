@@ -21,6 +21,16 @@
 		49E8B9922F9F9B35002F1EE2 /* FoundationModelsSandboxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FoundationModelsSandboxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		49306DF42FB9EFDB009AD561 /* Exceptions for "FoundationModelsSandboxTests" folder in "FoundationModelsSandboxTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				FoundationModelsSandbox.xctestplan,
+			);
+			target = 49E8B9912F9F9B35002F1EE2 /* FoundationModelsSandboxTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		49E8B9872F9F9B33002F1EE2 /* FoundationModelsSandbox */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -29,6 +39,9 @@
 		};
 		49E8B9952F9F9B35002F1EE2 /* FoundationModelsSandboxTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				49306DF42FB9EFDB009AD561 /* Exceptions for "FoundationModelsSandboxTests" folder in "FoundationModelsSandboxTests" target */,
+			);
 			path = FoundationModelsSandboxTests;
 			sourceTree = "<group>";
 		};
