@@ -3,8 +3,9 @@ import AppKit
 
 /// A TextEditor variant that handles Enter to submit and Shift+Enter for new lines
 struct SubmitOnEnterTextEditor: View {
+    
     @Binding var text: String
-    var placeholder: String = ""
+    var placeholder: Text
     let onSubmit: () -> Void
     
     var body: some View {
@@ -14,10 +15,10 @@ struct SubmitOnEnterTextEditor: View {
         )
         .overlay(alignment: .topLeading) {
             if text.isEmpty {
-                Text(placeholder)
+                placeholder
                     .foregroundStyle(.tertiary)
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 4)
                     .allowsHitTesting(false)
             }
         }
@@ -25,7 +26,8 @@ struct SubmitOnEnterTextEditor: View {
 }
 
 // MARK: - Custom NSTextView that handles Enter/Shift+Enter
-class SubmitTextView: NSTextView {
+final class SubmitTextView: NSTextView {
+    
     var onEnterPressed: (() -> Void)?
     private var isShiftPressed = false
     
@@ -51,6 +53,7 @@ class SubmitTextView: NSTextView {
 }
 
 struct SubmitOnEnterTextEditorRepresentable: NSViewRepresentable {
+    
     @Binding var text: String
     let onSubmit: () -> Void
     
@@ -60,6 +63,7 @@ struct SubmitOnEnterTextEditorRepresentable: NSViewRepresentable {
         
         textView.delegate = context.coordinator
         textView.font = NSFont.preferredFont(forTextStyle: .body)
+        textView.textContainerInset = NSSize(width: 0, height: 4)
         textView.backgroundColor = .clear
         textView.isEditable = true
         textView.isSelectable = true
