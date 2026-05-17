@@ -146,6 +146,38 @@
         }
       }
     },
+    "Enter instructions..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter instructions..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe las instrucciones..."
+          }
+        }
+      }
+    },
+    "Enter your prompt..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your prompt..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe tu prompt..."
+          }
+        }
+      }
+    },
     "Error" : {
 
     },

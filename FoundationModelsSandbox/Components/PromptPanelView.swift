@@ -20,7 +20,7 @@ struct PromptPanelView: View {
             
             SubmitOnEnterTextEditor(
                 text: $instructions,
-                placeholder: "Enter instructions...",
+                placeholder: String(localized: "Enter instructions..."),
                 onSubmit: onSubmit
             )
             .font(.body)
@@ -43,7 +43,7 @@ struct PromptPanelView: View {
             
             SubmitOnEnterTextEditor(
                 text: $userPrompt,
-                placeholder: "Enter your prompt...",
+                placeholder: String(localized: "Enter your prompt..."),
                 onSubmit: onSubmit
             )
             .font(.body)
