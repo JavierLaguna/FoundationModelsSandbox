@@ -2,7 +2,20 @@
   "sourceLanguage" : "en",
   "strings" : {
     "About" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de"
+          }
+        }
+      }
     },
     "AI Response" : {
       "localizations" : {
@@ -37,7 +50,20 @@
       }
     },
     "Choose the language for the app interface" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the language for the app interface"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el idioma de la interfaz de la app"
+          }
+        }
+      }
     },
     "Copy" : {
       "localizations" : {
@@ -313,7 +339,20 @@
       }
     },
     "Platform" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platform"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plataforma"
+          }
+        }
+      }
     },
     "Playground" : {
       "localizations" : {
@@ -430,7 +469,20 @@
       }
     },
     "Version" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión"
+          }
+        }
+      }
     },
     "Work in progress" : {
       "localizations" : {
