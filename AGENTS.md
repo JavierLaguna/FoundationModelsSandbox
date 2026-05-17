@@ -109,3 +109,11 @@ MyTextField(placeholder: Text("Enter your prompt..."))
   2. Propose a commit message following the repo's commit style
   3. Wait for user confirmation before executing `git commit`
 - If the user asks to "commit all changes" without specifying details, proceed with the commit.
+
+## Localization Requirements
+- **ALWAYS use the translation system** (`Localizable.xcstrings`) for any user-facing text literals.
+- **ALL supported languages must be translated**: When adding a new key, provide translations for both English (en) and Spanish (es).
+- **Use app context for translations**: Translate based on the app's domain (AI/Foundation Models), not literally. For example:
+  - "Playground" → "Laboratorio" (not "Patio de juegos")
+  - "Prompt" → Keep as "Prompt" or use context-appropriate term
+- **Never hardcode user-facing strings** in SwiftUI views - always use `Text("key")` with the translation key.
