@@ -6,7 +6,7 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Language") {
+            Section("General") {
                 Picker("Language", selection: $viewModel.selectedLanguage) {
                     ForEach(AppLanguage.allCases, id: \.self) { language in
                         Text(language.displayName)
@@ -18,9 +18,9 @@ struct SettingsView: View {
                 Text("Choose the language for the app interface")
                     .font(.caption)
                     .foregroundStyle(Color.secondaryText)
-            }
 
-            Section("Model") {
+                Divider()
+
                 Picker("Default Model", selection: $viewModel.selectedModelName) {
                     ForEach(Array(viewModel.availableModels.enumerated()), id: \.offset) { index, model in
                         Text("default")
