@@ -21,7 +21,7 @@ struct SettingsView: View {
             }
 
             Section("About") {
-                LabeledContent("Version", value: "1.0.0")
+                LabeledContent("Version", value: viewModel.appVersion)
                 LabeledContent("Platform", value: "macOS")
             }
         }
