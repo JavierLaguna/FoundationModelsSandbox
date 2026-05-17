@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Scope and current shape
-- This repo is a single Xcode project (`FoundationModelsSandbox.xcodeproj`) with three targets: app, unit tests, UI tests.
+- This repo is a single Xcode project (`FoundationModelsSandbox.xcodeproj`) with two targets: app and unit tests (UI tests target was removed).
 - There is no Swift Package manifest, no CI workflow, no lint/typecheck/format config, and no repo-local OpenCode instruction config (`opencode.json`) at the time of writing.
 
 ## Verified commands (don’t guess)
@@ -13,8 +13,7 @@
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' test`
 - Run only unit tests target:
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -only-testing:FoundationModelsSandboxTests test`
-- Run only UI tests target:
-  - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -only-testing:FoundationModelsSandboxUITests test`
+- Test status: **68 tests** (all Swift Testing, no XCTest).
 
 ## Command-order / defaults that can bite
 - `xcodebuild` defaults to **Release** if you omit scheme/configuration (`xcodebuild -list` reports this); pass scheme (and config if needed) explicitly.
@@ -31,6 +30,8 @@
 - Tests:
   - `FoundationModelsSandboxTests/` uses **Swift Testing** (`import Testing`, `@Test`), not XCTest.
   - `FoundationModelsSandboxUITests/` uses XCTest UI testing and launches the app via `XCUIApplication()`.
+  - Test files mirror the app's folder structure (e.g., `Business/Models/`, `Business/Interactors/`, `Scenes/Main/`).
+  - Mocks live in `FoundationModelsSandboxTests/Mocks/`.
 
 ## Async/await + Swift 6 Strict Concurrency
 - All asynchronous flows MUST use `async`/`await`. No completion handlers.
@@ -41,6 +42,7 @@
   - Use `@MainActor` for UI-bound state and actors for shared mutable state.
   - `nonisolated` for immutable computed properties in actors.
   - `@unchecked Sendable` only when truly safe (document why).
+- **In tests**: Use `@MainActor` on test structs when the source types have `@MainActor`-isolated properties (common with SwiftUI models).
 
 ## UI Design Guidelines
 - Follow **Apple Human Interface Guidelines** for all UI elements.
