@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "About" : {
+
+    },
     "AI Response" : {
       "localizations" : {
         "en" : {
@@ -32,6 +35,9 @@
           }
         }
       }
+    },
+    "Choose the language for the app interface" : {
+
     },
     "Copy" : {
       "localizations" : {
@@ -177,6 +183,22 @@
         }
       }
     },
+    "Language" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma"
+          }
+        }
+      }
+    },
     "Model" : {
       "localizations" : {
         "en" : {
@@ -273,6 +295,9 @@
         }
       }
     },
+    "Platform" : {
+
+    },
     "Playground" : {
       "localizations" : {
         "en" : {
@@ -321,22 +346,6 @@
         }
       }
     },
-    "Language" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Idioma"
-          }
-        }
-      }
-    },
     "Settings" : {
       "localizations" : {
         "en" : {
@@ -368,6 +377,9 @@
           }
         }
       }
+    },
+    "Version" : {
+
     },
     "Work in progress" : {
       "localizations" : {
