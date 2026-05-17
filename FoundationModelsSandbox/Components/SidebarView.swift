@@ -13,7 +13,7 @@ struct SidebarView: View {
                         .tag(route)
                 }
             } header: {
-                Text("Navigation")
+                Text("Sections")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

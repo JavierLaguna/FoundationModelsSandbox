@@ -1,24 +1,17 @@
 import Foundation
-import FoundationModels
 
 /// Handles default model preference persistence
 protocol DefaultModelInteractor: Sendable {
     func getDefaultModelName() -> String
     func setDefaultModelName(_ name: String)
-    func getAvailableModels() -> [SystemLanguageModel]
 }
 
 final class DefaultModelInteractorDefault: DefaultModelInteractor {
 
     private let userDefaults: UserDefaults
-    private let modelsLister: ListAvailableModelsInteractor
 
-    init(
-        userDefaults: UserDefaults = .standard,
-        modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault()
-    ) {
+    init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        self.modelsLister = modelsLister
     }
 
     func getDefaultModelName() -> String {
@@ -27,9 +20,5 @@ final class DefaultModelInteractorDefault: DefaultModelInteractor {
 
     func setDefaultModelName(_ name: String) {
         userDefaults.set(name, forKey: UserDefaultsKeys.defaultModelPreference)
-    }
-
-    func getAvailableModels() -> [SystemLanguageModel] {
-        modelsLister.execute()
     }
 }

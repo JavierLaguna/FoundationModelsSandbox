@@ -82,10 +82,36 @@
       }
     },
     "default" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predeterminado"
+          }
+        }
+      }
     },
     "Default Model" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Model"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo predeterminado"
+          }
+        }
+      }
     },
     "Defines the AI assistant behavior and context" : {
       "localizations" : {
@@ -185,7 +211,20 @@
       }
     },
     "Error" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        }
+      }
     },
     "Foundation Models are available" : {
       "localizations" : {
@@ -204,7 +243,20 @@
       }
     },
     "General" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        }
+      }
     },
     "Generating response..." : {
       "localizations" : {
@@ -319,7 +371,20 @@
       }
     },
     "Model selected by default in Playground" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model selected by default in Playground"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelo seleccionado por defecto en el Laboratorio"
+          }
+        }
+      }
     },
     "Model unavailable. Reason: %@" : {
       "localizations" : {
@@ -353,18 +418,18 @@
         }
       }
     },
-    "Navigation" : {
+    "Sections" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Navigation"
+            "value" : "Sections"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Navegación"
+            "value" : "Secciones"
           }
         }
       }

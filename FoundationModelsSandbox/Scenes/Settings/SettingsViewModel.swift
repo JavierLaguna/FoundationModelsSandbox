@@ -10,6 +10,7 @@ final class SettingsViewModel: Sendable {
 
     private let languageInteractor: any AppLanguageInteractor
     private let modelInteractor: any DefaultModelInteractor
+    private let modelsLister: any ListAvailableModelsInteractor
 
     var selectedLanguage: AppLanguage {
         didSet {
@@ -33,13 +34,15 @@ final class SettingsViewModel: Sendable {
 
     init(
         languageInteractor: any AppLanguageInteractor = AppLanguageInteractorDefault(),
-        modelInteractor: any DefaultModelInteractor = DefaultModelInteractorDefault()
+        modelInteractor: any DefaultModelInteractor = DefaultModelInteractorDefault(),
+        modelsLister: any ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault()
     ) {
         self.languageInteractor = languageInteractor
         self.modelInteractor = modelInteractor
+        self.modelsLister = modelsLister
         self.selectedLanguage = languageInteractor.getCurrentLanguage()
         self.availableLanguages = languageInteractor.getAvailableLanguages()
         self.selectedModelName = modelInteractor.getDefaultModelName()
-        self.availableModels = modelInteractor.getAvailableModels()
+        self.availableModels = modelsLister.execute()
     }
 }
