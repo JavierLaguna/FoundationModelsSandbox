@@ -101,3 +101,11 @@ struct MyTextField: View {
 // Usage:
 MyTextField(placeholder: Text("Enter your prompt..."))
 ```
+
+## Git Workflow
+- **AI agents must NOT commit changes to the repository** unless explicitly instructed by the user.
+- When the user requests a commit, the agent should:
+  1. Show the changes (`git status`, `git diff`)
+  2. Propose a commit message following the repo's commit style
+  3. Wait for user confirmation before executing `git commit`
+- If the user asks to "commit all changes" without specifying details, proceed with the commit.
