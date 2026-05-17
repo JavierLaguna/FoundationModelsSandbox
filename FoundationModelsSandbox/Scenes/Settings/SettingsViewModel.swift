@@ -26,6 +26,7 @@ final class SettingsViewModel: Sendable {
 
     let availableLanguages: [AppLanguage]
     let availableModels: [SystemLanguageModel]
+    let availableModelNames: [String]
 
     /// App version from Info.plist
     var appVersion: String {
@@ -43,6 +44,8 @@ final class SettingsViewModel: Sendable {
         self.selectedLanguage = languageInteractor.getCurrentLanguage()
         self.availableLanguages = languageInteractor.getAvailableLanguages()
         self.selectedModelName = modelInteractor.getDefaultModelName()
-        self.availableModels = modelsLister.execute()
+        let models = modelsLister.execute()
+        self.availableModels = models
+        self.availableModelNames = models.isEmpty ? [] : ["default"]
     }
 }

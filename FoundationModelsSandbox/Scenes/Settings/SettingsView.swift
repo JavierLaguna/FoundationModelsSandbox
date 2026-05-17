@@ -22,9 +22,9 @@ struct SettingsView: View {
                 Divider()
 
                 Picker("Default Model", selection: $viewModel.selectedModelName) {
-                    ForEach(Array(viewModel.availableModels.enumerated()), id: \.offset) { index, model in
-                        Text("default")
-                            .tag("default")
+                    ForEach(viewModel.availableModelNames, id: \.self) { name in
+                        Text(name)
+                            .tag(name)
                     }
                 }
                 .pickerStyle(.menu)
