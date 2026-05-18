@@ -74,7 +74,7 @@ struct AppLanguageInteractorTests {
 
     @Test
     func setLanguage_system_doesNotSetAppleLanguages() {
-        let userDefaults = UserDefaults(suiteName: #function + UUID().uuidString)!
+        let userDefaults = UserDefaults(suiteName: #function)!
         let interactor = AppLanguageInteractorDefault(userDefaults: userDefaults)
 
         interactor.setLanguage(.system)

@@ -92,6 +92,6 @@ struct AIResponseTests {
             contextSize: 128_000
         )
 
-        #expect(response.formattedTokenCounts.contains("0.2% context"))
+        #expect(response.formattedTokenCounts == "128 → 128 (256 total, 0.2% context)")
     }
 }

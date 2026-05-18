@@ -57,4 +57,19 @@ struct ClipboardInteractorTests {
 
         #expect(mockPasteboard.storedString == "Second")
     }
+
+    @Test
+    func copy_clearsBeforeSettingString() {
+        let mockPasteboard = MockPasteboard()
+        let interactor = ClipboardInteractorDefault(pasteboard: mockPasteboard)
+
+        interactor.copy("test")
+
+        let clearIndex = mockPasteboard.callHistory.firstIndex(of: "clearContents")
+        let setStringIndex = mockPasteboard.callHistory.firstIndex(of: "setString")
+
+        #expect(clearIndex != nil)
+        #expect(setStringIndex != nil)
+        #expect(clearIndex! < setStringIndex!)
+    }
 }

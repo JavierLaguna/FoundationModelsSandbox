@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:FoundationModelsSandbox.xctestplan"
+            reference = "container:FoundationModelsSandboxTests/FoundationModelsSandbox.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>

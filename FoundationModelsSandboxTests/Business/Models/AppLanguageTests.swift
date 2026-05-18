@@ -10,6 +10,7 @@ struct AppLanguageTests {
 
         #expect(cases.contains(.system))
         #expect(cases.contains(.english))
+        #expect(cases.contains(.spanish))
         #expect(cases.count == 3)
     }
 
@@ -26,28 +27,30 @@ struct AppLanguageTests {
         #expect(AppLanguage.system.localeIdentifier == nil)
     }
 
-    @Test
-    func localeIdentifier_english_returnsEn() {
-        #expect(AppLanguage.english.localeIdentifier == "en")
+    @Test(arguments: [
+        (AppLanguage.english, "en"),
+        (.spanish, "es"),
+    ])
+    func localeIdentifier(language: AppLanguage, expected: String) {
+        #expect(language.localeIdentifier == expected)
     }
 
-    @Test
-    func localeIdentifier_spanish_returnsEs() {
-        #expect(AppLanguage.spanish.localeIdentifier == "es")
+    @Test(arguments: [
+        (AppLanguage.system, "system"),
+        (.english, "english"),
+        (.spanish, "spanish"),
+    ])
+    func rawValue(language: AppLanguage, expected: String) {
+        #expect(language.rawValue == expected)
     }
 
-    @Test
-    func rawValue_matchesCaseName() {
-        #expect(AppLanguage.system.rawValue == "system")
-        #expect(AppLanguage.english.rawValue == "english")
-        #expect(AppLanguage.spanish.rawValue == "spanish")
-    }
-
-    @Test
-    func initFromRawValue_validValues_returnsCorrectCase() {
-        #expect(AppLanguage(rawValue: "system") == .system)
-        #expect(AppLanguage(rawValue: "english") == .english)
-        #expect(AppLanguage(rawValue: "spanish") == .spanish)
+    @Test(arguments: [
+        ("system", AppLanguage.system),
+        ("english", .english),
+        ("spanish", .spanish),
+    ])
+    func initFromRawValue(rawValue: String, expected: AppLanguage) {
+        #expect(AppLanguage(rawValue: rawValue) == expected)
     }
 
     @Test
