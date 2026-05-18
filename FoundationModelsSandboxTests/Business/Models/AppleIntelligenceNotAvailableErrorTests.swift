@@ -11,32 +11,28 @@ struct AppleIntelligenceNotAvailableErrorTests {
     func errorDescription_deviceNotEligible_returnsLocalizedString() {
         let error = AppleIntelligenceNotAvailableError.deviceNotEligible
 
-        #expect(error.errorDescription != nil)
-        #expect(!error.errorDescription!.isEmpty)
+        #expect(error.errorDescription?.isEmpty == false)
     }
 
     @Test
     func errorDescription_appleIntelligenceNotEnabled_returnsLocalizedString() {
         let error = AppleIntelligenceNotAvailableError.appleIntelligenceNotEnabled
 
-        #expect(error.errorDescription != nil)
-        #expect(!error.errorDescription!.isEmpty)
+        #expect(error.errorDescription?.isEmpty == false)
     }
 
     @Test
     func errorDescription_modelNotReady_returnsLocalizedString() {
         let error = AppleIntelligenceNotAvailableError.modelNotReady
 
-        #expect(error.errorDescription != nil)
-        #expect(!error.errorDescription!.isEmpty)
+        #expect(error.errorDescription?.isEmpty == false)
     }
 
     @Test
     func errorDescription_other_withReason_returnsLocalizedString() {
         let error = AppleIntelligenceNotAvailableError.other("Test reason")
 
-        #expect(error.errorDescription != nil)
-        #expect(error.errorDescription!.contains("Test reason"))
+        #expect(error.errorDescription?.contains("Test reason") == true)
     }
 
     // MARK: - Init from SystemLanguageModel.Availability
@@ -109,4 +105,8 @@ struct AppleIntelligenceNotAvailableErrorTests {
         // .unavailable(.modelNotReady) maps to .modelNotReady, not .other
         #expect(!isOtherCase)
     }
+
+    // NOTE: The catch-all case `.unavailable(let other)` in init(from:)
+    // is not tested here because `SystemLanguageModel.Availability.UnavailableReason`
+    // is from the FoundationModels module, and we cannot construct "unknown" reason values.
 }

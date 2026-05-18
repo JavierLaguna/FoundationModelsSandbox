@@ -13,7 +13,6 @@ struct ChatMessageTests {
 
         #expect(message.role == "user")
         #expect(message.content == "Hello")
-        #expect(message.id != nil)
     }
 
     @Test
@@ -39,31 +38,4 @@ struct ChatMessageTests {
         #expect(message.timestamp <= after)
     }
 
-    // MARK: - Properties
-
-    @Test
-    func properties_areAccessible() {
-        let message = ChatMessage(role: "user", content: "Test content")
-
-        let role = message.role
-        let content = message.content
-        let id = message.id
-        let timestamp = message.timestamp
-
-        #expect(role == "user")
-        #expect(content == "Test content")
-        #expect(id != nil)
-        #expect(timestamp != nil)
-    }
-
-    // MARK: - Identifiable
-
-    @Test
-    func conformsToIdentifiable() {
-        let message = ChatMessage(role: "user", content: "Test")
-
-        // ChatMessage should conform to Identifiable
-        let id = message.id
-        #expect(id != nil)
-    }
 }
