@@ -24,9 +24,9 @@ final class PlaygroundViewModel {
     var selectedModelName: String = ""
 
     // MARK: - Response State
-    private(set) var aiResponse: AIResponse?
+    var aiResponse: AIResponse?
     var isLoading: Bool = false
-    private(set) var error: String?
+    var error: String?
 
     // MARK: - Copy State
     var isCopied: Bool = false
