@@ -1,6 +1,8 @@
 import Foundation
 import FoundationModels
+import Mockable
 
+@Mockable
 protocol FoundationModelsInteractor: Sendable {
     func execute(prompt: String, instructions: String) async throws -> AIResponse
 }

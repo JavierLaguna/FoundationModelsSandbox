@@ -1,6 +1,8 @@
 import Foundation
+import Mockable
 
 /// Handles default model preference persistence
+@Mockable
 protocol DefaultModelInteractor: Sendable {
     func getDefaultModelName() -> String
     func setDefaultModelName(_ name: String)

@@ -1,12 +1,15 @@
 import Testing
 import Foundation
 import FoundationModels
+import Mockable
 @testable import FoundationModelsSandbox
 
 @MainActor
 struct PlaygroundViewModelTests {
 
-    // MARK: - Phase 1: Computed Properties
+    init() {
+        MockerPolicy.default = .relaxed
+    }
 
     // MARK: canSubmitPrompt
 
@@ -178,14 +181,17 @@ struct PlaygroundViewModelTests {
     @Test
     func init_withAvailableModels_setsAvailableModelsAndNames() {
         let modelsLister = MockListAvailableModelsInteractor()
-        modelsLister.executeResult = [Self.sampleModel]
+        given(modelsLister).execute().willReturn([Self.sampleModel])
+
+        let availabilityChecker = MockCheckFoundationModelsAvailabilityInteractor()
+        given(availabilityChecker).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
 
         let defaultModelInteractor = MockDefaultModelInteractor()
-        defaultModelInteractor.getDefaultModelNameResult = "default"
+        given(defaultModelInteractor).getDefaultModelName().willReturn("default")
 
         let sut = PlaygroundViewModel(
             interactor: MockFoundationModelsInteractor(),
-            availabilityChecker: MockCheckFoundationModelsAvailabilityInteractor(),
+            availabilityChecker: availabilityChecker,
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor
@@ -198,14 +204,20 @@ struct PlaygroundViewModelTests {
     @Test
     func init_withEmptyModelList_setsEmptyArrays() {
         let modelsLister = MockListAvailableModelsInteractor()
-        modelsLister.executeResult = []
+        given(modelsLister).execute().willReturn([])
+
+        let availabilityChecker = MockCheckFoundationModelsAvailabilityInteractor()
+        given(availabilityChecker).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
+
+        let defaultModelInteractor = MockDefaultModelInteractor()
+        given(defaultModelInteractor).getDefaultModelName().willReturn("default")
 
         let sut = PlaygroundViewModel(
             interactor: MockFoundationModelsInteractor(),
-            availabilityChecker: MockCheckFoundationModelsAvailabilityInteractor(),
+            availabilityChecker: availabilityChecker,
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
-            defaultModelInteractor: MockDefaultModelInteractor()
+            defaultModelInteractor: defaultModelInteractor
         )
 
         #expect(sut.availableModels.isEmpty)
@@ -215,14 +227,17 @@ struct PlaygroundViewModelTests {
     @Test
     func init_withSavedDefaultModel_usesStoredPreference() {
         let modelsLister = MockListAvailableModelsInteractor()
-        modelsLister.executeResult = [Self.sampleModel]
+        given(modelsLister).execute().willReturn([Self.sampleModel])
+
+        let availabilityChecker = MockCheckFoundationModelsAvailabilityInteractor()
+        given(availabilityChecker).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
 
         let defaultModelInteractor = MockDefaultModelInteractor()
-        defaultModelInteractor.getDefaultModelNameResult = "default"
+        given(defaultModelInteractor).getDefaultModelName().willReturn("default")
 
         let sut = PlaygroundViewModel(
             interactor: MockFoundationModelsInteractor(),
-            availabilityChecker: MockCheckFoundationModelsAvailabilityInteractor(),
+            availabilityChecker: availabilityChecker,
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor
@@ -234,14 +249,17 @@ struct PlaygroundViewModelTests {
     @Test
     func init_withNoSavedPreference_fallsBackToFirstModel() {
         let modelsLister = MockListAvailableModelsInteractor()
-        modelsLister.executeResult = [Self.sampleModel]
+        given(modelsLister).execute().willReturn([Self.sampleModel])
+
+        let availabilityChecker = MockCheckFoundationModelsAvailabilityInteractor()
+        given(availabilityChecker).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
 
         let defaultModelInteractor = MockDefaultModelInteractor()
-        defaultModelInteractor.getDefaultModelNameResult = ""
+        given(defaultModelInteractor).getDefaultModelName().willReturn("")
 
         let sut = PlaygroundViewModel(
             interactor: MockFoundationModelsInteractor(),
-            availabilityChecker: MockCheckFoundationModelsAvailabilityInteractor(),
+            availabilityChecker: availabilityChecker,
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor
@@ -255,7 +273,7 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_success_setsResponseAndClearsPrompt() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        mockInteractor.executeResult = Self.successResponse
+        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -272,7 +290,7 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_error_setsErrorMessage() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        mockInteractor.executeError = AppleIntelligenceNotAvailableError.deviceNotEligible
+        given(mockInteractor).execute(prompt: .any, instructions: .any).willThrow(AppleIntelligenceNotAvailableError.deviceNotEligible)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -289,7 +307,7 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_emptyUserPrompt_doesNothing() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        mockInteractor.executeResult = Self.successResponse
+        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -304,7 +322,7 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_alreadyLoading_doesNothing() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        mockInteractor.executeResult = Self.successResponse
+        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -346,7 +364,7 @@ struct PlaygroundViewModelTests {
 
         sut.copyResponseToClipboard()
 
-        #expect(mockClipboard.copiedText == nil)
+        verify(mockClipboard).copy(.any).called(.never)
     }
 
     @Test
@@ -359,27 +377,30 @@ struct PlaygroundViewModelTests {
 
         sut.copyResponseToClipboard()
 
-        #expect(mockClipboard.copiedText == Self.successResponse.content)
+        verify(mockClipboard).copy(.value(Self.successResponse.content)).called(.once)
         #expect(sut.isCopied == true)
     }
 
     @Test
     func modelSelectionChanged_updatesModelAndRechecksAvailability() {
         let availabilityChecker = MockCheckFoundationModelsAvailabilityInteractor()
-        availabilityChecker.executeResult = .unavailable(.deviceNotEligible)
+        given(availabilityChecker).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
 
         let modelsLister = MockListAvailableModelsInteractor()
-        modelsLister.executeResult = [Self.sampleModel]
+        given(modelsLister).execute().willReturn([Self.sampleModel])
+
+        let defaultModelInteractor = MockDefaultModelInteractor()
+        given(defaultModelInteractor).getDefaultModelName().willReturn("default")
 
         let sut = PlaygroundViewModel(
             interactor: MockFoundationModelsInteractor(),
             availabilityChecker: availabilityChecker,
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
-            defaultModelInteractor: MockDefaultModelInteractor()
+            defaultModelInteractor: defaultModelInteractor
         )
 
-        availabilityChecker.executeResult = .available
+        given(availabilityChecker).execute(model: .any).willReturn(.available)
 
         sut.modelSelectionChanged(to: "default")
 
@@ -467,11 +488,27 @@ struct PlaygroundViewModelTests {
     // MARK: - Test Fixtures
 
     private static func makeSUT(
-        interactor: FoundationModelsInteractor = MockFoundationModelsInteractor(),
-        availabilityChecker: CheckFoundationModelsAvailabilityInteractor = MockCheckFoundationModelsAvailabilityInteractor(),
-        modelsLister: ListAvailableModelsInteractor = MockListAvailableModelsInteractor(),
+        interactor: FoundationModelsInteractor = {
+            let mock = MockFoundationModelsInteractor()
+            given(mock).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
+            return mock
+        }(),
+        availabilityChecker: CheckFoundationModelsAvailabilityInteractor = {
+            let mock = MockCheckFoundationModelsAvailabilityInteractor()
+            given(mock).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
+            return mock
+        }(),
+        modelsLister: ListAvailableModelsInteractor = {
+            let mock = MockListAvailableModelsInteractor()
+            given(mock).execute().willReturn([])
+            return mock
+        }(),
         clipboard: ClipboardInteractor = MockClipboardInteractor(),
-        defaultModelInteractor: DefaultModelInteractor = MockDefaultModelInteractor()
+        defaultModelInteractor: DefaultModelInteractor = {
+            let mock = MockDefaultModelInteractor()
+            given(mock).getDefaultModelName().willReturn("default")
+            return mock
+        }()
     ) -> PlaygroundViewModel {
         PlaygroundViewModel(
             interactor: interactor,

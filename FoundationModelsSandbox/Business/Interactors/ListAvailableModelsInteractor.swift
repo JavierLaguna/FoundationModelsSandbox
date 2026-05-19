@@ -1,6 +1,8 @@
 import FoundationModels
+import Mockable
 
 /// Lists the available Foundation Models on the device.
+@Mockable
 protocol ListAvailableModelsInteractor: Sendable {
     func execute() -> [SystemLanguageModel]
 }

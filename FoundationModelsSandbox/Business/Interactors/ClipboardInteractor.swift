@@ -1,12 +1,15 @@
 import Foundation
 import AppKit
+import Mockable
 
 // MARK: - Clipboard Interactor Protocol
+@Mockable
 protocol ClipboardInteractor: Sendable {
     func copy(_ text: String)
 }
 
 // MARK: - Pasteboard Protocol (for testability)
+@Mockable
 protocol PasteboardProtocol {
     @discardableResult
     func clearContents() -> Int

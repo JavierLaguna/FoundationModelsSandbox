@@ -1,6 +1,8 @@
 import FoundationModels
+import Mockable
 
 /// Checks the availability status of Foundation Models on the device.
+@Mockable
 protocol CheckFoundationModelsAvailabilityInteractor: Sendable {
     func execute(model: SystemLanguageModel?) -> SystemLanguageModel.Availability
 }
