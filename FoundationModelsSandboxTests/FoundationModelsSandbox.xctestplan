@@ -4,11 +4,20 @@
       "id" : "F704754F-0945-418B-976E-BF82C6715C0F",
       "name" : "Test Scheme Action",
       "options" : {
-
+        "codeCoverage" : true,
+        "codeCoveragePathExclusions" : [
+          "**/*View.swift",
+          "**/Components/**/*.swift"
+        ]
       }
     }
   ],
   "defaultOptions" : {
+    "codeCoverage" : true,
+    "codeCoveragePathExclusions" : [
+      "**/*View.swift",
+      "**/Components/**/*.swift"
+    ],
     "performanceAntipatternCheckerEnabled" : true,
     "targetForVariableExpansion" : {
       "containerPath" : "container:FoundationModelsSandbox.xcodeproj",
