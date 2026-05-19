@@ -20,7 +20,9 @@ struct PlaygroundView: View {
                 error: viewModel.error,
                 isLoading: viewModel.isLoading,
                 isCopied: viewModel.isCopied,
-                onCopy: { viewModel.copyResponseToClipboard() }
+                isCodeCopied: viewModel.isCodeCopied,
+                onCopy: { viewModel.copyResponseToClipboard() },
+                onCopyCode: { viewModel.copyCodeToClipboard() }
             )
             
         } else {

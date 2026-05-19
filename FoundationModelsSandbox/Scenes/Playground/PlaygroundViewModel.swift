@@ -30,6 +30,7 @@ final class PlaygroundViewModel {
 
     // MARK: - Copy State
     var isCopied: Bool = false
+    var isCodeCopied: Bool = false
 
     // MARK: - Available Models
     private(set) var availableModelNames: [String] = []
@@ -143,6 +144,20 @@ final class PlaygroundViewModel {
         Task {
             try? await Task.sleep(for: .seconds(2))
             isCopied = false
+        }
+    }
+
+    func copyCodeToClipboard() {
+        guard !responseCode.isEmpty else { return }
+
+        clipboard.copy(responseCode)
+
+        isCodeCopied = true
+
+        // Reset the copied state after 2 seconds
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            isCodeCopied = false
         }
     }
 
