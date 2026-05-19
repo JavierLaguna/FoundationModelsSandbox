@@ -134,3 +134,7 @@ MyTextField(placeholder: Text("Enter your prompt..."))
   ```
 - New files should start directly with imports and code.
 - This applies to all new Swift files (app code, tests, etc.).
+
+## Test Warnings to Avoid
+- **Don't use `is` for type checks**: `#expect(result is [Type])` always returns true because the type is already known. Use other assertions instead.
+- **Don't compare non-optionals to nil**: SwiftUI types like `Color` are non-optional. Use `#expect(color != Color.clear)` instead of `#expect(color != nil)`.
