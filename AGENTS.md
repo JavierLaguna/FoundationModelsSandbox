@@ -138,3 +138,45 @@ MyTextField(placeholder: Text("Enter your prompt..."))
 ## Test Warnings to Avoid
 - **Don't use `is` for type checks**: `#expect(result is [Type])` always returns true because the type is already known. Use other assertions instead.
 - **Don't compare non-optionals to nil**: SwiftUI types like `Color` are non-optional. Use `#expect(color != Color.clear)` instead of `#expect(color != nil)`.
+
+## ViewModel State Management in Navigation
+- **Preserving state across screens**: When a ViewModel needs to persist its state when navigating between screens (e.g., switching between Playground, History, Settings), create the ViewModel at the parent view level (e.g., `MainView`) and pass it down to child views via initializer.
+- **Resetting session/state**: To reset a ViewModel (e.g., "New Chat" button), simply create a new instance: `viewModel = PlaygroundViewModel()`.
+- **Navigation from child views**: Pass navigation state (`@Binding`) and callbacks (e.g., `onNewChat: () -> Void`) from parent to child views to control navigation from the sidebar or other components.
+
+### Example Pattern
+```swift
+// MainView.swift - Parent creates and owns the ViewModel
+struct MainView: View {
+    @State private var selectedSection: NavigationRoute = .playground
+    @State private var playgroundViewModel = PlaygroundViewModel()
+
+    var body: some View {
+        NavigationSplitView {
+            SidebarView(
+                selectedSection: $selectedSection,
+                onNewChat: {
+                    playgroundViewModel = PlaygroundViewModel()  // Reset
+                    selectedSection = .playground                 // Navigate
+                }
+            )
+        } detail: {
+            switch selectedSection {
+            case .playground:
+                PlaygroundView(viewModel: playgroundViewModel)  // Pass down
+            // ...
+            }
+        }
+    }
+}
+
+// PlaygroundView.swift - Child receives ViewModel via init
+struct PlaygroundView: View {
+    @State private var viewModel: PlaygroundViewModel
+
+    init(viewModel: PlaygroundViewModel = PlaygroundViewModel()) {
+        self._viewModel = State(initialValue: viewModel)
+    }
+    // ...
+}
+```
