@@ -381,6 +381,35 @@ struct PlaygroundViewModelTests {
         #expect(sut.isCopied == true)
     }
 
+    // MARK: copyCodeToClipboard
+
+    @Test
+    func copyCodeToClipboard_emptyCode_doesNothing() {
+        let mockClipboard = MockClipboardInteractor()
+
+        let sut = Self.makeSUT(clipboard: mockClipboard)
+
+        sut.aiResponse = Self.plainTextResponse
+
+        sut.copyCodeToClipboard()
+
+        verify(mockClipboard).copy(.any).called(.never)
+    }
+
+    @Test
+    func copyCodeToClipboard_withCode_copiesAndSetsIsCodeCopied() {
+        let mockClipboard = MockClipboardInteractor()
+
+        let sut = Self.makeSUT(clipboard: mockClipboard)
+
+        sut.aiResponse = Self.successResponse
+
+        sut.copyCodeToClipboard()
+
+        verify(mockClipboard).copy(.value("let x = 1")).called(.once)
+        #expect(sut.isCodeCopied == true)
+    }
+
     @Test
     func modelSelectionChanged_updatesModelAndRechecksAvailability() {
         let availabilityChecker = MockCheckFoundationModelsAvailabilityInteractor()
