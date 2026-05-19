@@ -1,6 +1,8 @@
 import Foundation
+import Mockable
 
 /// Handles app language preference persistence
+@Mockable
 protocol AppLanguageInteractor: Sendable {
     func getCurrentLanguage() -> AppLanguage
     func setLanguage(_ language: AppLanguage)
