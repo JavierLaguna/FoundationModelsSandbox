@@ -13,7 +13,7 @@
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' test`
 - Run only unit tests target:
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -only-testing:FoundationModelsSandboxTests test`
-- Test status: **68 tests** (all Swift Testing, no XCTest).
+- Test status: **73+ tests** (all Swift Testing, no XCTest).
 
 ## Command-order / defaults that can bite
 - `xcodebuild` defaults to **Release** if you omit scheme/configuration (`xcodebuild -list` reports this); pass scheme (and config if needed) explicitly.
@@ -31,7 +31,9 @@
   - `FoundationModelsSandboxTests/` uses **Swift Testing** (`import Testing`, `@Test`), not XCTest.
   - `FoundationModelsSandboxUITests/` uses XCTest UI testing and launches the app via `XCUIApplication()`.
   - Test files mirror the app's folder structure (e.g., `Business/Models/`, `Business/Interactors/`, `Scenes/Main/`).
-  - Mocks live in `FoundationModelsSandboxTests/Mocks/`.
+  - **Mocks**: Uses **Mockable** library (`@Mockable` macro on protocols). No manual mocks - mocks generated at compile time when `MOCKING` flag is set.
+  - **Testing ViewModels with Mockable**: ViewModels that call dependencies in `init` need `MockerPolicy.default = .relaxed` in the test struct's `init()` to avoid crashes from unstubbed mock calls during initialization.
+  - **Code Coverage**: Configured in `FoundationModelsSandbox.xctestplan` with exclusions for `**/*View.swift` and `**/Components/**/*.swift`. ViewModels are included in coverage.
 
 ## Async/await + Swift 6 Strict Concurrency
 - All asynchronous flows MUST use `async`/`await`. No completion handlers.
