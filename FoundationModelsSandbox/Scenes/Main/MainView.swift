@@ -11,6 +11,7 @@ struct MainView: View {
     private var languagePreference: String = AppLanguage.system.rawValue
     
     @State private var selectedSection: NavigationRoute = .playground
+    @State private var playgroundViewModel = PlaygroundViewModel()
     
     private var currentLocale: Locale {
         guard let language = AppLanguage(rawValue: languagePreference) else {
@@ -30,7 +31,14 @@ struct MainView: View {
         NavigationSplitView {
             SidebarView(selectedSection: $selectedSection)
         } detail: {
-            selectedSection.destination
+            switch selectedSection {
+            case .playground:
+                PlaygroundView(viewModel: playgroundViewModel)
+            case .history:
+                HistoryView()
+            case .settings:
+                SettingsView()
+            }
         }
         .navigationSplitViewStyle(.balanced)
         .environment(\.locale, currentLocale)

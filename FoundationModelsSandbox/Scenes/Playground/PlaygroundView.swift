@@ -4,7 +4,11 @@ import SwiftUI
 // MARK: - Playground View
 struct PlaygroundView: View {
     
-    @State private var viewModel = PlaygroundViewModel()
+    @State private var viewModel: PlaygroundViewModel
+    
+    init(viewModel: PlaygroundViewModel = PlaygroundViewModel()) {
+        self._viewModel = State(initialValue: viewModel)
+    }
     
     @ViewBuilder
     private var detailView: some View {
