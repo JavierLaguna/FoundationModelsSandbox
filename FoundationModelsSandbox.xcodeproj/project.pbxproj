@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		49E518102FBC5CAE00E28D1A /* Mockable in Frameworks */ = {isa = PBXBuildFile; productRef = 49E5180F2FBC5CAE00E28D1A /* Mockable */; };
+		49E518122FBC5CB400E28D1A /* Mockable in Frameworks */ = {isa = PBXBuildFile; productRef = 49E518112FBC5CB400E28D1A /* Mockable */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		49E8B9932F9F9B35002F1EE2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				49E518102FBC5CAE00E28D1A /* Mockable in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,17 +65,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				49E518122FBC5CB400E28D1A /* Mockable in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		49E5180E2FBC5CAE00E28D1A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		49E8B97C2F9F9B33002F1EE2 = {
 			isa = PBXGroup;
 			children = (
 				49E8B9872F9F9B33002F1EE2 /* FoundationModelsSandbox */,
 				49E8B9952F9F9B35002F1EE2 /* FoundationModelsSandboxTests */,
+				49E5180E2FBC5CAE00E28D1A /* Frameworks */,
 				49E8B9862F9F9B33002F1EE2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -103,6 +118,7 @@
 			);
 			name = FoundationModelsSandbox;
 			packageProductDependencies = (
+				49E5180F2FBC5CAE00E28D1A /* Mockable */,
 			);
 			productName = FoundationModelsSandbox;
 			productReference = 49E8B9852F9F9B33002F1EE2 /* FoundationModelsSandbox.app */;
@@ -126,6 +142,7 @@
 			);
 			name = FoundationModelsSandboxTests;
 			packageProductDependencies = (
+				49E518112FBC5CB400E28D1A /* Mockable */,
 			);
 			productName = FoundationModelsSandboxTests;
 			productReference = 49E8B9922F9F9B35002F1EE2 /* FoundationModelsSandboxTests.xctest */;
@@ -160,6 +177,9 @@
 			);
 			mainGroup = 49E8B97C2F9F9B33002F1EE2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				49E5180D2FBC5CA500E28D1A /* XCRemoteSwiftPackageReference "Mockable" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 49E8B9862F9F9B33002F1EE2 /* Products */;
 			projectDirPath = "";
@@ -368,6 +388,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited) MOCKING";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -426,6 +447,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = dev.jlaguna.FoundationModelsSandboxTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited) MOCKING";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -489,6 +511,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		49E5180D2FBC5CA500E28D1A /* XCRemoteSwiftPackageReference "Mockable" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Kolos65/Mockable";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		49E5180F2FBC5CAE00E28D1A /* Mockable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 49E5180D2FBC5CA500E28D1A /* XCRemoteSwiftPackageReference "Mockable" */;
+			productName = Mockable;
+		};
+		49E518112FBC5CB400E28D1A /* Mockable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 49E5180D2FBC5CA500E28D1A /* XCRemoteSwiftPackageReference "Mockable" */;
+			productName = Mockable;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 49E8B97D2F9F9B33002F1EE2 /* Project object */;
 }
