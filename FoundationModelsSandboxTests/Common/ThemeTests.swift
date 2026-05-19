@@ -80,25 +80,25 @@ struct ThemeTests {
     func color_appleBlue_isValid() {
         // Just verify the color can be created
         let color = Color.appleBlue
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     @Test
     func color_successGreen_isValid() {
         let color = Color.successGreen
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     @Test
     func color_warningOrange_isValid() {
         let color = Color.warningOrange
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     @Test
     func color_errorRed_isValid() {
         let color = Color.errorRed
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     // MARK: - Hex Initializer
@@ -106,26 +106,26 @@ struct ThemeTests {
     @Test
     func hexInitializer_3Digits_createsColor() {
         let color = Color(hex: "FFF")
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     @Test
     func hexInitializer_6Digits_createsColor() {
         let color = Color(hex: "FF0000")
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     @Test
     func hexInitializer_8Digits_createsColor() {
         let color = Color(hex: "FF0000FF")
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     @Test
     func hexInitializer_invalid_returnsBlack() {
         // Invalid hex should not crash, returns default
         let color = Color(hex: "invalid")
-        #expect(color != nil)
+        #expect(color != Color.clear)
     }
 
     // MARK: - LiquidGlass Modifier
@@ -134,7 +134,7 @@ struct ThemeTests {
     func liquidGlass_modifierExists() {
         // Just verify the modifier can be created
         let modifier = LiquidGlass(cornerRadius: 16)
-        #expect(modifier != nil)
+        #expect(modifier.cornerRadius == 16)
     }
 
     @Test

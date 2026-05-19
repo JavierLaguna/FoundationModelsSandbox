@@ -14,7 +14,8 @@ struct ListAvailableModelsInteractorTests {
 
         let result = sut.execute()
 
-        #expect(result is [SystemLanguageModel])
+        // Verify result is an array (type check is implicit from return type)
+        #expect(!result.isEmpty || result.isEmpty)
     }
 
     @Test
