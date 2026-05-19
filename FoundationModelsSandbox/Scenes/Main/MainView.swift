@@ -29,7 +29,13 @@ struct MainView: View {
     
     var body: some View {
         NavigationSplitView {
-            SidebarView(selectedSection: $selectedSection)
+            SidebarView(
+                selectedSection: $selectedSection,
+                onNewChat: {
+                    playgroundViewModel = PlaygroundViewModel()
+                    selectedSection = .playground
+                }
+            )
         } detail: {
             switch selectedSection {
             case .playground:

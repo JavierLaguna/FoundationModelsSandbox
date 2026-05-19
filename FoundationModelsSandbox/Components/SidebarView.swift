@@ -4,6 +4,7 @@ import SwiftUI
 struct SidebarView: View {
     
     @Binding var selectedSection: NavigationRoute
+    var onNewChat: () -> Void
     
     var body: some View {
         List(selection: $selectedSection) {
@@ -22,7 +23,7 @@ struct SidebarView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    // New chat action
+                    onNewChat()
                 } label: {
                     Image(systemName: "square.and.pencil")
                 }
@@ -34,6 +35,6 @@ struct SidebarView: View {
 }
 
 #Preview {
-    SidebarView(selectedSection: .constant(.playground))
+    SidebarView(selectedSection: .constant(.playground), onNewChat: {})
         .frame(width: 280)
 }
