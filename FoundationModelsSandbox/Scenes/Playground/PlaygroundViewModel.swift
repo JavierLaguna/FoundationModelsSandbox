@@ -128,10 +128,17 @@ final class PlaygroundViewModel {
         isLoading = true
         error = nil
 
-        let messageId = session.addMessage(prompt: userPrompt, outcome: .noResponse)
+        let prompt = userPrompt
+        userPrompt = ""
+        
+        let messageId = session.addMessage(prompt: prompt, outcome: .noResponse)
 
         do {
-            let response = try await interactor.execute(prompt: userPrompt, instructions: instructions)
+            let response = try await interactor.execute(
+                prompt: prompt,
+                instructions: instructions
+            )
+            
             aiResponse = response
             session.updateMessage(id: messageId, outcome: .success(response))
 
@@ -140,8 +147,6 @@ final class PlaygroundViewModel {
             self.error = errorMessage
             session.updateMessage(id: messageId, outcome: .failure(errorMessage))
         }
-
-        userPrompt = ""
         isLoading = false
     }
 
