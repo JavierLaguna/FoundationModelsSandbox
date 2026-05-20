@@ -14,16 +14,7 @@ struct LoadingAppleIntelligence: View {
         self.textKey = text
         self.layout = layout
     }
-
-    var body: some View {
-        switch layout {
-        case .vertical:
-            verticalLayout
-        case .horizontal:
-            horizontalLayout
-        }
-    }
-
+    
     @ViewBuilder
     private var verticalLayout: some View {
         VStack(spacing: Spacing.md) {
@@ -40,14 +31,23 @@ struct LoadingAppleIntelligence: View {
 
     @ViewBuilder
     private var horizontalLayout: some View {
-        HStack(spacing: Spacing.md) {
-            AppleIntelligenceAnimation(size: 32)
+        HStack(spacing: Spacing.sm) {
+            AppleIntelligenceAnimation(size: 24)
 
             if let textKey {
                 Text(textKey)
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
+        }
+    }
+
+    var body: some View {
+        switch layout {
+        case .vertical:
+            verticalLayout
+        case .horizontal:
+            horizontalLayout
         }
     }
 }

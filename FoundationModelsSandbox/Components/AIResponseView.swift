@@ -130,7 +130,12 @@ private struct MessageBubble: View {
             errorView(errorMessage)
 
         case .noResponse:
-            noResponseView
+            LoadingAppleIntelligence(
+                text: "Waiting for response...",
+                layout: .horizontal
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, Spacing.xs)
         }
     }
 
@@ -179,15 +184,6 @@ private struct MessageBubble: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.errorRed.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
-            Spacer()
-        }
-        .padding(.trailing, Spacing.xl)
-    }
-
-    @ViewBuilder
-    private var noResponseView: some View {
-        HStack {
-            LoadingAppleIntelligence(text: "Waiting for response...", layout: .horizontal)
             Spacer()
         }
         .padding(.trailing, Spacing.xl)
