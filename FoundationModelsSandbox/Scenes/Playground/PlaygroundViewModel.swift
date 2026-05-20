@@ -129,7 +129,6 @@ final class PlaygroundViewModel {
         error = nil
 
         let messageId = session.addMessage(prompt: userPrompt, outcome: .noResponse)
-        userPrompt = ""
 
         do {
             let response = try await interactor.execute(prompt: userPrompt, instructions: instructions)
@@ -142,6 +141,7 @@ final class PlaygroundViewModel {
             session.updateMessage(id: messageId, outcome: .failure(errorMessage))
         }
 
+        userPrompt = ""
         isLoading = false
     }
 
