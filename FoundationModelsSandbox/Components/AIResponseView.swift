@@ -45,7 +45,6 @@ struct AIResponseView: View {
 
                     if isLoading {
                         HStack {
-                            LoadingAppleIntelligence(text: "Generating response...")
                             Spacer()
                         }
                     }
@@ -188,20 +187,7 @@ private struct MessageBubble: View {
     @ViewBuilder
     private var noResponseView: some View {
         HStack {
-            HStack(spacing: Spacing.sm) {
-                ProgressView()
-                    .controlSize(.small)
-
-                Text("Waiting for response...")
-                    .font(.caption)
-                    .foregroundStyle(Color.tertiaryText)
-
-                Spacer()
-            }
-            .padding(Spacing.md)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.appSecondaryBackground.opacity(0.5))
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
+            LoadingAppleIntelligence(text: "Waiting for response...", layout: .horizontal)
             Spacer()
         }
         .padding(.trailing, Spacing.xl)
