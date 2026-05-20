@@ -14,10 +14,7 @@ struct PlaygroundView: View {
     private var detailView: some View {
         if viewModel.isFoundationModelsAvailable {
             AIResponseView(
-                response: viewModel.responseContent,
-                code: viewModel.responseCode,
-                metrics: viewModel.aiResponse,
-                error: viewModel.error,
+                messages: viewModel.session.messages,
                 isLoading: viewModel.isLoading,
                 isCopied: viewModel.isCopied,
                 isCodeCopied: viewModel.isCodeCopied,
