@@ -3,11 +3,15 @@ import SwiftUI
 
 // MARK: - Playground View
 struct PlaygroundView: View {
-    
-    @State private var viewModel: PlaygroundViewModel
-    
-    init(viewModel: PlaygroundViewModel = PlaygroundViewModel()) {
-        self._viewModel = State(initialValue: viewModel)
+
+    @Bindable var viewModel: PlaygroundViewModel
+
+    init(viewModel: PlaygroundViewModel) {
+        self._viewModel = Bindable(wrappedValue: viewModel)
+    }
+
+    init() {
+        self._viewModel = Bindable(wrappedValue: PlaygroundViewModel())
     }
     
     @ViewBuilder

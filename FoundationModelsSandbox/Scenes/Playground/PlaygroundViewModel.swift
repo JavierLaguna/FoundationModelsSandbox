@@ -80,6 +80,7 @@ final class PlaygroundViewModel {
         self.clipboard = clipboard
         self.defaultModelInteractor = defaultModelInteractor
         self.session = ConversationSession()
+        
         loadModels()
         checkAvailability()
     }
