@@ -590,6 +590,9 @@
         }
       }
     },
+    "Waiting for response..." : {
+
+    },
     "Work in progress" : {
       "localizations" : {
         "en" : {

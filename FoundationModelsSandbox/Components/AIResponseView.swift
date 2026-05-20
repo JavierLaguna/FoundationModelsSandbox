@@ -37,24 +37,32 @@ struct AIResponseView: View {
     private var conversationView: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: Spacing.md) {
+                LazyVStack(alignment: .trailing, spacing: Spacing.md) {
                     ForEach(messages) { message in
                         MessageBubble(message: message, isCodeCopied: isCodeCopied, onCopyCode: onCopyCode)
                             .id(message.id)
                     }
 
                     if isLoading {
-                        LoadingAppleIntelligence(text: "Generating response...")
-                            .padding(.leading, Spacing.sm)
+                        HStack {
+                            LoadingAppleIntelligence(text: "Generating response...")
+                            Spacer()
+                        }
                     }
                 }
                 .padding(Spacing.lg)
+                .frame(maxWidth: .infinity)
             }
             .onChange(of: messages.count) { _, _ in
                 if let lastMessage = messages.last {
                     withAnimation {
                         proxy.scrollTo(lastMessage.id, anchor: .bottom)
                     }
+                }
+            }
+            .onAppear {
+                if let lastMessage = messages.last {
+                    proxy.scrollTo(lastMessage.id, anchor: .bottom)
                 }
             }
         }
@@ -102,12 +110,11 @@ private struct MessageBubble: View {
             .foregroundStyle(Color.primaryText)
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)
-            .glassEffect(in: .capsule)
+            .glassEffect(in: .rect(cornerRadius: CornerRadius.medium))
             .background(
-                Capsule()
+                RoundedRectangle(cornerRadius: CornerRadius.medium)
                     .fill(Color.appleBlue.opacity(0.1))
             )
-            .frame(maxWidth: 280, alignment: .trailing)
     }
 
     @ViewBuilder
@@ -140,7 +147,6 @@ private struct MessageBubble: View {
             metricsFooter(response)
         }
         .padding(Spacing.md)
-        .frame(maxWidth: 320, alignment: .leading)
         .liquidGlass(cornerRadius: CornerRadius.medium)
     }
 
@@ -162,7 +168,7 @@ private struct MessageBubble: View {
                 .lineSpacing(3)
         }
         .padding(Spacing.md)
-        .frame(maxWidth: 320, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.errorRed.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
     }
@@ -176,9 +182,11 @@ private struct MessageBubble: View {
             Text("Waiting for response...")
                 .font(.caption)
                 .foregroundStyle(Color.tertiaryText)
+
+            Spacer()
         }
         .padding(Spacing.md)
-        .frame(maxWidth: 320, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSecondaryBackground.opacity(0.5))
         .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
     }
