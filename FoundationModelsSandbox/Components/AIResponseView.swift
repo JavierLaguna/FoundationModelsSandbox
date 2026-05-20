@@ -53,7 +53,7 @@ struct AIResponseView: View {
                 .padding(Spacing.lg)
                 .frame(maxWidth: .infinity)
             }
-            .onChange(of: messages.count) { _, _ in
+            .onChange(of: messages) { _, _ in
                 if let lastMessage = messages.last {
                     withAnimation {
                         proxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -108,6 +108,7 @@ private struct MessageBubble: View {
         Text(message.prompt)
             .font(.body)
             .foregroundStyle(Color.primaryText)
+            .padding(.leading, Spacing.xl)
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)
             .glassEffect(in: .rect(cornerRadius: CornerRadius.medium))
@@ -146,6 +147,7 @@ private struct MessageBubble: View {
 
             metricsFooter(response)
         }
+        .padding(.trailing, Spacing.xl)
         .padding(Spacing.md)
         .liquidGlass(cornerRadius: CornerRadius.medium)
     }
@@ -167,6 +169,7 @@ private struct MessageBubble: View {
                 .foregroundStyle(Color.secondaryText)
                 .lineSpacing(3)
         }
+        .padding(.trailing, Spacing.xl)
         .padding(Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.errorRed.opacity(0.1))
@@ -185,6 +188,7 @@ private struct MessageBubble: View {
 
             Spacer()
         }
+        .padding(.trailing, Spacing.xl)
         .padding(Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSecondaryBackground.opacity(0.5))

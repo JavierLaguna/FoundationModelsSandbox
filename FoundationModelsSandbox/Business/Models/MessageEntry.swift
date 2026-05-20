@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents a single message exchange in a conversation
-struct MessageEntry: Identifiable, Sendable {
+struct MessageEntry: Identifiable, Sendable, Equatable {
     let id: UUID
     let prompt: String
     var outcome: SessionOutcome

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents the outcome of a conversation message exchange
-enum SessionOutcome: Sendable {
+enum SessionOutcome: Sendable, Equatable {
     case success(AIResponse)
     case failure(String)
     case noResponse
