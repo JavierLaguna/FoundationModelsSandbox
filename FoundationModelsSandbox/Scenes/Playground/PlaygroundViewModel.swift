@@ -28,6 +28,9 @@ final class PlaygroundViewModel {
     var isLoading: Bool = false
     var error: String?
 
+    // MARK: - Session State
+    private(set) var session: ConversationSession
+
     // MARK: - Copy State
     var isCopied: Bool = false
     var isCodeCopied: Bool = false
@@ -76,6 +79,7 @@ final class PlaygroundViewModel {
         self.modelsLister = modelsLister
         self.clipboard = clipboard
         self.defaultModelInteractor = defaultModelInteractor
+        self.session = ConversationSession()
         loadModels()
         checkAvailability()
     }
@@ -91,6 +95,9 @@ final class PlaygroundViewModel {
         let defaultModelName = defaultModelInteractor.getDefaultModelName()
         selectedModelName = availableModelNames.contains(defaultModelName) ? defaultModelName : (availableModelNames.first ?? "")
         selectedModel = models.first
+
+        // Initialize session with the selected model
+        session.modelName = selectedModelName
     }
 
     private func checkAvailability() {
@@ -106,6 +113,13 @@ final class PlaygroundViewModel {
         selectedModel = availableModels.first
         // Re-check availability for the newly selected model
         checkAvailability()
+        // Update session with new model name
+        session.modelName = modelName
+    }
+
+    func updateInstructions(_ newInstructions: String) {
+        instructions = newInstructions
+        session.instructions = newInstructions
     }
 
     func submitPrompt() async {
@@ -117,10 +131,13 @@ final class PlaygroundViewModel {
         do {
             let response = try await interactor.execute(prompt: userPrompt, instructions: instructions)
             aiResponse = response
+            session.addMessage(prompt: userPrompt, outcome: .success(response))
             userPrompt = ""
 
         } catch {
-            self.error = error.localizedDescription
+            let errorMessage = error.localizedDescription
+            self.error = errorMessage
+            session.addMessage(prompt: userPrompt, outcome: .failure(errorMessage))
         }
 
         isLoading = false
@@ -131,6 +148,7 @@ final class PlaygroundViewModel {
         userPrompt = ""
         aiResponse = nil
         error = nil
+        session = ConversationSession(modelName: selectedModelName, instructions: "")
     }
 
     func copyResponseToClipboard() {
