@@ -108,9 +108,10 @@ private struct MessageBubble: View {
         Text(message.prompt)
             .font(.body)
             .foregroundStyle(Color.primaryText)
-            .padding(.leading, Spacing.xl)
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)
+            .padding(.leading, Spacing.xl)
+            .frame(maxWidth: .infinity, alignment: .trailing)
             .glassEffect(in: .rect(cornerRadius: CornerRadius.medium))
             .background(
                 RoundedRectangle(cornerRadius: CornerRadius.medium)
@@ -147,8 +148,9 @@ private struct MessageBubble: View {
 
             metricsFooter(response)
         }
-        .padding(.trailing, Spacing.xl)
         .padding(Spacing.md)
+        .padding(.trailing, Spacing.xl)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .liquidGlass(cornerRadius: CornerRadius.medium)
     }
 
@@ -169,8 +171,8 @@ private struct MessageBubble: View {
                 .foregroundStyle(Color.secondaryText)
                 .lineSpacing(3)
         }
-        .padding(.trailing, Spacing.xl)
         .padding(Spacing.md)
+        .padding(.trailing, Spacing.xl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.errorRed.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
@@ -188,8 +190,8 @@ private struct MessageBubble: View {
 
             Spacer()
         }
-        .padding(.trailing, Spacing.xl)
         .padding(Spacing.md)
+        .padding(.trailing, Spacing.xl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSecondaryBackground.opacity(0.5))
         .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
