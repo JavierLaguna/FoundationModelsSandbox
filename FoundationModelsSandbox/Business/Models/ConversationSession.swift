@@ -21,10 +21,19 @@ struct ConversationSession: Identifiable, Sendable {
         self.messages = []
     }
 
-    /// Adds a new message entry to the session
-    mutating func addMessage(prompt: String, outcome: SessionOutcome) {
+    /// Adds a new message entry to the session and returns its ID
+    @discardableResult
+    mutating func addMessage(prompt: String, outcome: SessionOutcome) -> UUID {
         let entry = MessageEntry(prompt: prompt, outcome: outcome)
         messages.append(entry)
+        return entry.id
+    }
+
+    /// Updates the outcome of an existing message by its ID
+    mutating func updateMessage(id: UUID, outcome: SessionOutcome) {
+        if let index = messages.firstIndex(where: { $0.id == id }) {
+            messages[index].outcome = outcome
+        }
     }
 
     /// Returns the total number of exchanges in this session

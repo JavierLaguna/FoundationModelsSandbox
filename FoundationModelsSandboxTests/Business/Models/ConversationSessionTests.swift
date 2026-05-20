@@ -160,4 +160,37 @@ struct ConversationSessionTests {
 
         #expect(session.messages[0].id != session.messages[1].id)
     }
+
+    @Test
+    func addMessage_returnsMessageId() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "Test", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        let id = session.addMessage(prompt: "P1", outcome: .success(response))
+
+        #expect(session.messages[0].id == id)
+    }
+
+    @Test
+    func updateMessage_updatesExistingMessage() {
+        var session = ConversationSession()
+        let id = session.addMessage(prompt: "P1", outcome: .noResponse)
+
+        session.updateMessage(id: id, outcome: .success(AIResponse(content: "Updated", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)))
+
+        #expect(session.messages[0].outcome.content == "Updated")
+    }
+
+    @Test
+    func updateMessage_withInvalidId_doesNotModifyMessages() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "Original", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+        let id = session.addMessage(prompt: "P1", outcome: .success(response))
+
+        session.updateMessage(id: UUID(), outcome: .noResponse)
+
+        if case .success(let storedResponse) = session.messages[0].outcome {
+            #expect(storedResponse.content == "Original")
+        }
+    }
 }

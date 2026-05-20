@@ -2,8 +2,14 @@ import Foundation
 
 /// Represents a single message exchange in a conversation
 struct MessageEntry: Identifiable, Sendable {
-    let id = UUID()
+    let id: UUID
     let prompt: String
-    let outcome: SessionOutcome
+    var outcome: SessionOutcome
     let timestamp: Date = Date()
+
+    init(id: UUID = UUID(), prompt: String, outcome: SessionOutcome) {
+        self.id = id
+        self.prompt = prompt
+        self.outcome = outcome
+    }
 }

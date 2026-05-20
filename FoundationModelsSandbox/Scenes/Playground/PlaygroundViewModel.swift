@@ -128,16 +128,18 @@ final class PlaygroundViewModel {
         isLoading = true
         error = nil
 
+        let messageId = session.addMessage(prompt: userPrompt, outcome: .noResponse)
+        userPrompt = ""
+
         do {
             let response = try await interactor.execute(prompt: userPrompt, instructions: instructions)
             aiResponse = response
-            session.addMessage(prompt: userPrompt, outcome: .success(response))
-            userPrompt = ""
+            session.updateMessage(id: messageId, outcome: .success(response))
 
         } catch {
             let errorMessage = error.localizedDescription
             self.error = errorMessage
-            session.addMessage(prompt: userPrompt, outcome: .failure(errorMessage))
+            session.updateMessage(id: messageId, outcome: .failure(errorMessage))
         }
 
         isLoading = false
