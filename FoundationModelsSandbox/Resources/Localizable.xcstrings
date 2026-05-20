@@ -65,16 +65,6 @@
         }
       }
     },
-    "Copied" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiado"
-          }
-        }
-      }
-    },
     "Copy" : {
       "localizations" : {
         "en" : {
@@ -87,6 +77,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copiar"
+          }
+        }
+      }
+    },
+    "Copied" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiado"
           }
         }
       }
@@ -591,7 +597,20 @@
       }
     },
     "Waiting for response..." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for response..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando respuesta..."
+          }
+        }
+      }
     },
     "Work in progress" : {
       "localizations" : {
