@@ -105,18 +105,20 @@ private struct MessageBubble: View {
 
     @ViewBuilder
     private var promptBubble: some View {
-        Text(message.prompt)
-            .font(.body)
-            .foregroundStyle(Color.primaryText)
-            .padding(.horizontal, Spacing.md)
-            .padding(.vertical, Spacing.sm)
-            .padding(.leading, Spacing.xl)
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .glassEffect(in: .rect(cornerRadius: CornerRadius.medium))
-            .background(
-                RoundedRectangle(cornerRadius: CornerRadius.medium)
-                    .fill(Color.appleBlue.opacity(0.1))
-            )
+        HStack {
+            Spacer()
+            Text(message.prompt)
+                .font(.body)
+                .foregroundStyle(Color.primaryText)
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.sm)
+                .glassEffect(in: .rect(cornerRadius: CornerRadius.medium))
+                .background(
+                    RoundedRectangle(cornerRadius: CornerRadius.medium)
+                        .fill(Color.appleBlue.opacity(0.1))
+                )
+        }
+        .padding(.leading, Spacing.xl)
     }
 
     @ViewBuilder
@@ -135,66 +137,74 @@ private struct MessageBubble: View {
 
     @ViewBuilder
     private func responseSuccessView(_ response: AIResponse) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text(response.content)
-                .font(.body)
-                .lineSpacing(4)
-                .foregroundStyle(Color.primaryText)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        HStack {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                Text(response.content)
+                    .font(.body)
+                    .lineSpacing(4)
+                    .foregroundStyle(Color.primaryText)
 
-            if !extractCodeBlock(from: response.content).isEmpty {
-                codeBlock(extractCodeBlock(from: response.content))
+                if !extractCodeBlock(from: response.content).isEmpty {
+                    codeBlock(extractCodeBlock(from: response.content))
+                }
+
+                metricsFooter(response)
             }
-
-            metricsFooter(response)
+            .padding(Spacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .liquidGlass(cornerRadius: CornerRadius.medium)
+            Spacer()
         }
-        .padding(Spacing.md)
         .padding(.trailing, Spacing.xl)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .liquidGlass(cornerRadius: CornerRadius.medium)
     }
 
     @ViewBuilder
     private func errorView(_ errorMessage: String) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            HStack(spacing: Spacing.sm) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
+        HStack {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.red)
 
-                Text("Error")
-                    .font(.headline)
-                    .foregroundStyle(.red)
+                    Text("Error")
+                        .font(.headline)
+                        .foregroundStyle(.red)
+                }
+
+                Text(errorMessage)
+                    .font(.body)
+                    .foregroundStyle(Color.secondaryText)
+                    .lineSpacing(3)
             }
-
-            Text(errorMessage)
-                .font(.body)
-                .foregroundStyle(Color.secondaryText)
-                .lineSpacing(3)
+            .padding(Spacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.errorRed.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
+            Spacer()
         }
-        .padding(Spacing.md)
         .padding(.trailing, Spacing.xl)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.errorRed.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
     }
 
     @ViewBuilder
     private var noResponseView: some View {
-        HStack(spacing: Spacing.sm) {
-            ProgressView()
-                .controlSize(.small)
+        HStack {
+            HStack(spacing: Spacing.sm) {
+                ProgressView()
+                    .controlSize(.small)
 
-            Text("Waiting for response...")
-                .font(.caption)
-                .foregroundStyle(Color.tertiaryText)
+                Text("Waiting for response...")
+                    .font(.caption)
+                    .foregroundStyle(Color.tertiaryText)
 
+                Spacer()
+            }
+            .padding(Spacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.appSecondaryBackground.opacity(0.5))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
             Spacer()
         }
-        .padding(Spacing.md)
         .padding(.trailing, Spacing.xl)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.appSecondaryBackground.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
     }
 
     @ViewBuilder
