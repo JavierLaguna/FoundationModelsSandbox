@@ -48,20 +48,27 @@ struct AIResponseView: View {
                             Spacer()
                         }
                     }
+
+                    // Bottom sentinel — ensures we can always reach the very end
+                    Color.clear
+                        .frame(height: 1)
+                        .id("scrollBottom")
                 }
                 .padding(Spacing.lg)
                 .frame(maxWidth: .infinity)
             }
+            .defaultScrollAnchor(.bottom)
             .onChange(of: messages) { _, _ in
-                if let lastMessage = messages.last {
-                    withAnimation {
-                        proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                    }
+                withAnimation {
+                    proxy.scrollTo("scrollBottom", anchor: .bottom)
                 }
             }
             .onAppear {
-                if let lastMessage = messages.last {
-                    proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                // Defer to next run loop to ensure layout is complete
+                DispatchQueue.main.async {
+                    withAnimation {
+                        proxy.scrollTo("scrollBottom", anchor: .bottom)
+                    }
                 }
             }
         }
