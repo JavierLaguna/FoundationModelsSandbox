@@ -9,6 +9,11 @@ struct AIResponseView: View {
     let onCopy: () -> Void
     let onCopyCode: () -> Void
 
+    @State private var canScrollToBottom: Bool = false
+
+    /// Threshold in points: button appears when the user is more than this away from the bottom.
+    private static let scrollThreshold: CGFloat = 580
+
     var body: some View {
         VStack(spacing: 0) {
             ToolbarView(
@@ -39,8 +44,12 @@ struct AIResponseView: View {
             ScrollView {
                 LazyVStack(alignment: .trailing, spacing: Spacing.md) {
                     ForEach(messages) { message in
-                        MessageBubble(message: message, isCodeCopied: isCodeCopied, onCopyCode: onCopyCode)
-                            .id(message.id)
+                        MessageBubble(
+                            message: message,
+                            isCodeCopied: isCodeCopied,
+                            onCopyCode: onCopyCode
+                        )
+                        .id(message.id)
                     }
 
                     if isLoading {
@@ -58,6 +67,11 @@ struct AIResponseView: View {
                 .frame(maxWidth: .infinity)
             }
             .defaultScrollAnchor(.bottom)
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.visibleRect.maxY >= geometry.contentSize.height - Self.scrollThreshold
+            } action: { _, isAtBottom in
+                canScrollToBottom = !isAtBottom
+            }
             .onChange(of: messages) { _, _ in
                 withAnimation {
                     proxy.scrollTo("scrollBottom", anchor: .bottom)
@@ -69,6 +83,29 @@ struct AIResponseView: View {
                     withAnimation {
                         proxy.scrollTo("scrollBottom", anchor: .bottom)
                     }
+                }
+            }
+            .overlay(alignment: .bottom) {
+                // Scroll-to-bottom floating button
+                if canScrollToBottom {
+                    Button {
+                        withAnimation {
+                            proxy.scrollTo("scrollBottom", anchor: .bottom)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.down")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Circle()
+                                    .glassEffect(in: .circle)
+                            )
+                            .contentShape(.circle)
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(.bottom, Spacing.sm)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
                 }
             }
         }
