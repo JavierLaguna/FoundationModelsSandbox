@@ -197,8 +197,8 @@ private struct MessageBubble: View {
                     .lineSpacing(4)
                     .foregroundStyle(Color.primaryText)
 
-                if !extractCodeBlock(from: response.content).isEmpty {
-                    codeBlock(extractCodeBlock(from: response.content))
+                if let info = extractCodeBlockInfo(from: response.content) {
+                    codeBlock(language: info.language, code: info.code)
                 }
 
                 metricsFooter(response)
@@ -239,10 +239,10 @@ private struct MessageBubble: View {
     }
 
     @ViewBuilder
-    private func codeBlock(_ code: String) -> some View {
+    private func codeBlock(language: String?, code: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("JavaScript")
+                Text(language?.capitalized ?? "Code")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.secondaryText)
 
@@ -287,14 +287,22 @@ private struct MessageBubble: View {
         }
     }
 
-    private func extractCodeBlock(from response: String) -> String {
-        let pattern = "```(?:\\w+)?\\n([\\s\\S]*?)```"
+    private func extractCodeBlockInfo(from response: String) -> (language: String?, code: String)? {
+        let pattern = "```(\\w*)\\n([\\s\\S]*?)```"
         guard let regex = try? NSRegularExpression(pattern: pattern),
               let match = regex.firstMatch(in: response, range: NSRange(response.startIndex..., in: response)),
-              let range = Range(match.range(at: 1), in: response) else {
-            return ""
+              let codeRange = Range(match.range(at: 2), in: response) else {
+            return nil
         }
-        return String(response[range]).trimmingCharacters(in: .whitespacesAndNewlines)
+        let language: String?
+        if let langRange = Range(match.range(at: 1), in: response) {
+            let lang = String(response[langRange])
+            language = lang.isEmpty ? nil : lang
+        } else {
+            language = nil
+        }
+        let code = String(response[codeRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+        return (language, code)
     }
 }
 

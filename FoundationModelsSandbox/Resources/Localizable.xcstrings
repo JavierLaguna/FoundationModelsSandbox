@@ -308,6 +308,7 @@
       }
     },
     "JavaScript" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
