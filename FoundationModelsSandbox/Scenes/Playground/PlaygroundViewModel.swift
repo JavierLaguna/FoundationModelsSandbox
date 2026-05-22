@@ -28,8 +28,10 @@ final class PlaygroundViewModel {
     var isLoading: Bool = false
     var error: String?
 
+    // MARK: - Session State
+    private(set) var session: ConversationSession
+
     // MARK: - Copy State
-    var isCopied: Bool = false
     var isCodeCopied: Bool = false
 
     // MARK: - Available Models
@@ -76,6 +78,8 @@ final class PlaygroundViewModel {
         self.modelsLister = modelsLister
         self.clipboard = clipboard
         self.defaultModelInteractor = defaultModelInteractor
+        self.session = ConversationSession()
+        
         loadModels()
         checkAvailability()
     }
@@ -91,6 +95,9 @@ final class PlaygroundViewModel {
         let defaultModelName = defaultModelInteractor.getDefaultModelName()
         selectedModelName = availableModelNames.contains(defaultModelName) ? defaultModelName : (availableModelNames.first ?? "")
         selectedModel = models.first
+
+        // Initialize session with the selected model
+        session.modelName = selectedModelName
     }
 
     private func checkAvailability() {
@@ -106,6 +113,13 @@ final class PlaygroundViewModel {
         selectedModel = availableModels.first
         // Re-check availability for the newly selected model
         checkAvailability()
+        // Update session with new model name
+        session.modelName = modelName
+    }
+
+    func updateInstructions(_ newInstructions: String) {
+        instructions = newInstructions
+        session.instructions = newInstructions
     }
 
     func submitPrompt() async {
@@ -114,15 +128,25 @@ final class PlaygroundViewModel {
         isLoading = true
         error = nil
 
+        let prompt = userPrompt
+        userPrompt = ""
+        
+        let messageId = session.addMessage(prompt: prompt, outcome: .noResponse)
+
         do {
-            let response = try await interactor.execute(prompt: userPrompt, instructions: instructions)
+            let response = try await interactor.execute(
+                prompt: prompt,
+                instructions: instructions
+            )
+            
             aiResponse = response
-            userPrompt = ""
+            session.updateMessage(id: messageId, outcome: .success(response))
 
         } catch {
-            self.error = error.localizedDescription
+            let errorMessage = error.localizedDescription
+            self.error = errorMessage
+            session.updateMessage(id: messageId, outcome: .failure(errorMessage))
         }
-
         isLoading = false
     }
 
@@ -131,20 +155,13 @@ final class PlaygroundViewModel {
         userPrompt = ""
         aiResponse = nil
         error = nil
+        session = ConversationSession(modelName: selectedModelName, instructions: "")
     }
 
-    func copyResponseToClipboard() {
-        guard !responseContent.isEmpty else { return }
+    func copyMessageToClipboard(_ message: MessageEntry) {
+        guard case .success(let response) = message.outcome, !response.content.isEmpty else { return }
 
-        clipboard.copy(responseContent)
-
-        isCopied = true
-
-        // Reset the copied state after 2 seconds
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            isCopied = false
-        }
+        clipboard.copy(response.content)
     }
 
     func copyCodeToClipboard() {

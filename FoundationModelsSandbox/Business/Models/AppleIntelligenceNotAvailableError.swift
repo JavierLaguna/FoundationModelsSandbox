@@ -1,7 +1,7 @@
 import Foundation
 import FoundationModels
 
-enum AppleIntelligenceNotAvailableError: Error, LocalizedError {
+enum AppleIntelligenceNotAvailableError: Error, LocalizedError, Equatable {
     case deviceNotEligible
     case appleIntelligenceNotEnabled
     case modelNotReady

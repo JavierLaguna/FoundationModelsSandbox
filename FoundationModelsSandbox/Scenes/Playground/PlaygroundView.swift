@@ -3,26 +3,26 @@ import SwiftUI
 
 // MARK: - Playground View
 struct PlaygroundView: View {
-    
-    @State private var viewModel: PlaygroundViewModel
-    
-    init(viewModel: PlaygroundViewModel = PlaygroundViewModel()) {
-        self._viewModel = State(initialValue: viewModel)
+
+    @Bindable var viewModel: PlaygroundViewModel
+
+    init(viewModel: PlaygroundViewModel) {
+        self._viewModel = Bindable(wrappedValue: viewModel)
+    }
+
+    init() {
+        self._viewModel = Bindable(wrappedValue: PlaygroundViewModel())
     }
     
     @ViewBuilder
     private var detailView: some View {
         if viewModel.isFoundationModelsAvailable {
             AIResponseView(
-                response: viewModel.responseContent,
-                code: viewModel.responseCode,
-                metrics: viewModel.aiResponse,
-                error: viewModel.error,
+                messages: viewModel.session.messages,
                 isLoading: viewModel.isLoading,
-                isCopied: viewModel.isCopied,
                 isCodeCopied: viewModel.isCodeCopied,
-                onCopy: { viewModel.copyResponseToClipboard() },
-                onCopyCode: { viewModel.copyCodeToClipboard() }
+                onCopyCode: { viewModel.copyCodeToClipboard() },
+                onCopyMessage: { message in viewModel.copyMessageToClipboard(message) }
             )
             
         } else {

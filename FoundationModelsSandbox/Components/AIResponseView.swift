@@ -2,49 +2,111 @@ import SwiftUI
 
 // MARK: - Native AI Response Panel (Apple HIG compliant)
 struct AIResponseView: View {
-    let response: String
-    let code: String
-    let metrics: AIResponse?
-    let error: String?
+    let messages: [MessageEntry]
     let isLoading: Bool
-    let isCopied: Bool
     let isCodeCopied: Bool
-    let onCopy: () -> Void
     let onCopyCode: () -> Void
+    let onCopyMessage: (MessageEntry) -> Void
+
+    @State private var canScrollToBottom: Bool = false
+
+    /// Threshold in points: button appears when the user is more than this away from the bottom.
+    private static let scrollThreshold: CGFloat = 240
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ToolbarView(
+                title: "AI Response",
+                statusColor: Color.successGreen
+            )
+
+            Divider()
+
+            if messages.isEmpty && !isLoading {
+                emptyState
+            } else {
+                conversationView
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.appBackground)
+    }
 
     @ViewBuilder
-    private var responseContent: some View {
-        if response.isEmpty && error == nil {
-            emptyState
-
-        } else {
+    private var conversationView: some View {
+        ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.lg) {
-                    // Response text
-                    if !response.isEmpty {
-                        Text(response)
-                            .font(.body)
-                            .lineSpacing(4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+                VStack(spacing: 0) {
+                    LazyVStack(alignment: .trailing, spacing: Spacing.md) {
+                        ForEach(messages) { message in
+                            MessageBubble(
+                                message: message,
+                                isCodeCopied: isCodeCopied,
+                                onCopyCode: onCopyCode,
+                                onCopyMessage: onCopyMessage
+                            )
+                            .id(message.id)
+                        }
 
-                    // Error message
-                    if let error = error {
-                        errorView(error)
+                        if isLoading {
+                            HStack {
+                                Spacer()
+                            }
+                        }
                     }
+                    .padding(Spacing.lg)
+                    .frame(maxWidth: .infinity)
 
-                    // Code block with native styling
-                    if !code.isEmpty {
-                        codeBlock(code)
-                    }
-
-                    // Metrics footer
-                    if let metrics = metrics {
-                        metricsFooter(metrics)
+                    // Bottom sentinel — OUTSIDE the LazyVStack, after its padding,
+                    // at the true end of the scrollable content
+                    Color.clear
+                        .frame(height: 1)
+                        .id("scrollBottom")
+                }
+            }
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.visibleRect.maxY >= geometry.contentSize.height - Self.scrollThreshold
+            } action: { _, isAtBottom in
+                canScrollToBottom = !isAtBottom
+            }
+            .onChange(of: messages) { _, _ in
+                // Defer to next run loop so new content has been laid out
+                DispatchQueue.main.async {
+                    withAnimation {
+                        proxy.scrollTo("scrollBottom", anchor: .bottom)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(Spacing.lg)
+            }
+            .onAppear {
+                // Defer to next run loop to ensure layout is complete
+                DispatchQueue.main.async {
+                    withAnimation {
+                        proxy.scrollTo("scrollBottom", anchor: .bottom)
+                    }
+                }
+            }
+            .overlay(alignment: .bottom) {
+                // Scroll-to-bottom floating button
+                if canScrollToBottom {
+                    Button {
+                        withAnimation {
+                            proxy.scrollTo("scrollBottom", anchor: .bottom)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.down")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Circle()
+                                    .glassEffect(in: .circle)
+                            )
+                            .contentShape(.circle)
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(.bottom, Spacing.sm)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                }
             }
         }
     }
@@ -66,44 +128,144 @@ struct AIResponseView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+}
 
-    @ViewBuilder
-    private func errorView(_ error: String) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            HStack(spacing: Spacing.sm) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
+// MARK: - Message Bubble
+private struct MessageBubble: View {
+    let message: MessageEntry
+    let isCodeCopied: Bool
+    let onCopyCode: () -> Void
+    let onCopyMessage: (MessageEntry) -> Void
 
-                Text("Error")
-                    .font(.headline)
-                    .foregroundStyle(.red)
-            }
+    @State private var isMessageCopied = false
 
-            Text(error)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .lineSpacing(3)
+    var body: some View {
+        VStack(alignment: .trailing, spacing: Spacing.sm) {
+            // Prompt bubble (right-aligned)
+            promptBubble
+
+            // Response bubble (left-aligned)
+            responseBubble
         }
-        .padding(Spacing.md)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.red.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))
+    }
+
+    private func copyMessageContent() {
+        onCopyMessage(message)
+
+        isMessageCopied = true
+
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            isMessageCopied = false
+        }
     }
 
     @ViewBuilder
-    private func codeBlock(_ code: String) -> some View {
+    private var promptBubble: some View {
+        HStack {
+            Spacer()
+            Text(message.prompt)
+                .font(.body)
+                .foregroundStyle(Color.primaryText)
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.sm)
+                .glassEffect(in: .rect(cornerRadius: CornerRadius.medium))
+                .background(
+                    RoundedRectangle(cornerRadius: CornerRadius.medium)
+                        .fill(Color.appleBlue.opacity(0.1))
+                )
+        }
+        .padding(.leading, Spacing.xl)
+    }
+
+    @ViewBuilder
+    private var responseBubble: some View {
+        switch message.outcome {
+        case .success(let response):
+            responseSuccessView(response)
+
+        case .failure(let errorMessage):
+            errorView(errorMessage)
+
+        case .noResponse:
+            LoadingAppleIntelligence(
+                text: "Waiting for response...",
+                layout: .horizontal
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, Spacing.xs)
+        }
+    }
+
+    @ViewBuilder
+    private func responseSuccessView(_ response: AIResponse) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                Text(response.content)
+                    .font(.body)
+                    .lineSpacing(4)
+                    .foregroundStyle(Color.primaryText)
+
+                if let info = extractCodeBlockInfo(from: response.content) {
+                    codeBlock(language: info.language, code: info.code)
+                }
+
+                metricsFooter(response)
+            }
+            .padding(Spacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .liquidGlass(cornerRadius: CornerRadius.medium)
+            .overlay(alignment: .topTrailing) {
+                Button(action: copyMessageContent) {
+                    Image(systemName: isMessageCopied ? "checkmark" : "doc.on.doc")
+                        .font(.caption.weight(.semibold))
+                }
+                .buttonStyle(.borderless)
+                .padding(Spacing.sm)
+            }
+            Spacer()
+        }
+        .padding(.trailing, Spacing.xl)
+    }
+
+    @ViewBuilder
+    private func errorView(_ errorMessage: String) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.red)
+
+                    Text("Error")
+                        .font(.headline)
+                        .foregroundStyle(.red)
+                }
+
+                Text(errorMessage)
+                    .font(.body)
+                    .foregroundStyle(Color.secondaryText)
+                    .lineSpacing(3)
+            }
+            .padding(Spacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.errorRed.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
+            Spacer()
+        }
+        .padding(.trailing, Spacing.xl)
+    }
+
+    @ViewBuilder
+    private func codeBlock(language: String?, code: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Header
             HStack {
-                Text("JavaScript")
+                Text(language?.capitalized ?? "Code")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.secondaryText)
 
                 Spacer()
 
-                Button {
-                    onCopyCode()
-                } label: {
+                Button(action: onCopyCode) {
                     Label(isCodeCopied ? "Copied" : "Copy", systemImage: isCodeCopied ? "checkmark" : "doc.on.doc")
                         .font(.caption)
                 }
@@ -115,118 +277,90 @@ struct AIResponseView: View {
 
             Divider()
 
-            // Code content
             ScrollView(.horizontal, showsIndicators: false) {
                 SyntaxHighlightedCode(code: code)
                     .padding(Spacing.md)
             }
             .background(Color.codeBackground)
         }
-        .liquidGlass(cornerRadius: CornerRadius.medium)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))
     }
 
     @ViewBuilder
     private func metricsFooter(_ metrics: AIResponse) -> some View {
         HStack(spacing: Spacing.md) {
-            // Duration
             Label(metrics.formattedDuration, systemImage: "clock")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(Color.tertiaryText)
 
             Divider()
                 .frame(height: 12)
 
-            // Token counts
             Label(metrics.formattedTokenCounts, systemImage: "text.alignleft")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(Color.tertiaryText)
 
             Spacer()
         }
-        .padding(.top, Spacing.sm)
     }
 
-    var body: some View {
-        VStack(spacing: 0) {
-            ToolbarView(
-                title: "AI Response",
-                statusColor: Color.successGreen
-            ) {
-                Button(action: onCopy) {
-                    Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
-                }
-                .buttonStyle(.borderless)
-            }
-
-            Divider()
-
-            if isLoading {
-                LoadingAppleIntelligence(text: "Generating response...")
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity
-                    )
-
-            } else {
-                responseContent
-            }
+    private func extractCodeBlockInfo(from response: String) -> (language: String?, code: String)? {
+        let pattern = "```(\\w*)\\n([\\s\\S]*?)```"
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: response, range: NSRange(response.startIndex..., in: response)),
+              let codeRange = Range(match.range(at: 2), in: response) else {
+            return nil
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.appBackground)
+        let language: String?
+        if let langRange = Range(match.range(at: 1), in: response) {
+            let lang = String(response[langRange])
+            language = lang.isEmpty ? nil : lang
+        } else {
+            language = nil
+        }
+        let code = String(response[codeRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+        return (language, code)
     }
 }
 
 #Preview {
-    AIResponseView(
-        response: "To implement a real-time data stream in your application, you should use WebSockets or Server-Sent Events (SSE).",
-        code: """
-const WebSocket = require('ws');
+    let messages = [
+        MessageEntry(prompt: "Hello, can you explain async/await in Swift?", outcome: .success(AIResponse(content: "Async/await is a modern Swift concurrency feature that allows you to write asynchronous code in a sequential, readable manner.", duration: 1.5, promptTokenCount: 10, responseTokenCount: 25, contextSize: nil))),
+        MessageEntry(prompt: "Show me an example", outcome: .success(AIResponse(content: "Here's an example:\n```swift\nfunc fetchData() async throws -> Data {\n    let (data, _) = try await URLSession.shared.data(from: url)\n    return data\n}", duration: 2.0, promptTokenCount: 5, responseTokenCount: 40, contextSize: nil))),
+        MessageEntry(prompt: "What about error handling?", outcome: .failure("Network request failed"))
+    ]
 
-const wss = new WebSocket.Server({ port: 8080 });
-""",
-        metrics: AIResponse(
-            content: "",
-            duration: 1.23,
-            promptTokenCount: 14,
-            responseTokenCount: 42,
-            contextSize: 4096
-        ),
-        error: nil,
+    AIResponseView(
+        messages: messages,
         isLoading: false,
-        isCopied: false,
         isCodeCopied: false,
-        onCopy: {},
-        onCopyCode: {}
+        onCopyCode: {},
+        onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
 }
 
-#Preview("With Error") {
+#Preview("Empty State") {
     AIResponseView(
-        response: "",
-        code: "",
-        metrics: nil,
-        error: "Apple Intelligence is not available on this device",
+        messages: [],
         isLoading: false,
-        isCopied: false,
         isCodeCopied: false,
-        onCopy: {},
-        onCopyCode: {}
+        onCopyCode: {},
+        onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
 }
 
-#Preview("Loading") {
+#Preview("With Loading") {
     AIResponseView(
-        response: "",
-        code: "",
-        metrics: nil,
-        error: nil,
+        messages: [
+            MessageEntry(prompt: "Hello", outcome: .success(AIResponse(content: "Hi there!", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil))),
+            MessageEntry(prompt: "Tell me a joke", outcome: .noResponse)
+        ],
         isLoading: true,
-        isCopied: false,
         isCodeCopied: false,
-        onCopy: {},
-        onCopyCode: {}
+        onCopyCode: {},
+        onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
 }

@@ -67,6 +67,12 @@
     },
     "Copied" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -252,22 +258,6 @@
         }
       }
     },
-    "Generating response..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generating response..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generando respuesta..."
-          }
-        }
-      }
-    },
     "History" : {
       "localizations" : {
         "en" : {
@@ -296,22 +286,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instrucciones"
-          }
-        }
-      }
-    },
-    "JavaScript" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JavaScript"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JavaScript"
           }
         }
       }
@@ -586,6 +560,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versión"
+          }
+        }
+      }
+    },
+    "Waiting for response..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for response..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando respuesta..."
           }
         }
       }
