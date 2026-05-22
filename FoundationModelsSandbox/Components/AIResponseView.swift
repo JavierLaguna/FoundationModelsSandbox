@@ -71,7 +71,7 @@ struct AIResponseView: View {
             }
             .onChange(of: messages) { _, _ in
                 // Defer to next run loop so new content has been laid out
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     withAnimation {
                         proxy.scrollTo("scrollBottom", anchor: .bottom)
                     }
@@ -79,7 +79,7 @@ struct AIResponseView: View {
             }
             .onAppear {
                 // Defer to next run loop to ensure layout is complete
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     withAnimation {
                         proxy.scrollTo("scrollBottom", anchor: .bottom)
                     }
@@ -170,10 +170,6 @@ private struct MessageBubble: View {
                 .padding(.horizontal, Spacing.md)
                 .padding(.vertical, Spacing.sm)
                 .glassEffect(in: .rect(cornerRadius: CornerRadius.medium))
-                .background(
-                    RoundedRectangle(cornerRadius: CornerRadius.medium)
-                        .fill(Color.appleBlue.opacity(0.1))
-                )
         }
         .padding(.leading, Spacing.xl)
     }
