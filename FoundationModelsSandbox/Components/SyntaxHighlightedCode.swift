@@ -4,8 +4,14 @@ import SwiftUI
 struct SyntaxHighlightedCode: View {
     
     let code: String
+    private let attributedCode: AttributedString
     
-    private var attributedCode: AttributedString {
+    init(code: String) {
+        self.code = code
+        self.attributedCode = Self.buildAttributedString(from: code)
+    }
+    
+    private static func buildAttributedString(from code: String) -> AttributedString {
         var result = AttributedString(code)
         
         // Color keywords
