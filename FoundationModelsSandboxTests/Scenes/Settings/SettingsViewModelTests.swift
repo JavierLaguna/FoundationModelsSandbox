@@ -6,9 +6,18 @@ import Mockable
 
 @MainActor
 struct SettingsViewModelTests {
-    
+
+    private static let testSuiteName = "com.foundationmodels.test.settings"
+
     private static var sampleModel: SystemLanguageModel {
         SystemLanguageModel.default
+    }
+
+    /// Returns a clean UserDefaults suite for testing.
+    private static func makeUserDefaults() -> UserDefaults {
+        let ud = UserDefaults(suiteName: testSuiteName)!
+        ud.removePersistentDomain(forName: testSuiteName)
+        return ud
     }
 
     init() {
@@ -40,6 +49,7 @@ struct SettingsViewModelTests {
         #expect(sut.selectedModelName == "test-model")
         #expect(sut.availableModels.count == 1)
         #expect(sut.availableModelNames == ["default"])
+        #expect(sut.selectedTheme == .system)
     }
 
     @Test
@@ -62,6 +72,26 @@ struct SettingsViewModelTests {
 
         #expect(sut.availableModels.isEmpty)
         #expect(sut.availableModelNames.isEmpty)
+    }
+
+    @Test
+    func init_readsStoredThemePreference() {
+        let userDefaults = Self.makeUserDefaults()
+        userDefaults.set(AppTheme.light.rawValue, forKey: UserDefaultsKeys.appThemePreference)
+
+        let sut = makeSUT(userDefaults: userDefaults)
+
+        #expect(sut.selectedTheme == .light)
+    }
+
+    @Test
+    func init_withInvalidStoredTheme_fallsBackToSystem() {
+        let userDefaults = Self.makeUserDefaults()
+        userDefaults.set("invalid_theme", forKey: UserDefaultsKeys.appThemePreference)
+
+        let sut = makeSUT(userDefaults: userDefaults)
+
+        #expect(sut.selectedTheme == .system)
     }
 
     // MARK: Setters
@@ -121,6 +151,52 @@ struct SettingsViewModelTests {
         #expect(!sut.appVersion.isEmpty)
     }
 
+    // MARK: - Theme
+
+    @Test
+    func selectedTheme_defaultsToSystem() {
+        let sut = makeSUT()
+
+        #expect(sut.selectedTheme == .system)
+    }
+
+    @Test
+    func availableThemes_containsAllCases() {
+        let sut = makeSUT()
+
+        #expect(sut.availableThemes.count == 3)
+        #expect(sut.availableThemes.contains(.system))
+        #expect(sut.availableThemes.contains(.light))
+        #expect(sut.availableThemes.contains(.dark))
+    }
+
+    @Test
+    func selectedThemeDidSet_persistsToUserDefaults() {
+        let userDefaults = Self.makeUserDefaults()
+
+        let sut = makeSUT(userDefaults: userDefaults)
+
+        sut.selectedTheme = .dark
+
+        let stored = userDefaults.string(forKey: UserDefaultsKeys.appThemePreference)
+        #expect(stored == AppTheme.dark.rawValue)
+    }
+
+    @Test
+    func selectedThemeDidSet_overwritesPreviousValue() {
+        let userDefaults = Self.makeUserDefaults()
+        userDefaults.set(AppTheme.light.rawValue, forKey: UserDefaultsKeys.appThemePreference)
+
+        let sut = makeSUT(userDefaults: userDefaults)
+        #expect(sut.selectedTheme == .light)
+
+        sut.selectedTheme = .dark
+        #expect(sut.selectedTheme == .dark)
+
+        let stored = userDefaults.string(forKey: UserDefaultsKeys.appThemePreference)
+        #expect(stored == AppTheme.dark.rawValue)
+    }
+
     // MARK: - Test Helpers
 
     private func makeSUT(
@@ -139,12 +215,14 @@ struct SettingsViewModelTests {
             let mock = MockListAvailableModelsInteractor()
             given(mock).execute().willReturn([])
             return mock
-        }()
+        }(),
+        userDefaults: UserDefaults = makeUserDefaults()
     ) -> SettingsViewModel {
         SettingsViewModel(
             languageInteractor: languageInteractor,
             modelInteractor: modelInteractor,
-            modelsLister: modelsLister
+            modelsLister: modelsLister,
+            userDefaults: userDefaults
         )
     }
 }

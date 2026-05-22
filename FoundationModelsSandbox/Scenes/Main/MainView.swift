@@ -9,6 +9,9 @@ struct MainView: View {
     
     @AppStorage(UserDefaultsKeys.appLanguagePreference)
     private var languagePreference: String = AppLanguage.system.rawValue
+
+    @AppStorage(UserDefaultsKeys.appThemePreference)
+    private var themePreference: String = AppTheme.system.rawValue
     
     @State private var selectedSection: NavigationRoute = .playground
     @State private var playgroundViewModel = PlaygroundViewModel()
@@ -27,6 +30,10 @@ struct MainView: View {
         }
     }
     
+    private var currentTheme: AppTheme {
+        AppTheme(rawValue: themePreference) ?? .system
+    }
+
     var body: some View {
         NavigationSplitView {
             SidebarView(
@@ -48,6 +55,23 @@ struct MainView: View {
         }
         .navigationSplitViewStyle(.balanced)
         .environment(\.locale, currentLocale)
+        .onAppear {
+            applyTheme(currentTheme)
+        }
+        .onChange(of: themePreference) { _, newValue in
+            applyTheme(AppTheme(rawValue: newValue) ?? .system)
+        }
+    }
+
+    private func applyTheme(_ theme: AppTheme) {
+        switch theme {
+        case .system:
+            NSApp.appearance = nil
+        case .light:
+            NSApp.appearance = NSAppearance(named: .aqua)
+        case .dark:
+            NSApp.appearance = NSAppearance(named: .darkAqua)
+        }
     }
 }
 

@@ -32,6 +32,20 @@ struct SettingsView: View {
                 Text("Model selected by default in Playground")
                     .font(.caption)
                     .foregroundStyle(Color.secondaryText)
+
+                Divider()
+
+                Picker("Theme", selection: $viewModel.selectedTheme) {
+                    ForEach(viewModel.availableThemes, id: \.self) { theme in
+                        Text(theme.displayName)
+                            .tag(theme)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Text("Choose the appearance for the app interface")
+                    .font(.caption)
+                    .foregroundStyle(Color.secondaryText)
             }
 
             Section("About") {
