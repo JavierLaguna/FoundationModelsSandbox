@@ -11,6 +11,7 @@ final class SettingsViewModel: Sendable {
     private let languageInteractor: any AppLanguageInteractor
     private let modelInteractor: any DefaultModelInteractor
     private let modelsLister: any ListAvailableModelsInteractor
+    private let userDefaults: UserDefaults
 
     var selectedLanguage: AppLanguage {
         didSet {
@@ -24,7 +25,14 @@ final class SettingsViewModel: Sendable {
         }
     }
 
+    var selectedTheme: AppTheme {
+        didSet {
+            userDefaults.set(selectedTheme.rawValue, forKey: UserDefaultsKeys.appThemePreference)
+        }
+    }
+
     let availableLanguages: [AppLanguage]
+    let availableThemes: [AppTheme] = AppTheme.allCases
     let availableModels: [SystemLanguageModel]
     let availableModelNames: [String]
 
@@ -36,14 +44,19 @@ final class SettingsViewModel: Sendable {
     init(
         languageInteractor: any AppLanguageInteractor = AppLanguageInteractorDefault(),
         modelInteractor: any DefaultModelInteractor = DefaultModelInteractorDefault(),
-        modelsLister: any ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault()
+        modelsLister: any ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault(),
+        userDefaults: UserDefaults = .standard
     ) {
         self.languageInteractor = languageInteractor
         self.modelInteractor = modelInteractor
         self.modelsLister = modelsLister
+        self.userDefaults = userDefaults
         self.selectedLanguage = languageInteractor.getCurrentLanguage()
         self.availableLanguages = languageInteractor.getAvailableLanguages()
         self.selectedModelName = modelInteractor.getDefaultModelName()
+        let storedTheme = userDefaults.string(forKey: UserDefaultsKeys.appThemePreference)
+            ?? AppTheme.system.rawValue
+        self.selectedTheme = AppTheme(rawValue: storedTheme) ?? .system
         let models = modelsLister.execute()
         self.availableModels = models
         self.availableModelNames = models.isEmpty ? [] : ["default"]

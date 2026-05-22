@@ -11,4 +11,7 @@ enum UserDefaultsKeys {
 
     /// Key for storing the default model preference
     static let defaultModelPreference = "default_model_preference"
+
+    /// Key for storing the app's theme preference (system/light/dark)
+    static let appThemePreference = "app_theme_preference"
 }

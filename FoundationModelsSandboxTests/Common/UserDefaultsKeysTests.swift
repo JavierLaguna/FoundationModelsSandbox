@@ -21,6 +21,11 @@ struct UserDefaultsKeysTests {
         #expect(UserDefaultsKeys.defaultModelPreference == "default_model_preference")
     }
 
+    @Test
+    func appThemePreference_keyExists() {
+        #expect(UserDefaultsKeys.appThemePreference == "app_theme_preference")
+    }
+
     // MARK: - Keys are non-empty
 
     @Test
@@ -28,6 +33,7 @@ struct UserDefaultsKeysTests {
         #expect(!UserDefaultsKeys.appLanguagePreference.isEmpty)
         #expect(!UserDefaultsKeys.appleLanguages.isEmpty)
         #expect(!UserDefaultsKeys.defaultModelPreference.isEmpty)
+        #expect(!UserDefaultsKeys.appThemePreference.isEmpty)
     }
 
     // MARK: - Keys are unique
@@ -37,7 +43,8 @@ struct UserDefaultsKeysTests {
         let keys = [
             UserDefaultsKeys.appLanguagePreference,
             UserDefaultsKeys.appleLanguages,
-            UserDefaultsKeys.defaultModelPreference
+            UserDefaultsKeys.defaultModelPreference,
+            UserDefaultsKeys.appThemePreference
         ]
         let uniqueKeys = Set(keys)
         #expect(keys.count == uniqueKeys.count)

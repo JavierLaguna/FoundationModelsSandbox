@@ -33,9 +33,18 @@ extension Color {
         Color(white: 0.08),
         Color(white: 0.97)
     )
-    static let codeKeyword = Color(hex: "#FF79C6")
-    static let codeString = Color(hex: "#F1FA8C")
-    static let codeNumber = Color(hex: "#BD93F9")
+    static let codeKeyword = Color.adaptive(
+        Color(hex: "#FF79C6"),  // dark mode (Dracula pink)
+        Color(hex: "#9B239B")   // light mode (Xcode purple)
+    )
+    static let codeString = Color.adaptive(
+        Color(hex: "#F1FA8C"),  // dark mode (Dracula yellow)
+        Color(hex: "#196C19")   // light mode (Xcode green)
+    )
+    static let codeNumber = Color.adaptive(
+        Color(hex: "#BD93F9"),  // dark mode (Dracula purple)
+        Color(hex: "#C41A16")   // light mode (Xcode red)
+    )
 }
 
 // MARK: - Adaptive Color Helper (macOS)
