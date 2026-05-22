@@ -101,6 +101,24 @@ struct ThemeTests {
         #expect(color != Color.clear)
     }
 
+    @Test
+    func color_codeKeyword_isValid() {
+        let color = Color.codeKeyword
+        #expect(color != Color.clear)
+    }
+
+    @Test
+    func color_codeString_isValid() {
+        let color = Color.codeString
+        #expect(color != Color.clear)
+    }
+
+    @Test
+    func color_codeNumber_isValid() {
+        let color = Color.codeNumber
+        #expect(color != Color.clear)
+    }
+
     // MARK: - Hex Initializer
 
     @Test
