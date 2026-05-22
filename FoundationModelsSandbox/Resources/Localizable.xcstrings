@@ -258,23 +258,6 @@
         }
       }
     },
-    "Generating response..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generating response..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generando respuesta..."
-          }
-        }
-      }
-    },
     "History" : {
       "localizations" : {
         "en" : {
@@ -303,23 +286,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instrucciones"
-          }
-        }
-      }
-    },
-    "JavaScript" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JavaScript"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JavaScript"
           }
         }
       }
