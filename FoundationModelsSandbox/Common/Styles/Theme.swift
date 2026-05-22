@@ -81,7 +81,6 @@ struct LiquidGlass: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .padding()
             .glassEffect(in: .rect(cornerRadius: cornerRadius))
     }
 }
@@ -95,18 +94,7 @@ extension View {
     /// Applies Apple Liquid Glass effect with custom glass configuration
     func liquidGlass(_ glass: Glass, cornerRadius: CGFloat = 16) -> some View {
         self
-            .padding()
             .glassEffect(glass, in: .rect(cornerRadius: cornerRadius))
-    }
-}
-
-// MARK: - GlassEffectContainer for multiple glass views
-extension View {
-    /// Groups multiple glass-effect views for optimal rendering and morphing
-    func glassEffectContainer(spacing: CGFloat = 8) -> some View {
-        GlassEffectContainer(spacing: spacing) {
-            self
-        }
     }
 }
 

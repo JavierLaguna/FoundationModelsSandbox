@@ -25,6 +25,7 @@ struct PromptPanelView: View {
             )
             .font(.body)
             .scrollContentBackground(.hidden)
+            .padding(Spacing.md)
             .liquidGlass(cornerRadius: CornerRadius.medium)
             
             Text("Defines the AI assistant behavior and context")
@@ -48,6 +49,7 @@ struct PromptPanelView: View {
             )
             .font(.body)
             .scrollContentBackground(.hidden)
+            .padding(Spacing.md)
             .liquidGlass(cornerRadius: CornerRadius.medium)
         }
         .frame(maxHeight: .infinity)
