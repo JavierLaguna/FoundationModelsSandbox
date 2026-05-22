@@ -100,14 +100,16 @@ struct PromptPanelView: View {
             Divider()
             
             // MARK: - Content
-            VStack(spacing: Spacing.lg) {
-                instructionsSection
-                
-                Divider()
-                
-                userPromptSection
+            GlassEffectContainer(spacing: Spacing.lg) {
+                VStack(spacing: Spacing.lg) {
+                    instructionsSection
+                    
+                    Divider()
+                    
+                    userPromptSection
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
             .padding(Spacing.lg)
             
             Divider()

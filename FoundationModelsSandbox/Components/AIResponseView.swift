@@ -137,15 +137,35 @@ private struct MessageBubble: View {
     let onCopyCode: () -> Void
     let onCopyMessage: (MessageEntry) -> Void
 
+    /// Pre-computed code block info to avoid regex in body evaluations.
+    private let codeBlockInfo: (language: String?, code: String)?
+
     @State private var isMessageCopied = false
 
-    var body: some View {
-        VStack(alignment: .trailing, spacing: Spacing.sm) {
-            // Prompt bubble (right-aligned)
-            promptBubble
+    init(
+        message: MessageEntry,
+        isCodeCopied: Bool,
+        onCopyCode: @escaping () -> Void,
+        onCopyMessage: @escaping (MessageEntry) -> Void
+    ) {
+        self.message = message
+        self.isCodeCopied = isCodeCopied
+        self.onCopyCode = onCopyCode
+        self.onCopyMessage = onCopyMessage
+        // Extract code block info once at init to avoid regex in body
+        if case .success(let response) = message.outcome {
+            self.codeBlockInfo = Self.extractCodeBlockInfo(from: response.content)
+        } else {
+            self.codeBlockInfo = nil
+        }
+    }
 
-            // Response bubble (left-aligned)
-            responseBubble
+    var body: some View {
+        GlassEffectContainer(spacing: Spacing.sm) {
+            VStack(alignment: .trailing, spacing: Spacing.sm) {
+                promptBubble
+                responseBubble
+            }
         }
     }
 
@@ -202,7 +222,7 @@ private struct MessageBubble: View {
                     .lineSpacing(4)
                     .foregroundStyle(Color.primaryText)
 
-                if let info = extractCodeBlockInfo(from: response.content) {
+                if let info = codeBlockInfo {
                     codeBlock(language: info.language, code: info.code)
                 }
 
@@ -245,7 +265,8 @@ private struct MessageBubble: View {
             .padding(Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.errorRed.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.medium))
+                .compositingGroup()
+                .clipShape(.rect(cornerRadius: CornerRadius.medium))
             Spacer()
         }
         .padding(.trailing, Spacing.xl)
@@ -279,7 +300,8 @@ private struct MessageBubble: View {
             }
             .background(Color.codeBackground)
         }
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.small))
+        .compositingGroup()
+        .clipShape(.rect(cornerRadius: CornerRadius.small))
     }
 
     @ViewBuilder
@@ -300,7 +322,7 @@ private struct MessageBubble: View {
         }
     }
 
-    private func extractCodeBlockInfo(from response: String) -> (language: String?, code: String)? {
+    private static func extractCodeBlockInfo(from response: String) -> (language: String?, code: String)? {
         let pattern = "```(\\w*)\\n([\\s\\S]*?)```"
         guard let regex = try? NSRegularExpression(pattern: pattern),
               let match = regex.firstMatch(in: response, range: NSRange(response.startIndex..., in: response)),
