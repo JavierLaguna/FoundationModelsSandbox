@@ -12,7 +12,7 @@ struct AIResponseView: View {
     @State private var canScrollToBottom: Bool = false
 
     /// Threshold in points: button appears when the user is more than this away from the bottom.
-    private static let scrollThreshold: CGFloat = 580
+    private static let scrollThreshold: CGFloat = 240
 
     var body: some View {
         VStack(spacing: 0) {
@@ -42,29 +42,32 @@ struct AIResponseView: View {
     private var conversationView: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .trailing, spacing: Spacing.md) {
-                    ForEach(messages) { message in
-                        MessageBubble(
-                            message: message,
-                            isCodeCopied: isCodeCopied,
-                            onCopyCode: onCopyCode
-                        )
-                        .id(message.id)
-                    }
+                VStack(spacing: 0) {
+                    LazyVStack(alignment: .trailing, spacing: Spacing.md) {
+                        ForEach(messages) { message in
+                            MessageBubble(
+                                message: message,
+                                isCodeCopied: isCodeCopied,
+                                onCopyCode: onCopyCode
+                            )
+                            .id(message.id)
+                        }
 
-                    if isLoading {
-                        HStack {
-                            Spacer()
+                        if isLoading {
+                            HStack {
+                                Spacer()
+                            }
                         }
                     }
+                    .padding(Spacing.lg)
+                    .frame(maxWidth: .infinity)
 
-                    // Bottom sentinel — ensures we can always reach the very end
+                    // Bottom sentinel — OUTSIDE the LazyVStack, after its padding,
+                    // at the true end of the scrollable content
                     Color.clear
                         .frame(height: 1)
                         .id("scrollBottom")
                 }
-                .padding(Spacing.lg)
-                .frame(maxWidth: .infinity)
             }
             .defaultScrollAnchor(.bottom)
             .onScrollGeometryChange(for: Bool.self) { geometry in
@@ -73,8 +76,11 @@ struct AIResponseView: View {
                 canScrollToBottom = !isAtBottom
             }
             .onChange(of: messages) { _, _ in
-                withAnimation {
-                    proxy.scrollTo("scrollBottom", anchor: .bottom)
+                // Defer to next run loop so new content has been laid out
+                DispatchQueue.main.async {
+                    withAnimation {
+                        proxy.scrollTo("scrollBottom", anchor: .bottom)
+                    }
                 }
             }
             .onAppear {
