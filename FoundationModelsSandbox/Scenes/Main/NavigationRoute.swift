@@ -22,15 +22,4 @@ enum NavigationRoute: String, CaseIterable, Hashable {
         }
     }
 
-    @ViewBuilder
-    var destination: some View {
-        switch self {
-        case .playground:
-            PlaygroundView()
-        case .history:
-            HistoryView()
-        case .settings:
-            SettingsView()
-        }
-    }
 }

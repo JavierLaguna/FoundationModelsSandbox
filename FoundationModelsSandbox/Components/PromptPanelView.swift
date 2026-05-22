@@ -25,6 +25,7 @@ struct PromptPanelView: View {
             )
             .font(.body)
             .scrollContentBackground(.hidden)
+            .padding(Spacing.md)
             .liquidGlass(cornerRadius: CornerRadius.medium)
             
             Text("Defines the AI assistant behavior and context")
@@ -48,6 +49,7 @@ struct PromptPanelView: View {
             )
             .font(.body)
             .scrollContentBackground(.hidden)
+            .padding(Spacing.md)
             .liquidGlass(cornerRadius: CornerRadius.medium)
         }
         .frame(maxHeight: .infinity)
@@ -98,14 +100,16 @@ struct PromptPanelView: View {
             Divider()
             
             // MARK: - Content
-            VStack(spacing: Spacing.lg) {
-                instructionsSection
-                
-                Divider()
-                
-                userPromptSection
+            GlassEffectContainer(spacing: Spacing.lg) {
+                VStack(spacing: Spacing.lg) {
+                    instructionsSection
+                    
+                    Divider()
+                    
+                    userPromptSection
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
             .padding(Spacing.lg)
             
             Divider()

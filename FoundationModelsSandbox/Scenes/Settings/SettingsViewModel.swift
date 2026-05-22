@@ -6,7 +6,7 @@ import SwiftUI
 /// Manages language selection which is persisted via @AppStorage.
 @Observable
 @MainActor
-final class SettingsViewModel: Sendable {
+final class SettingsViewModel {
 
     private let languageInteractor: any AppLanguageInteractor
     private let modelInteractor: any DefaultModelInteractor
