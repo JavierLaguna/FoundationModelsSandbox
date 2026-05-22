@@ -69,7 +69,6 @@ struct AIResponseView: View {
                         .id("scrollBottom")
                 }
             }
-            .defaultScrollAnchor(.bottom)
             .onScrollGeometryChange(for: Bool.self) { geometry in
                 geometry.visibleRect.maxY >= geometry.contentSize.height - Self.scrollThreshold
             } action: { _, isAtBottom in
