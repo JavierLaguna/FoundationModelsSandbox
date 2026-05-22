@@ -91,6 +91,10 @@ struct SubmitOnEnterTextEditorRepresentable: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: NSScrollView, context: Context) {
+        // Update the coordinator's parent so textDidChange writes to the current binding,
+        // not the one from makeCoordinator() which may reference an old ViewModel
+        context.coordinator.parent = self
+        
         if let textView = nsView.documentView as? NSTextView {
             if textView.string != text {
                 textView.string = text
