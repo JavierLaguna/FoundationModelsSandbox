@@ -403,30 +403,67 @@ struct PlaygroundViewModelTests {
     }
 
     @Test
-    func copyResponseToClipboard_emptyContent_doesNothing() {
+    func copyMessageToClipboard_withSuccessResponse_copiesContent() {
         let mockClipboard = MockClipboardInteractor()
 
         let sut = Self.makeSUT(clipboard: mockClipboard)
 
-        sut.aiResponse = nil
+        let message = MessageEntry(
+            prompt: "test prompt",
+            outcome: .success(Self.successResponse)
+        )
 
-        sut.copyResponseToClipboard()
+        sut.copyMessageToClipboard(message)
+
+        verify(mockClipboard).copy(.value(Self.successResponse.content)).called(.once)
+    }
+
+    @Test
+    func copyMessageToClipboard_emptyContent_doesNothing() {
+        let mockClipboard = MockClipboardInteractor()
+
+        let sut = Self.makeSUT(clipboard: mockClipboard)
+
+        let message = MessageEntry(
+            prompt: "test prompt",
+            outcome: .success(Self.emptyResponse)
+        )
+
+        sut.copyMessageToClipboard(message)
 
         verify(mockClipboard).copy(.any).called(.never)
     }
 
     @Test
-    func copyResponseToClipboard_withContent_copiesAndSetsIsCopied() {
+    func copyMessageToClipboard_failureOutcome_doesNothing() {
         let mockClipboard = MockClipboardInteractor()
 
         let sut = Self.makeSUT(clipboard: mockClipboard)
 
-        sut.aiResponse = Self.successResponse
+        let message = MessageEntry(
+            prompt: "test prompt",
+            outcome: .failure("some error")
+        )
 
-        sut.copyResponseToClipboard()
+        sut.copyMessageToClipboard(message)
 
-        verify(mockClipboard).copy(.value(Self.successResponse.content)).called(.once)
-        #expect(sut.isCopied == true)
+        verify(mockClipboard).copy(.any).called(.never)
+    }
+
+    @Test
+    func copyMessageToClipboard_noResponseOutcome_doesNothing() {
+        let mockClipboard = MockClipboardInteractor()
+
+        let sut = Self.makeSUT(clipboard: mockClipboard)
+
+        let message = MessageEntry(
+            prompt: "test prompt",
+            outcome: .noResponse
+        )
+
+        sut.copyMessageToClipboard(message)
+
+        verify(mockClipboard).copy(.any).called(.never)
     }
 
     // MARK: copyCodeToClipboard

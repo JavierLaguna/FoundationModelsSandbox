@@ -4,10 +4,9 @@ import SwiftUI
 struct AIResponseView: View {
     let messages: [MessageEntry]
     let isLoading: Bool
-    let isCopied: Bool
     let isCodeCopied: Bool
-    let onCopy: () -> Void
     let onCopyCode: () -> Void
+    let onCopyMessage: (MessageEntry) -> Void
 
     @State private var canScrollToBottom: Bool = false
 
@@ -19,12 +18,7 @@ struct AIResponseView: View {
             ToolbarView(
                 title: "AI Response",
                 statusColor: Color.successGreen
-            ) {
-                Button(action: onCopy) {
-                    Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
-                }
-                .buttonStyle(.borderless)
-            }
+            )
 
             Divider()
 
@@ -48,7 +42,8 @@ struct AIResponseView: View {
                             MessageBubble(
                                 message: message,
                                 isCodeCopied: isCodeCopied,
-                                onCopyCode: onCopyCode
+                                onCopyCode: onCopyCode,
+                                onCopyMessage: onCopyMessage
                             )
                             .id(message.id)
                         }
@@ -140,6 +135,9 @@ private struct MessageBubble: View {
     let message: MessageEntry
     let isCodeCopied: Bool
     let onCopyCode: () -> Void
+    let onCopyMessage: (MessageEntry) -> Void
+
+    @State private var isMessageCopied = false
 
     var body: some View {
         VStack(alignment: .trailing, spacing: Spacing.sm) {
@@ -148,6 +146,17 @@ private struct MessageBubble: View {
 
             // Response bubble (left-aligned)
             responseBubble
+        }
+    }
+
+    private func copyMessageContent() {
+        onCopyMessage(message)
+
+        isMessageCopied = true
+
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            isMessageCopied = false
         }
     }
 
@@ -206,6 +215,14 @@ private struct MessageBubble: View {
             .padding(Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .liquidGlass(cornerRadius: CornerRadius.medium)
+            .overlay(alignment: .topTrailing) {
+                Button(action: copyMessageContent) {
+                    Image(systemName: isMessageCopied ? "checkmark" : "doc.on.doc")
+                        .font(.caption.weight(.semibold))
+                }
+                .buttonStyle(.borderless)
+                .padding(Spacing.sm)
+            }
             Spacer()
         }
         .padding(.trailing, Spacing.xl)
@@ -316,10 +333,9 @@ private struct MessageBubble: View {
     AIResponseView(
         messages: messages,
         isLoading: false,
-        isCopied: false,
         isCodeCopied: false,
-        onCopy: {},
-        onCopyCode: {}
+        onCopyCode: {},
+        onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
 }
@@ -328,10 +344,9 @@ private struct MessageBubble: View {
     AIResponseView(
         messages: [],
         isLoading: false,
-        isCopied: false,
         isCodeCopied: false,
-        onCopy: {},
-        onCopyCode: {}
+        onCopyCode: {},
+        onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
 }
@@ -343,10 +358,9 @@ private struct MessageBubble: View {
             MessageEntry(prompt: "Tell me a joke", outcome: .noResponse)
         ],
         isLoading: true,
-        isCopied: false,
         isCodeCopied: false,
-        onCopy: {},
-        onCopyCode: {}
+        onCopyCode: {},
+        onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
 }

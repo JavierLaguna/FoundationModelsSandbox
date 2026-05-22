@@ -32,7 +32,6 @@ final class PlaygroundViewModel {
     private(set) var session: ConversationSession
 
     // MARK: - Copy State
-    var isCopied: Bool = false
     var isCodeCopied: Bool = false
 
     // MARK: - Available Models
@@ -159,18 +158,10 @@ final class PlaygroundViewModel {
         session = ConversationSession(modelName: selectedModelName, instructions: "")
     }
 
-    func copyResponseToClipboard() {
-        guard !responseContent.isEmpty else { return }
+    func copyMessageToClipboard(_ message: MessageEntry) {
+        guard case .success(let response) = message.outcome, !response.content.isEmpty else { return }
 
-        clipboard.copy(responseContent)
-
-        isCopied = true
-
-        // Reset the copied state after 2 seconds
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            isCopied = false
-        }
+        clipboard.copy(response.content)
     }
 
     func copyCodeToClipboard() {
