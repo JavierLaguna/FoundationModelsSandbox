@@ -185,7 +185,7 @@ struct ConversationSessionTests {
     func updateMessage_withInvalidId_doesNotModifyMessages() {
         var session = ConversationSession()
         let response = AIResponse(content: "Original", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
-        let id = session.addMessage(prompt: "P1", outcome: .success(response))
+        session.addMessage(prompt: "P1", outcome: .success(response))
 
         session.updateMessage(id: UUID(), outcome: .noResponse)
 
