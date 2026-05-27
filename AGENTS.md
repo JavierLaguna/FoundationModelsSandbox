@@ -3,6 +3,7 @@
 ## Scope and current shape
 - This repo is a single Xcode project (`FoundationModelsSandbox.xcodeproj`) with two targets: app and unit tests (UI tests target was removed).
 - There is no Swift Package manifest, no CI workflow, no lint/typecheck/format config, and no repo-local OpenCode instruction config (`opencode.json`) at the time of writing.
+- **Swift Package dependencies**: Mockable (test mocking), sqlite-data (session persistence via GRDB), plus their transitive dependencies (swift-dependencies, swift-perception, GRDB, etc.).
 
 ## Verified commands (don’t guess)
 - List available schemes/targets:
@@ -13,27 +14,36 @@
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' test`
 - Run only unit tests target:
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -only-testing:FoundationModelsSandboxTests test`
-- Test status: **73+ tests** (all Swift Testing, no XCTest).
+- Test status: **73+ tests** (all Swift Testing, no XCTest). Run with `-parallel-testing-enabled NO` for stable results.
 
 ## Command-order / defaults that can bite
 - `xcodebuild` defaults to **Release** if you omit scheme/configuration (`xcodebuild -list` reports this); pass scheme (and config if needed) explicitly.
 - Use `-destination 'platform=macOS'` for deterministic local runs.
+- **Macro approval**: `sqlite-data`'s transitive dependency `swift-perception` includes macros that require approval. In CI/CLI, pass `-skipMacroValidation` to `xcodebuild`. Without it, builds fail with `Macro … was changed since a previous approval and must be enabled`.
+- **Parallel test flakiness**: Some tests (especially those involving `Task { }` in ViewModel init) can crash under parallel test execution. Use `-parallel-testing-enabled NO` for stable local runs.
 
 ## Architecture map (high-signal)
 - App entrypoint: `FoundationModelsSandbox/FoundationModelsSandboxApp.swift` (`@main`, loads `MainView`).
 - **Clean Architecture** folder structure:
   - `Business/` - Interactors (e.g., `FoundationModelsInteractor`), Use Cases, Error types
+  - `Business/Repositories/` - Data persistence layer (Repository pattern, currently `SessionRepository` + `LiveSessionRepository` using SQLite/GRDB)
   - `Components/` - Reusable UI components (SwiftUI Views)
   - `Scenes/` - Feature modules/scenes with ViewModels
 - UI uses `@Observable` ViewModels for state management.
 - **Dependency Injection**: Pass dependencies via initializers. Use protocols for testability.
+- **Persistence**: Session data stored via SQLite using GRDB (from the `sqlite-data` package). The database lives at `~/Library/Application Support/FoundationModelsSandbox/sessions.db`. Messages are serialized as JSON in a text column.
 - Tests:
   - `FoundationModelsSandboxTests/` uses **Swift Testing** (`import Testing`, `@Test`), not XCTest.
   - `FoundationModelsSandboxUITests/` uses XCTest UI testing and launches the app via `XCUIApplication()`.
   - Test files mirror the app's folder structure (e.g., `Business/Models/`, `Business/Interactors/`, `Scenes/Main/`).
   - **Mocks**: Uses **Mockable** library (`@Mockable` macro on protocols). No manual mocks - mocks generated at compile time when `MOCKING` flag is set.
   - **Testing ViewModels with Mockable**: ViewModels that call dependencies in `init` need `MockerPolicy.default = .relaxed` in the test struct's `init()` to avoid crashes from unstubbed mock calls during initialization.
+  - **Mocks and Task in init**: If the ViewModel spawns a `Task` in `init` (e.g., restoring last session), `MockSessionRepository.allSessions()` MUST be stubbed with `given(mock).allSessions().willReturn([])` even with relaxed policy, or the test process will crash.
   - **Code Coverage**: Configured in `FoundationModelsSandbox.xctestplan` with exclusions for `**/*View.swift` and `**/Components/**/*.swift`. ViewModels are included in coverage.
+
+## Observable patterns
+- **`didSet` works with `@Observable`**: Property observers (`didSet`/`willSet`) fire normally on `@Observable` properties. This is useful for syncing a ViewModel property with a model property (e.g., `var instructions: String = "" { didSet { session.instructions = instructions } }`).
+- **Bindings bypass methods**: When a view uses `$viewModel.property` as a `Binding`, writes go directly to the stored property, not through helper methods like `updateInstructions()`. Use `didSet` if you need side effects on every write.
 
 ## Async/await + Swift 6 Strict Concurrency
 - All asynchronous flows MUST use `async`/`await`. No completion handlers.
@@ -178,5 +188,28 @@ struct PlaygroundView: View {
         self._viewModel = State(initialValue: viewModel)
     }
     // ...
+}
+```
+
+### Injecting shared dependencies (e.g., SessionRepository)
+When a ViewModel needs persistence or other shared services, create those at the `App` level and inject them through `MainView`:
+```swift
+// FoundationModelsSandboxApp.swift
+@main
+struct FoundationModelsSandboxApp: App {
+    private let sessionRepository: any SessionRepository
+    
+    init() {
+        self.sessionRepository = LiveSessionRepository.makeDefault()
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            MainView(
+                systemLocale: Self.systemLocale,
+                sessionRepository: sessionRepository
+            )
+        }
+    }
 }
 ```
