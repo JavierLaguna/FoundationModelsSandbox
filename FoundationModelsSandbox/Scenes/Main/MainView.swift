@@ -6,6 +6,9 @@ struct MainView: View {
     
     /// The real system locale captured at startup, used when System is selected.
     let systemLocale: Locale
+
+    /// Session repository shared across features.
+    let sessionRepository: any SessionRepository
     
     @AppStorage(UserDefaultsKeys.appLanguagePreference)
     private var languagePreference: String = AppLanguage.system.rawValue
@@ -14,8 +17,18 @@ struct MainView: View {
     private var themePreference: String = AppTheme.system.rawValue
     
     @State private var selectedSection: NavigationRoute = .playground
-    @State private var playgroundViewModel = PlaygroundViewModel()
-    
+    @State private var playgroundViewModel: PlaygroundViewModel
+
+    init(systemLocale: Locale, sessionRepository: any SessionRepository) {
+        self.systemLocale = systemLocale
+        self.sessionRepository = sessionRepository
+        self._playgroundViewModel = State(
+            initialValue: PlaygroundViewModel(
+                sessionRepository: sessionRepository
+            )
+        )
+    }
+
     private var currentLocale: Locale {
         guard let language = AppLanguage(rawValue: languagePreference) else {
             return systemLocale
@@ -39,7 +52,7 @@ struct MainView: View {
             SidebarView(
                 selectedSection: $selectedSection,
                 onNewChat: {
-                    playgroundViewModel = PlaygroundViewModel()
+                    playgroundViewModel = PlaygroundViewModel(sessionRepository: sessionRepository)
                     selectedSection = .playground
                 }
             )
@@ -75,7 +88,40 @@ struct MainView: View {
     }
 }
 
+// MARK: - Preview Helpers
+
+private final class PreviewSessionRepository: SessionRepository {
+    private var sessions: [UUID: ConversationSession] = [:]
+
+    func saveSession(_ session: ConversationSession) throws {
+        sessions[session.id] = session
+    }
+
+    func updateSession(_ session: ConversationSession) throws {
+        sessions[session.id] = session
+    }
+
+    func session(id: UUID) throws -> ConversationSession? {
+        sessions[id]
+    }
+
+    func allSessions() throws -> [ConversationSession] {
+        Array(sessions.values).sorted { $0.createdAt > $1.createdAt }
+    }
+
+    func deleteSession(id: UUID) throws {
+        sessions.removeValue(forKey: id)
+    }
+
+    func deleteAllSessions() throws {
+        sessions.removeAll()
+    }
+}
+
 #Preview {
-    MainView(systemLocale: .current)
-        .frame(width: 1200, height: 800)
+    MainView(
+        systemLocale: .current,
+        sessionRepository: PreviewSessionRepository()
+    )
+    .frame(width: 1200, height: 800)
 }
