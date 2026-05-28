@@ -18,12 +18,18 @@ struct MainView: View {
     
     @State private var selectedSection: NavigationRoute = .playground
     @State private var playgroundViewModel: PlaygroundViewModel
+    @State private var historyViewModel: HistoryViewModel
 
     init(systemLocale: Locale, sessionRepository: any SessionRepository) {
         self.systemLocale = systemLocale
         self.sessionRepository = sessionRepository
         self._playgroundViewModel = State(
             initialValue: PlaygroundViewModel(
+                sessionRepository: sessionRepository
+            )
+        )
+        self._historyViewModel = State(
+            initialValue: HistoryViewModel(
                 sessionRepository: sessionRepository
             )
         )
@@ -52,7 +58,10 @@ struct MainView: View {
             SidebarView(
                 selectedSection: $selectedSection,
                 onNewChat: {
-                    playgroundViewModel = PlaygroundViewModel(sessionRepository: sessionRepository)
+                    playgroundViewModel = PlaygroundViewModel(
+                        sessionRepository: sessionRepository,
+                        shouldRestoreLastSession: false
+                    )
                     selectedSection = .playground
                 }
             )
@@ -61,7 +70,17 @@ struct MainView: View {
             case .playground:
                 PlaygroundView(viewModel: playgroundViewModel)
             case .history:
-                HistoryView()
+                HistoryView(
+                    viewModel: historyViewModel,
+                    onSelectSession: { session in
+                        playgroundViewModel = PlaygroundViewModel(
+                            sessionRepository: sessionRepository,
+                            shouldRestoreLastSession: false
+                        )
+                        playgroundViewModel.loadSession(session)
+                        selectedSection = .playground
+                    }
+                )
             case .settings:
                 SettingsView()
             }
@@ -107,6 +126,10 @@ private final class PreviewSessionRepository: SessionRepository {
 
     func allSessions() throws -> [ConversationSession] {
         Array(sessions.values).sorted { $0.createdAt > $1.createdAt }
+    }
+
+    func lastSession() throws -> ConversationSession? {
+        sessions.values.max(by: { $0.createdAt < $1.createdAt })
     }
 
     func deleteSession(id: UUID) throws {

@@ -1,6 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
+    },
     "About" : {
       "localizations" : {
         "en" : {
@@ -13,38 +29,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Acerca de"
-          }
-        }
-      }
-    },
-    "Choose the appearance for the app interface" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose the appearance for the app interface"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige la apariencia de la interfaz de la app"
-          }
-        }
-      }
-    },
-    "Theme" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Theme"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tema"
           }
         }
       }
@@ -81,6 +65,22 @@
         }
       }
     },
+    "Choose the appearance for the app interface" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the appearance for the app interface"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige la apariencia de la interfaz de la app"
+          }
+        }
+      }
+    },
     "Choose the language for the app interface" : {
       "localizations" : {
         "en" : {
@@ -93,6 +93,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige el idioma de la interfaz de la app"
+          }
+        }
+      }
+    },
+    "Code" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código"
           }
         }
       }
@@ -173,6 +190,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu dispositivo no es compatible con esta función."
+          }
+        }
+      }
+    },
+    "Empty session" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empty session"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesión vacía"
           }
         }
       }
@@ -434,6 +467,25 @@
         }
       }
     },
+    "No sessions yet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No sessions yet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay sesiones todavía"
+          }
+        }
+      }
+    },
+    "Open session" : {
+
+    },
     "Platform" : {
       "localizations" : {
         "en" : {
@@ -481,6 +533,9 @@
           }
         }
       }
+    },
+    "Search sessions…" : {
+
     },
     "Sections" : {
       "localizations" : {
@@ -547,6 +602,39 @@
         }
       }
     },
+    "system_language" : {
+      "comment" : "System language option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sistema"
+          }
+        }
+      }
+    },
+    "Theme" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema"
+          }
+        }
+      }
+    },
     "theme_dark" : {
       "comment" : "Dark theme option",
       "localizations" : {
@@ -583,23 +671,6 @@
     },
     "theme_system" : {
       "comment" : "System theme option",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "System"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sistema"
-          }
-        }
-      }
-    },
-    "system_language" : {
-      "comment" : "System language option",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -675,6 +746,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trabajo en progreso"
+          }
+        }
+      }
+    },
+    "Your conversation history will appear here" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your conversation history will appear here"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El historial de tus conversaciones aparecerá aquí"
           }
         }
       }

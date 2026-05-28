@@ -193,4 +193,176 @@ struct ConversationSessionTests {
             #expect(storedResponse.content == "Original")
         }
     }
+
+    // MARK: - Display Helpers
+
+    @Test
+    func responseCount_withNoMessages_returnsZero() {
+        let session = ConversationSession()
+
+        #expect(session.responseCount == 0)
+    }
+
+    @Test
+    func responseCount_withMixedOutcomes_returnsCorrectCount() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "OK", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "P1", outcome: .success(response))
+        session.addMessage(prompt: "P2", outcome: .failure("error"))
+        session.addMessage(prompt: "P3", outcome: .noResponse)
+
+        #expect(session.responseCount == 1)
+    }
+
+    @Test
+    func responseCount_withMultipleSuccesses_returnsCorrectCount() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "OK", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "P1", outcome: .success(response))
+        session.addMessage(prompt: "P2", outcome: .success(response))
+
+        #expect(session.responseCount == 2)
+    }
+
+    @Test
+    func firstPrompt_withMessages_returnsFirst() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "R1", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "First", outcome: .success(response))
+        session.addMessage(prompt: "Second", outcome: .success(response))
+
+        #expect(session.firstPrompt == "First")
+    }
+
+    @Test
+    func firstPrompt_withEmptySession_returnsNil() {
+        let session = ConversationSession()
+
+        #expect(session.firstPrompt == nil)
+    }
+
+    @Test
+    func lastPrompt_withMessages_returnsLast() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "R1", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "First", outcome: .success(response))
+        session.addMessage(prompt: "Last", outcome: .success(response))
+
+        #expect(session.lastPrompt == "Last")
+    }
+
+    @Test
+    func lastPrompt_withEmptySession_returnsNil() {
+        let session = ConversationSession()
+
+        #expect(session.lastPrompt == nil)
+    }
+
+    @Test
+    func lastResponseContent_withSuccess_returnsContent() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "Final answer", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "P1", outcome: .success(response))
+
+        #expect(session.lastResponseContent == "Final answer")
+    }
+
+    @Test
+    func lastResponseContent_withFailure_returnsNil() {
+        var session = ConversationSession()
+
+        session.addMessage(prompt: "P1", outcome: .failure("error"))
+
+        #expect(session.lastResponseContent == nil)
+    }
+
+    @Test
+    func lastResponseContent_withNoResponse_returnsNil() {
+        var session = ConversationSession()
+
+        session.addMessage(prompt: "P1", outcome: .noResponse)
+
+        #expect(session.lastResponseContent == nil)
+    }
+
+    @Test
+    func lastResponseContent_withEmptySession_returnsNil() {
+        let session = ConversationSession()
+
+        #expect(session.lastResponseContent == nil)
+    }
+
+    @Test
+    func hasResponses_withSuccess_returnsTrue() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "OK", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "P1", outcome: .success(response))
+
+        #expect(session.hasResponses == true)
+    }
+
+    @Test
+    func hasResponses_withOnlyFailures_returnsFalse() {
+        var session = ConversationSession()
+
+        session.addMessage(prompt: "P1", outcome: .failure("error"))
+
+        #expect(session.hasResponses == false)
+    }
+
+    @Test
+    func hasResponses_withEmptySession_returnsFalse() {
+        let session = ConversationSession()
+
+        #expect(session.hasResponses == false)
+    }
+
+    @Test
+    func lastResponsePreview_truncatesLongContent() {
+        var session = ConversationSession()
+        let longContent = String(repeating: "word ", count: 200)
+        let response = AIResponse(content: longContent, duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "P1", outcome: .success(response))
+
+        let preview = session.lastResponsePreview
+        #expect(preview != nil)
+        #expect(preview!.count <= 503)  // 500 + "..."
+        #expect(preview!.hasSuffix("..."))
+    }
+
+    @Test
+    func lastResponsePreview_withShortContent_returnsFull() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "Short answer.", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "P1", outcome: .success(response))
+
+        #expect(session.lastResponsePreview == "Short answer.")
+    }
+
+    @Test
+    func lastResponsePreview_withNewlines_preservesLineBreaks() {
+        var session = ConversationSession()
+        let response = AIResponse(content: "Line1\nLine2\nLine3", duration: 1.0, promptTokenCount: 5, responseTokenCount: 10, contextSize: nil)
+
+        session.addMessage(prompt: "P1", outcome: .success(response))
+
+        #expect(session.lastResponsePreview == "Line1\nLine2\nLine3")
+    }
+
+    @Test
+    func lastResponsePreview_withFailure_returnsNil() {
+        var session = ConversationSession()
+
+        session.addMessage(prompt: "P1", outcome: .failure("error"))
+
+        #expect(session.lastResponsePreview == nil)
+    }
 }
