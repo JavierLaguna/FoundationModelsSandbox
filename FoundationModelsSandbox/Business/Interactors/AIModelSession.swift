@@ -11,21 +11,30 @@ struct SessionResponse: Sendable, Equatable {
     let responseTokenCount: Int
 }
 
-/// Protocol that wraps `LanguageModelSession.respond(to:options:)` so it can be mocked in tests.
+/// Protocol that wraps `LanguageModelSession` so it can be mocked in tests.
 @Mockable
 protocol AIModelSession: Sendable {
     func respond(to prompt: Prompt, options: GenerationOptions) async throws -> SessionResponse
+    var transcript: Transcript { get }
 }
 
 /// Default implementation that delegates to a real `LanguageModelSession`
 /// and extracts metrics via reflection.
-struct LiveModelSession: AIModelSession {
-    private let session: LanguageModelSession
+final class LiveModelSession: AIModelSession, @unchecked Sendable {
+    private var session: LanguageModelSession
 
     init(model: SystemLanguageModel, instructions: String) {
         self.session = LanguageModelSession(
             model: model,
             instructions: instructions
+        )
+    }
+
+    /// Creates a session from an existing transcript (for restoration or truncation).
+    init(model: SystemLanguageModel, transcript: Transcript) {
+        self.session = LanguageModelSession(
+            model: model,
+            transcript: transcript
         )
     }
 
@@ -38,9 +47,13 @@ struct LiveModelSession: AIModelSession {
             responseTokenCount: extractTokenCount(from: response, label: "responseTokenCount")
         )
     }
+
+    var transcript: Transcript {
+        session.transcript
+    }
 }
 
-// MARK: - Mirror-based extraction (moved from FoundationModelsInteractorDefault)
+// MARK: - Mirror-based extraction
 
 private extension LiveModelSession {
 
