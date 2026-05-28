@@ -195,7 +195,7 @@ struct PlaygroundViewModelTests {
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor,
-            sessionRepository: { let m = MockSessionRepository(); given(m).allSessions().willReturn([]); return m }()
+            sessionRepository: { let m = MockSessionRepository(); given(m).lastSession().willReturn(nil); return m }()
         )
 
         #expect(sut.availableModels.count == 1)
@@ -219,7 +219,7 @@ struct PlaygroundViewModelTests {
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor,
-            sessionRepository: { let m = MockSessionRepository(); given(m).allSessions().willReturn([]); return m }()
+            sessionRepository: { let m = MockSessionRepository(); given(m).lastSession().willReturn(nil); return m }()
         )
 
         #expect(sut.availableModels.isEmpty)
@@ -243,7 +243,7 @@ struct PlaygroundViewModelTests {
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor,
-            sessionRepository: { let m = MockSessionRepository(); given(m).allSessions().willReturn([]); return m }()
+            sessionRepository: { let m = MockSessionRepository(); given(m).lastSession().willReturn(nil); return m }()
         )
 
         #expect(sut.selectedModelName == "default")
@@ -266,7 +266,7 @@ struct PlaygroundViewModelTests {
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor,
-            sessionRepository: { let m = MockSessionRepository(); given(m).allSessions().willReturn([]); return m }()
+            sessionRepository: { let m = MockSessionRepository(); given(m).lastSession().willReturn(nil); return m }()
         )
 
         #expect(sut.selectedModelName == "default")
@@ -516,7 +516,7 @@ struct PlaygroundViewModelTests {
             modelsLister: modelsLister,
             clipboard: MockClipboardInteractor(),
             defaultModelInteractor: defaultModelInteractor,
-            sessionRepository: { let m = MockSessionRepository(); given(m).allSessions().willReturn([]); return m }()
+            sessionRepository: { let m = MockSessionRepository(); given(m).lastSession().willReturn(nil); return m }()
         )
 
         given(availabilityChecker).execute(model: .any).willReturn(.available)
@@ -630,7 +630,7 @@ struct PlaygroundViewModelTests {
         }(),
         sessionRepository: SessionRepository = {
             let mock = MockSessionRepository()
-            given(mock).allSessions().willReturn([])
+            given(mock).lastSession().willReturn(nil)
             return mock
         }()
     ) -> PlaygroundViewModel {

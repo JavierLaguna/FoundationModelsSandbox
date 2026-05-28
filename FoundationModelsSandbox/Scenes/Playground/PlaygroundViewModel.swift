@@ -34,9 +34,6 @@ final class PlaygroundViewModel {
     // MARK: - Session State
     private(set) var session: ConversationSession
 
-    /// True while the initial session restoration from disk is in progress.
-    private(set) var isRestoringSession: Bool = false
-
     // MARK: - Copy State
     var isCodeCopied: Bool = false
 
@@ -78,7 +75,8 @@ final class PlaygroundViewModel {
         modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault(),
         clipboard: ClipboardInteractor = ClipboardInteractorDefault(),
         defaultModelInteractor: DefaultModelInteractor = DefaultModelInteractorDefault(),
-        sessionRepository: any SessionRepository = LiveSessionRepository.makeDefault()
+        sessionRepository: any SessionRepository = LiveSessionRepository.makeDefault(),
+        shouldRestoreLastSession: Bool = true
     ) {
         self.interactor = interactor
         self.availabilityChecker = availabilityChecker
@@ -92,7 +90,10 @@ final class PlaygroundViewModel {
         checkAvailability()
 
         // Restore the last session from disk without blocking init.
-        restoreLastSession()
+        // Pass `false` for "New Chat" to start with a clean session.
+        if shouldRestoreLastSession {
+            restoreLastSession()
+        }
     }
 
     // MARK: - Actions
@@ -117,23 +118,21 @@ final class PlaygroundViewModel {
         isFoundationModelsAvailable = selectedModel?.isAvailable ?? false
     }
 
-    /// Attempts to restore the most recent session from the repository.
+    /// Restores the most recent session from the repository, if any.
     private func restoreLastSession() {
-        isRestoringSession = true
-        
-        Task { [weak self] in
-            guard let self else { return }
-            defer { isRestoringSession = false }
-            guard let last = try? sessionRepository.allSessions().first else { return }
+        guard let last = try? sessionRepository.lastSession() else { return }
+        loadSession(last)
+    }
 
-            session = last
-            instructions = last.instructions
-            if !last.modelName.isEmpty {
-                selectedModelName = last.modelName
-            }
-            if case .success(let response) = last.latestResponse {
-                aiResponse = response
-            }
+    /// Loads a specific session into the ViewModel.
+    func loadSession(_ session: ConversationSession) {
+        self.session = session
+        instructions = session.instructions
+        if !session.modelName.isEmpty {
+            selectedModelName = session.modelName
+        }
+        if case .success(let response) = session.latestResponse {
+            aiResponse = response
         }
     }
 
