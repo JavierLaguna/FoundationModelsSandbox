@@ -11,10 +11,10 @@ struct FoundationModelsInteractorTests {
         MockerPolicy.default = .relaxed
     }
 
-    // MARK: - execute — unavailable paths
+    // MARK: - startConversation — unavailable paths
 
     @Test
-    func execute_whenDeviceNotEligible_throws() async {
+    func startConversation_whenDeviceNotEligible_throws() async {
         let checker = MockCheckFoundationModelsAvailabilityInteractor()
         given(checker).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
 
@@ -24,12 +24,18 @@ struct FoundationModelsInteractorTests {
         )
 
         await #expect(throws: AppleIntelligenceNotAvailableError.deviceNotEligible) {
-            try await sut.execute(prompt: "test", instructions: "")
+            try await sut.startConversation(
+                model: SystemLanguageModel.default,
+                instructions: "",
+                truncationStrategy: .dropOldest
+            )
         }
+
+        #expect(sut.hasActiveConversation == false)
     }
 
     @Test
-    func execute_whenAppleIntelligenceNotEnabled_throws() async {
+    func startConversation_whenAppleIntelligenceNotEnabled_throws() async {
         let checker = MockCheckFoundationModelsAvailabilityInteractor()
         given(checker).execute(model: .any).willReturn(.unavailable(.appleIntelligenceNotEnabled))
 
@@ -39,12 +45,16 @@ struct FoundationModelsInteractorTests {
         )
 
         await #expect(throws: AppleIntelligenceNotAvailableError.appleIntelligenceNotEnabled) {
-            try await sut.execute(prompt: "test", instructions: "")
+            try await sut.startConversation(
+                model: SystemLanguageModel.default,
+                instructions: "",
+                truncationStrategy: .dropOldest
+            )
         }
     }
 
     @Test
-    func execute_whenModelNotReady_throws() async {
+    func startConversation_whenModelNotReady_throws() async {
         let checker = MockCheckFoundationModelsAvailabilityInteractor()
         given(checker).execute(model: .any).willReturn(.unavailable(.modelNotReady))
 
@@ -54,20 +64,46 @@ struct FoundationModelsInteractorTests {
         )
 
         await #expect(throws: AppleIntelligenceNotAvailableError.modelNotReady) {
-            try await sut.execute(prompt: "test", instructions: "")
+            try await sut.startConversation(
+                model: SystemLanguageModel.default,
+                instructions: "",
+                truncationStrategy: .dropOldest
+            )
         }
     }
 
-    // MARK: - execute — available path
+    // MARK: - startConversation — available path
 
     @Test
-    func execute_whenAvailable_returnsContentFromSession() async throws {
+    func startConversation_whenAvailable_setsHasActiveConversation() async throws {
+        let session = MockAIModelSession()
+
+        let sut = FoundationModelsInteractorDefault(
+            availabilityChecker: Self.makeAvailableChecker(),
+            sessionFactory: { _, _ in session }
+        )
+
+        #expect(sut.hasActiveConversation == false)
+
+        try await sut.startConversation(
+            model: SystemLanguageModel.default,
+            instructions: "Be helpful",
+            truncationStrategy: .dropOldest
+        )
+
+        #expect(sut.hasActiveConversation == true)
+    }
+
+    // MARK: - sendMessage — active conversation
+
+    @Test
+    func sendMessage_withActiveSession_returnsContent() async throws {
         let session = MockAIModelSession()
         let expectedResponse = SessionResponse(
             content: "Hello from AI!",
-            duration: 0,
-            promptTokenCount: 0,
-            responseTokenCount: 0
+            duration: 0.5,
+            promptTokenCount: 10,
+            responseTokenCount: 20
         )
         given(session).respond(to: .any, options: .any).willReturn(expectedResponse)
 
@@ -76,13 +112,34 @@ struct FoundationModelsInteractorTests {
             sessionFactory: { _, _ in session }
         )
 
-        let result = try await sut.execute(prompt: "Hi", instructions: "")
+        try await sut.startConversation(
+            model: SystemLanguageModel.default,
+            instructions: "",
+            truncationStrategy: .dropOldest
+        )
+
+        let result = try await sut.sendMessage("Hi")
 
         #expect(result.content == "Hello from AI!")
+        #expect(result.duration == 0.5)
+        #expect(result.promptTokenCount == 10)
+        #expect(result.responseTokenCount == 20)
+        #expect(result.contextSize == 4096)
     }
 
     @Test
-    func execute_whenAvailable_forwardsPromptAndOptions() async throws {
+    func sendMessage_noActiveSession_throws() async {
+        let sut = FoundationModelsInteractorDefault(
+            availabilityChecker: Self.makeAvailableChecker()
+        )
+
+        await #expect(throws: FoundationModelsInteractorError.noActiveConversation) {
+            try await sut.sendMessage("Hi")
+        }
+    }
+
+    @Test
+    func sendMessage_usesSessionRespond() async throws {
         let session = MockAIModelSession()
         given(session).respond(to: .any, options: .any).willReturn(
             SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
@@ -93,41 +150,19 @@ struct FoundationModelsInteractorTests {
             sessionFactory: { _, _ in session }
         )
 
-        _ = try await sut.execute(prompt: "test prompt", instructions: "some instructions")
+        try await sut.startConversation(
+            model: SystemLanguageModel.default,
+            instructions: "",
+            truncationStrategy: .dropOldest
+        )
+
+        _ = try await sut.sendMessage("test prompt")
 
         verify(session).respond(to: .any, options: .any).called(.once)
     }
 
     @Test
-    func execute_whenAvailable_createsNewSessionPerCall() async throws {
-        let session1 = MockAIModelSession()
-        given(session1).respond(to: .any, options: .any).willReturn(
-            SessionResponse(content: "First", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
-        )
-
-        let session2 = MockAIModelSession()
-        given(session2).respond(to: .any, options: .any).willReturn(
-            SessionResponse(content: "Second", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
-        )
-
-        var callCount = 0
-        let sut = FoundationModelsInteractorDefault(
-            availabilityChecker: Self.makeAvailableChecker(),
-            sessionFactory: { _, _ in
-                callCount += 1
-                return callCount == 1 ? session1 : session2
-            }
-        )
-
-        let result1 = try await sut.execute(prompt: "first", instructions: "")
-        let result2 = try await sut.execute(prompt: "second", instructions: "")
-
-        #expect(result1.content == "First")
-        #expect(result2.content == "Second")
-    }
-
-    @Test
-    func execute_whenAvailable_setsContextSizeFromModel() async throws {
+    func sendMessage_reusesSameSessionAcrossCalls() async throws {
         let session = MockAIModelSession()
         given(session).respond(to: .any, options: .any).willReturn(
             SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
@@ -138,10 +173,67 @@ struct FoundationModelsInteractorTests {
             sessionFactory: { _, _ in session }
         )
 
-        let result = try await sut.execute(prompt: "Hi", instructions: "")
+        try await sut.startConversation(
+            model: SystemLanguageModel.default,
+            instructions: "",
+            truncationStrategy: .dropOldest
+        )
 
-        // SystemLanguageModel.default.contextSize returns 4096 on current SDK
-        #expect(result.contextSize != nil)
+        _ = try await sut.sendMessage("first")
+        _ = try await sut.sendMessage("second")
+
+        // Same session should be used (not recreated), so respond is called twice
+        verify(session).respond(to: .any, options: .any).called(.exactly(2))
+    }
+
+    // MARK: - endConversation
+
+    @Test
+    func endConversation_clearsActiveSession() async throws {
+        let session = MockAIModelSession()
+        given(session).respond(to: .any, options: .any).willReturn(
+            SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
+        )
+
+        let sut = FoundationModelsInteractorDefault(
+            availabilityChecker: Self.makeAvailableChecker(),
+            sessionFactory: { _, _ in session }
+        )
+
+        try await sut.startConversation(
+            model: SystemLanguageModel.default,
+            instructions: "",
+            truncationStrategy: .dropOldest
+        )
+
+        #expect(sut.hasActiveConversation == true)
+
+        sut.endConversation()
+
+        #expect(sut.hasActiveConversation == false)
+    }
+
+    // MARK: - contextSize
+
+    @Test
+    func contextSize_returnsModelContextSize() async throws {
+        let session = MockAIModelSession()
+        given(session).respond(to: .any, options: .any).willReturn(
+            SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
+        )
+
+        let sut = FoundationModelsInteractorDefault(
+            availabilityChecker: Self.makeAvailableChecker(),
+            sessionFactory: { _, _ in session }
+        )
+
+        try await sut.startConversation(
+            model: SystemLanguageModel.default,
+            instructions: "",
+            truncationStrategy: .dropOldest
+        )
+
+        #expect(sut.contextSize == 4096)
     }
 
     // MARK: - Test Fixtures

@@ -277,7 +277,8 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_success_setsResponseAndClearsPrompt() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
+        given(mockInteractor).hasActiveConversation.willReturn(true)
+        given(mockInteractor).sendMessage(.any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -294,7 +295,8 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_error_setsErrorMessage() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        given(mockInteractor).execute(prompt: .any, instructions: .any).willThrow(AppleIntelligenceNotAvailableError.deviceNotEligible)
+        given(mockInteractor).hasActiveConversation.willReturn(true)
+        given(mockInteractor).sendMessage(.any).willThrow(AppleIntelligenceNotAvailableError.deviceNotEligible)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -311,7 +313,8 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_emptyUserPrompt_doesNothing() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
+        given(mockInteractor).hasActiveConversation.willReturn(true)
+        given(mockInteractor).sendMessage(.any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -326,7 +329,8 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_alreadyLoading_doesNothing() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
+        given(mockInteractor).hasActiveConversation.willReturn(true)
+        given(mockInteractor).sendMessage(.any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
 
@@ -342,7 +346,8 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_success_addsMessageToSessionWithSuccessOutcome() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
+        given(mockInteractor).hasActiveConversation.willReturn(true)
+        given(mockInteractor).sendMessage(.any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
         sut.userPrompt = "test prompt"
@@ -359,7 +364,8 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_error_addsMessageToSessionWithFailureOutcome() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        given(mockInteractor).execute(prompt: .any, instructions: .any).willThrow(AppleIntelligenceNotAvailableError.deviceNotEligible)
+        given(mockInteractor).hasActiveConversation.willReturn(true)
+        given(mockInteractor).sendMessage(.any).willThrow(AppleIntelligenceNotAvailableError.deviceNotEligible)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
         sut.userPrompt = "test prompt"
@@ -376,7 +382,8 @@ struct PlaygroundViewModelTests {
     @Test
     func submitPrompt_preservesOriginalPromptInSession() async {
         let mockInteractor = MockFoundationModelsInteractor()
-        given(mockInteractor).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
+        given(mockInteractor).hasActiveConversation.willReturn(true)
+        given(mockInteractor).sendMessage(.any).willReturn(Self.successResponse)
 
         let sut = Self.makeSUT(interactor: mockInteractor)
         sut.userPrompt = "original prompt text"
@@ -609,7 +616,8 @@ struct PlaygroundViewModelTests {
     private static func makeSUT(
         interactor: FoundationModelsInteractor = {
             let mock = MockFoundationModelsInteractor()
-            given(mock).execute(prompt: .any, instructions: .any).willReturn(Self.successResponse)
+            given(mock).hasActiveConversation.willReturn(true)
+            given(mock).sendMessage(.any).willReturn(Self.successResponse)
             return mock
         }(),
         availabilityChecker: CheckFoundationModelsAvailabilityInteractor = {
