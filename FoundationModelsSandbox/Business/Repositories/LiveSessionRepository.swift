@@ -19,6 +19,8 @@ final class LiveSessionRepository: SessionRepository {
         var modelName: String
         var instructions: String
         var messagesData: String
+        var transcriptData: String?
+        var truncationStrategy: String?
     }
 
     // MARK: - Properties
@@ -62,6 +64,17 @@ final class LiveSessionRepository: SessionRepository {
                 t.column("messagesData", .text).notNull()
             }
         }
+        migrator.registerMigration("addTranscriptColumns") { db in
+            // Check if columns exist using PRAGMA table_info
+            let columns = try Row.fetchAll(db, sql: "PRAGMA table_info('sessionRow')")
+            let columnNames = Set(columns.compactMap { $0["name"] as? String })
+            if !columnNames.contains("transcriptData") {
+                try db.execute(sql: "ALTER TABLE sessionRow ADD COLUMN transcriptData TEXT")
+            }
+            if !columnNames.contains("truncationStrategy") {
+                try db.execute(sql: "ALTER TABLE sessionRow ADD COLUMN truncationStrategy TEXT DEFAULT 'dropOldest'")
+            }
+        }
         try? migrator.migrate(database)
     }
 
@@ -72,10 +85,10 @@ final class LiveSessionRepository: SessionRepository {
         try database.write { db in
             try db.execute(
                 sql: """
-                    INSERT OR REPLACE INTO sessionRow (id, createdAt, modelName, instructions, messagesData)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO sessionRow (id, createdAt, modelName, instructions, messagesData, transcriptData, truncationStrategy)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
-                arguments: [row.id, row.createdAt, row.modelName, row.instructions, row.messagesData]
+                arguments: [row.id, row.createdAt, row.modelName, row.instructions, row.messagesData, row.transcriptData, row.truncationStrategy]
             )
         }
     }
@@ -86,10 +99,10 @@ final class LiveSessionRepository: SessionRepository {
             try db.execute(
                 sql: """
                     UPDATE sessionRow
-                    SET createdAt = ?, modelName = ?, instructions = ?, messagesData = ?
+                    SET createdAt = ?, modelName = ?, instructions = ?, messagesData = ?, transcriptData = ?, truncationStrategy = ?
                     WHERE id = ?
                     """,
-                arguments: [row.createdAt, row.modelName, row.instructions, row.messagesData, row.id]
+                arguments: [row.createdAt, row.modelName, row.instructions, row.messagesData, row.transcriptData, row.truncationStrategy, row.id]
             )
         }
     }
@@ -126,13 +139,20 @@ final class LiveSessionRepository: SessionRepository {
             [MessageEntry].self,
             from: Data(messagesData.utf8)
         )
+        let strategy = (row["truncationStrategy"] as? String)
+            .flatMap { ContextTruncationStrategy(rawValue: $0) } ?? .dropOldest
+        let transcriptData = (row["transcriptData"] as? String)
+            .flatMap { Data($0.utf8) }
+
         var session = ConversationSession(
             id: id,
             createdAt: row["createdAt"] as? Date ?? Date(),
             modelName: row["modelName"] as? String ?? "",
-            instructions: row["instructions"] as? String ?? ""
+            instructions: row["instructions"] as? String ?? "",
+            truncationStrategy: strategy
         )
         session.messages = messages
+        session.transcriptData = transcriptData
         return session
     }
 
@@ -140,12 +160,16 @@ final class LiveSessionRepository: SessionRepository {
     private func encodeRow(_ session: ConversationSession) throws -> SessionRow {
         let data = try JSONEncoder().encode(session.messages)
         let jsonString = String(data: data, encoding: .utf8) ?? "[]"
+        let transcriptString = session.transcriptData.flatMap { String(data: $0, encoding: .utf8) }
+        let strategyString = session.truncationStrategy.rawValue
         return SessionRow(
             id: session.id.uuidString,
             createdAt: session.createdAt,
             modelName: session.modelName,
             instructions: session.instructions,
-            messagesData: jsonString
+            messagesData: jsonString,
+            transcriptData: transcriptString,
+            truncationStrategy: strategyString
         )
     }
 

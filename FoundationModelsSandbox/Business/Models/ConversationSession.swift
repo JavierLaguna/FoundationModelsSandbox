@@ -7,17 +7,23 @@ struct ConversationSession: Identifiable, Sendable {
     var modelName: String
     var instructions: String
     var messages: [MessageEntry]
+    /// The truncation strategy used when context window is exceeded.
+    var truncationStrategy: ContextTruncationStrategy = .dropOldest
+    /// JSON-encoded `Transcript` data for session restoration.
+    var transcriptData: Data?
 
     init(
         id: UUID = UUID(),
         createdAt: Date = Date(),
         modelName: String = "",
-        instructions: String = ""
+        instructions: String = "",
+        truncationStrategy: ContextTruncationStrategy = .dropOldest
     ) {
         self.id = id
         self.createdAt = createdAt
         self.modelName = modelName
         self.instructions = instructions
+        self.truncationStrategy = truncationStrategy
         self.messages = []
     }
 
