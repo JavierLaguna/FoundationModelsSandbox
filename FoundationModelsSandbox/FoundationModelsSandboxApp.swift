@@ -11,15 +11,22 @@ struct FoundationModelsSandboxApp: App {
         return Locale.current
     }()
 
+    /// Shared repository for session persistence (SQLite-backed).
+    private let sessionRepository: any SessionRepository
+
     init() {
         // Also clean up on init to handle the case where app_language_preference
         // is "System" but AppleLanguages still has a stale value from a previous version.
         _ = Self.systemLocale
+        self.sessionRepository = LiveSessionRepository.makeDefault()
     }
 
     var body: some Scene {
         WindowGroup {
-            MainView(systemLocale: Self.systemLocale)
+            MainView(
+                systemLocale: Self.systemLocale,
+                sessionRepository: sessionRepository
+            )
         }
     }
 }

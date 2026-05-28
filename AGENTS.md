@@ -3,6 +3,7 @@
 ## Scope and current shape
 - This repo is a single Xcode project (`FoundationModelsSandbox.xcodeproj`) with two targets: app and unit tests (UI tests target was removed).
 - There is no Swift Package manifest, no CI workflow, no lint/typecheck/format config, and no repo-local OpenCode instruction config (`opencode.json`) at the time of writing.
+- **Swift Package dependencies**: Mockable (test mocking), sqlite-data (session persistence via GRDB), plus their transitive dependencies (swift-dependencies, swift-perception, GRDB, etc.).
 
 ## Verified commands (don’t guess)
 - List available schemes/targets:
@@ -13,27 +14,40 @@
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' test`
 - Run only unit tests target:
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -only-testing:FoundationModelsSandboxTests test`
-- Test status: **73+ tests** (all Swift Testing, no XCTest).
+- Test status: **209 tests** (all Swift Testing, no XCTest). Run with `-parallel-testing-enabled NO` for stable results.
+- Run a specific test suite: `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -skipMacroValidation -parallel-testing-enabled NO -only-testing:FoundationModelsSandboxTests/HistoryViewModelTests test`
 
 ## Command-order / defaults that can bite
 - `xcodebuild` defaults to **Release** if you omit scheme/configuration (`xcodebuild -list` reports this); pass scheme (and config if needed) explicitly.
 - Use `-destination 'platform=macOS'` for deterministic local runs.
+- **Macro approval**: `sqlite-data`'s transitive dependency `swift-perception` includes macros that require approval. In CI/CLI, pass `-skipMacroValidation` to `xcodebuild`. Without it, builds fail with `Macro … was changed since a previous approval and must be enabled`.
+- **Parallel test flakiness**: Some tests (especially those involving `Task { }` in ViewModel init) can crash under parallel test execution. Use `-parallel-testing-enabled NO` for stable local runs.
 
 ## Architecture map (high-signal)
 - App entrypoint: `FoundationModelsSandbox/FoundationModelsSandboxApp.swift` (`@main`, loads `MainView`).
 - **Clean Architecture** folder structure:
   - `Business/` - Interactors (e.g., `FoundationModelsInteractor`), Use Cases, Error types
+  - `Business/Repositories/` - Data persistence layer (Repository pattern, currently `SessionRepository` + `LiveSessionRepository` using SQLite/GRDB)
   - `Components/` - Reusable UI components (SwiftUI Views)
   - `Scenes/` - Feature modules/scenes with ViewModels
 - UI uses `@Observable` ViewModels for state management.
 - **Dependency Injection**: Pass dependencies via initializers. Use protocols for testability.
+- **Persistence**: Session data stored via SQLite using GRDB (from the `sqlite-data` package). The database lives at `~/Library/Application Support/FoundationModelsSandbox/sessions.db`. Messages are serialized as JSON in a text column.
+  - `SessionRepository` has a `lastSession()` method (SQL `LIMIT 1`) for efficient single-session restoration — prefer over `allSessions().first`.
 - Tests:
   - `FoundationModelsSandboxTests/` uses **Swift Testing** (`import Testing`, `@Test`), not XCTest.
   - `FoundationModelsSandboxUITests/` uses XCTest UI testing and launches the app via `XCUIApplication()`.
   - Test files mirror the app's folder structure (e.g., `Business/Models/`, `Business/Interactors/`, `Scenes/Main/`).
   - **Mocks**: Uses **Mockable** library (`@Mockable` macro on protocols). No manual mocks - mocks generated at compile time when `MOCKING` flag is set.
   - **Testing ViewModels with Mockable**: ViewModels that call dependencies in `init` need `MockerPolicy.default = .relaxed` in the test struct's `init()` to avoid crashes from unstubbed mock calls during initialization.
+  - **Mockable stubs are sticky**: With `MockerPolicy.default = .relaxed`, `given(mock).method().willReturn(value)` makes the mock return the same value on every subsequent call. You CANNOT change the return value mid-test by calling `given()` again — the first stub persists. Plan your test stubs accordingly.
+  - **Async ViewModel init with Mockable**: If the ViewModel spawns a `Task` in `init`, use `await Task.yield()` in tests to let the task complete before making assertions. The task runs on the main actor because the ViewModel is `@MainActor`.
+  - **Session restoration uses `lastSession()`**: `PlaygroundViewModel.restoreLastSession()` now calls `sessionRepository.lastSession()` (uses SQL `LIMIT 1`) instead of `allSessions().first`. Stub with `given(mock).lastSession().willReturn(nil)` in tests.
   - **Code Coverage**: Configured in `FoundationModelsSandbox.xctestplan` with exclusions for `**/*View.swift` and `**/Components/**/*.swift`. ViewModels are included in coverage.
+
+## Observable patterns
+- **`didSet` works with `@Observable`**: Property observers (`didSet`/`willSet`) fire normally on `@Observable` properties. This is useful for syncing a ViewModel property with a model property (e.g., `var instructions: String = "" { didSet { session.instructions = instructions } }`).
+- **Bindings bypass methods**: When a view uses `$viewModel.property` as a `Binding`, writes go directly to the stored property, not through helper methods like `updateInstructions()`. Use `didSet` if you need side effects on every write.
 
 ## Async/await + Swift 6 Strict Concurrency
 - All asynchronous flows MUST use `async`/`await`. No completion handlers.
@@ -45,6 +59,21 @@
   - `nonisolated` for immutable computed properties in actors.
   - `@unchecked Sendable` only when truly safe (document why).
 - **In tests**: Use `@MainActor` on test structs when the source types have `@MainActor`-isolated properties (common with SwiftUI models).
+
+## Installed skills (high-priority for this repo)
+- **`swift-concurrency`** — Use for any concurrency-sensitive work:
+  - Data races, actor isolation, `Sendable` issues, task cancellation, or callback-to-`async/await` migrations.
+  - Swift 6 strict concurrency compiler warnings/errors.
+  - Refactors in interactors/repositories/view models where thread-safety and isolation are critical.
+  - Expected output: concrete code changes + isolation rationale (`@MainActor`, `actor`, `nonisolated`, `Sendable`) + test impact.
+- **`swiftui-expert-skill`** — Use for SwiftUI architecture and UI quality work:
+  - View composition, state ownership (`@State`/`@Bindable`), navigation patterns, and performance/readability improvements.
+  - Liquid Glass styling, `NavigationSplitView`, and component-level SwiftUI best practices.
+  - Localization-safe UI updates (prefer `Text("key")` for reactive language changes).
+  - Expected output: idiomatic SwiftUI code aligned with this repo’s patterns.
+- **When both apply**:
+  - Run `swift-concurrency` first for model/view model isolation decisions.
+  - Then run `swiftui-expert-skill` to shape final UI/state wiring on top of safe concurrency boundaries.
 
 ## UI Design Guidelines
 - Follow **Apple Human Interface Guidelines** for all UI elements.
@@ -142,7 +171,34 @@ MyTextField(placeholder: Text("Enter your prompt..."))
 ## ViewModel State Management in Navigation
 - **Preserving state across screens**: When a ViewModel needs to persist its state when navigating between screens (e.g., switching between Playground, History, Settings), create the ViewModel at the parent view level (e.g., `MainView`) and pass it down to child views via initializer.
 - **Resetting session/state**: To reset a ViewModel (e.g., "New Chat" button), simply create a new instance: `viewModel = PlaygroundViewModel()`.
-- **Navigation from child views**: Pass navigation state (`@Binding`) and callbacks (e.g., `onNewChat: () -> Void`) from parent to child views to control navigation from the sidebar or other components.
+  - **IMPORTANT**: When creating a new ViewModel for "New Chat", pass `shouldRestoreLastSession: false` to prevent automatically loading the last saved session:
+    ```swift
+    playgroundViewModel = PlaygroundViewModel(
+        sessionRepository: sessionRepository,
+        shouldRestoreLastSession: false
+    )
+    ```
+  - The default `shouldRestoreLastSession: true` is used on app launch so the user returns to their last conversation.
+- **Loading a specific session**: Use `PlaygroundViewModel.loadSession(_:)` to load a specific `ConversationSession` (from history, restoration, etc.). This sets `session`, `instructions`, `selectedModelName`, and `aiResponse` from the given session:
+  ```swift
+  let vm = PlaygroundViewModel(sessionRepository: repo, shouldRestoreLastSession: false)
+  vm.loadSession(selectedSession)
+  ```
+- **Session selection from History → Playground**: The `HistoryView` exposes an `onSelectSession: ((ConversationSession) -> Void)?` closure. In `MainView`, wire it to create a fresh `PlaygroundViewModel` and navigate:
+  ```swift
+  HistoryView(
+      viewModel: historyViewModel,
+      onSelectSession: { session in
+          playgroundViewModel = PlaygroundViewModel(
+              sessionRepository: sessionRepository,
+              shouldRestoreLastSession: false
+          )
+          playgroundViewModel.loadSession(session)
+          selectedSection = .playground
+      }
+  )
+  ```
+- **Navigation from child views**: Pass navigation state (`@Binding`) and callbacks (e.g., `onNewChat: () -> Void`, `onSelectSession:`) from parent to child views to control navigation from the sidebar or other components.
 
 ### Example Pattern
 ```swift
@@ -180,3 +236,68 @@ struct PlaygroundView: View {
     // ...
 }
 ```
+
+### Injecting shared dependencies (e.g., SessionRepository)
+When a ViewModel needs persistence or other shared services, create those at the `App` level and inject them through `MainView`:
+```swift
+// FoundationModelsSandboxApp.swift
+@main
+struct FoundationModelsSandboxApp: App {
+    private let sessionRepository: any SessionRepository
+    
+    init() {
+        self.sessionRepository = LiveSessionRepository.makeDefault()
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            MainView(
+                systemLocale: Self.systemLocale,
+                sessionRepository: sessionRepository
+            )
+        }
+    }
+}
+```
+
+## Search Pattern
+- **`.searchable` with `@Observable` ViewModel**: Add `searchQuery: String` to the ViewModel and a `filteredSessions` computed property. The view binds `$viewModel.searchQuery` to `.searchable`:
+  ```swift
+  // ViewModel
+  var searchQuery: String = ""
+  var isSearching: Bool { !searchQuery.trimmingCharacters(in: .whitespaces).isEmpty }
+
+  var filteredSessions: [ConversationSession] {
+      let trimmed = searchQuery.trimmingCharacters(in: .whitespaces)
+      guard !trimmed.isEmpty else { return sessions }
+      return sessions.filter { session in
+          session.firstPrompt?.localizedStandardContains(trimmed) == true ||
+          session.lastResponsePreview?.localizedStandardContains(trimmed) == true
+      }
+  }
+
+  // View
+  .searchable(text: $viewModel.searchQuery, prompt: Text("Search sessions…"))
+  ```
+- **Empty search results**: Use `ContentUnavailableView.search(text:)` when `isSearching && filteredSessions.isEmpty`:
+  ```swift
+  } else if viewModel.isSearching && viewModel.filteredSessions.isEmpty {
+      ContentUnavailableView.search(text: viewModel.searchQuery)
+  }
+  ```
+- Keep filtering logic in the ViewModel, not inline in the view body.
+
+## @Bindable vs @State for @Observable ViewModels
+- **Owned ViewModel** (view creates it): use `@State private var` — SwiftUI preserves the instance across redraws.
+- **Received ViewModel** (passed from parent): use `@Bindable var` — semantically correct, expresses that the view doesn't own the model. If the init has a default value, assign directly:
+  ```swift
+  struct HistoryView: View {
+      @Bindable var viewModel: HistoryViewModel
+      let onSelectSession: ((ConversationSession) -> Void)?
+
+      init(viewModel: HistoryViewModel = HistoryViewModel(), ...) {
+          self.viewModel = viewModel
+          // ...
+      }
+  }
+  ```

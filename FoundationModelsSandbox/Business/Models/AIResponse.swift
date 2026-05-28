@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents an AI response with content and performance metrics
-struct AIResponse: Sendable, Equatable {
+struct AIResponse: Sendable, Equatable, Codable {
     /// The generated text content from the model
     let content: String
 

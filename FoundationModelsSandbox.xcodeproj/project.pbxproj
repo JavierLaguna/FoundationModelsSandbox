@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4962EC632FC0CEBC009902AA /* SQLiteData in Frameworks */ = {isa = PBXBuildFile; productRef = 4962EC622FC0CEBC009902AA /* SQLiteData */; };
+		4962EC652FC0CEBC009902AA /* SQLiteDataTestSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 4962EC642FC0CEBC009902AA /* SQLiteDataTestSupport */; };
 		49E518102FBC5CAE00E28D1A /* Mockable in Frameworks */ = {isa = PBXBuildFile; productRef = 49E5180F2FBC5CAE00E28D1A /* Mockable */; };
 		49E518122FBC5CB400E28D1A /* Mockable in Frameworks */ = {isa = PBXBuildFile; productRef = 49E518112FBC5CB400E28D1A /* Mockable */; };
 /* End PBXBuildFile section */
@@ -57,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4962EC632FC0CEBC009902AA /* SQLiteData in Frameworks */,
 				49E518102FBC5CAE00E28D1A /* Mockable in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4962EC652FC0CEBC009902AA /* SQLiteDataTestSupport in Frameworks */,
 				49E518122FBC5CB400E28D1A /* Mockable in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -119,6 +123,7 @@
 			name = FoundationModelsSandbox;
 			packageProductDependencies = (
 				49E5180F2FBC5CAE00E28D1A /* Mockable */,
+				4962EC622FC0CEBC009902AA /* SQLiteData */,
 			);
 			productName = FoundationModelsSandbox;
 			productReference = 49E8B9852F9F9B33002F1EE2 /* FoundationModelsSandbox.app */;
@@ -143,6 +148,7 @@
 			name = FoundationModelsSandboxTests;
 			packageProductDependencies = (
 				49E518112FBC5CB400E28D1A /* Mockable */,
+				4962EC642FC0CEBC009902AA /* SQLiteDataTestSupport */,
 			);
 			productName = FoundationModelsSandboxTests;
 			productReference = 49E8B9922F9F9B35002F1EE2 /* FoundationModelsSandboxTests.xctest */;
@@ -179,6 +185,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				49E5180D2FBC5CA500E28D1A /* XCRemoteSwiftPackageReference "Mockable" */,
+				4962EC612FC0CEBC009902AA /* XCRemoteSwiftPackageReference "sqlite-data" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 49E8B9862F9F9B33002F1EE2 /* Products */;
@@ -513,6 +520,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		4962EC612FC0CEBC009902AA /* XCRemoteSwiftPackageReference "sqlite-data" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/sqlite-data";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.1;
+			};
+			traits = (
+			);
+		};
 		49E5180D2FBC5CA500E28D1A /* XCRemoteSwiftPackageReference "Mockable" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Kolos65/Mockable";
@@ -524,6 +541,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4962EC622FC0CEBC009902AA /* SQLiteData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4962EC612FC0CEBC009902AA /* XCRemoteSwiftPackageReference "sqlite-data" */;
+			productName = SQLiteData;
+		};
+		4962EC642FC0CEBC009902AA /* SQLiteDataTestSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4962EC612FC0CEBC009902AA /* XCRemoteSwiftPackageReference "sqlite-data" */;
+			productName = SQLiteDataTestSupport;
+		};
 		49E5180F2FBC5CAE00E28D1A /* Mockable */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 49E5180D2FBC5CA500E28D1A /* XCRemoteSwiftPackageReference "Mockable" */;

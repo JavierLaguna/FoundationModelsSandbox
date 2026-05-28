@@ -13,13 +13,16 @@ final class PlaygroundViewModel {
     private let modelsLister: ListAvailableModelsInteractor
     private let clipboard: ClipboardInteractor
     private let defaultModelInteractor: DefaultModelInteractor
+    private let sessionRepository: any SessionRepository
 
     // MARK: - Availability State
     private(set) var isFoundationModelsAvailable: Bool = false
     private(set) var availabilityReason: SystemLanguageModel.Availability?
 
     // MARK: - Instructions State
-    var instructions: String = ""
+    var instructions: String = "" {
+        didSet { session.instructions = instructions }
+    }
     var userPrompt: String = ""
     var selectedModelName: String = ""
 
@@ -71,17 +74,26 @@ final class PlaygroundViewModel {
         availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault(),
         modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault(),
         clipboard: ClipboardInteractor = ClipboardInteractorDefault(),
-        defaultModelInteractor: DefaultModelInteractor = DefaultModelInteractorDefault()
+        defaultModelInteractor: DefaultModelInteractor = DefaultModelInteractorDefault(),
+        sessionRepository: any SessionRepository = LiveSessionRepository.makeDefault(),
+        shouldRestoreLastSession: Bool = true
     ) {
         self.interactor = interactor
         self.availabilityChecker = availabilityChecker
         self.modelsLister = modelsLister
         self.clipboard = clipboard
         self.defaultModelInteractor = defaultModelInteractor
+        self.sessionRepository = sessionRepository
         self.session = ConversationSession()
-        
+
         loadModels()
         checkAvailability()
+
+        // Restore the last session from disk without blocking init.
+        // Pass `false` for "New Chat" to start with a clean session.
+        if shouldRestoreLastSession {
+            restoreLastSession()
+        }
     }
 
     // MARK: - Actions
@@ -104,6 +116,24 @@ final class PlaygroundViewModel {
         let reason = availabilityChecker.execute(model: selectedModel)
         availabilityReason = reason
         isFoundationModelsAvailable = selectedModel?.isAvailable ?? false
+    }
+
+    /// Restores the most recent session from the repository, if any.
+    private func restoreLastSession() {
+        guard let last = try? sessionRepository.lastSession() else { return }
+        loadSession(last)
+    }
+
+    /// Loads a specific session into the ViewModel.
+    func loadSession(_ session: ConversationSession) {
+        self.session = session
+        instructions = session.instructions
+        if !session.modelName.isEmpty {
+            selectedModelName = session.modelName
+        }
+        if case .success(let response) = session.latestResponse {
+            aiResponse = response
+        }
     }
 
     func modelSelectionChanged(to modelName: String) {
@@ -130,15 +160,17 @@ final class PlaygroundViewModel {
 
         let prompt = userPrompt
         userPrompt = ""
-        
+
         let messageId = session.addMessage(prompt: prompt, outcome: .noResponse)
+        // Persist immediately so the prompt is saved even if the response fails.
+        try? sessionRepository.saveSession(session)
 
         do {
             let response = try await interactor.execute(
                 prompt: prompt,
                 instructions: instructions
             )
-            
+
             aiResponse = response
             session.updateMessage(id: messageId, outcome: .success(response))
 
@@ -148,9 +180,18 @@ final class PlaygroundViewModel {
             session.updateMessage(id: messageId, outcome: .failure(errorMessage))
         }
         isLoading = false
+
+        // Persist the updated session with the response.
+        try? sessionRepository.saveSession(session)
     }
 
     func clearPrompts() {
+        // Save the current session to disk before clearing.
+        let oldSession = session
+        Task { [weak self] in
+            try? self?.sessionRepository.saveSession(oldSession)
+        }
+
         instructions = ""
         userPrompt = ""
         aiResponse = nil
