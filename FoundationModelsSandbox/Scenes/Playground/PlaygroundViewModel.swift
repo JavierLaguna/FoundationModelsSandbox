@@ -34,6 +34,11 @@ final class PlaygroundViewModel {
     // MARK: - Session State
     private(set) var session: ConversationSession
 
+    // MARK: - Context Management
+    var truncationStrategy: ContextTruncationStrategy = .dropOldest {
+        didSet { session.truncationStrategy = truncationStrategy }
+    }
+
     // MARK: - Copy State
     var isCodeCopied: Bool = false
 
@@ -66,6 +71,21 @@ final class PlaygroundViewModel {
     var metricsFooter: String {
         guard let response = aiResponse else { return "" }
         return "\(response.formattedDuration) • \(response.formattedTokenCounts)"
+    }
+
+    /// Context usage information for UI display.
+    var contextUsageFooter: String? {
+        guard interactor.hasActiveConversation else { return nil }
+        let contextSize = interactor.contextSize
+        // Estimate: count prompts from the session messages as a rough token approximation.
+        // In production, this uses transcripts and actual token counts.
+        let estimatedTokens = session.messages.reduce(0) { total, message in
+            let promptTokens = message.prompt.count / 4  // rough estimate ~4 chars per token
+            let responseTokens = message.outcome.content.count / 4
+            return total + promptTokens + responseTokens
+        }
+        let percentage = Double(estimatedTokens) / Double(contextSize) * 100
+        return "▸ \(estimatedTokens) / \(contextSize) tokens (\(String(format: "%.1f", percentage))%)"
     }
 
     // MARK: - Initialization
@@ -134,6 +154,27 @@ final class PlaygroundViewModel {
         if case .success(let response) = session.latestResponse {
             aiResponse = response
         }
+
+        // End any existing conversation
+        interactor.endConversation()
+
+        // Start a new conversation with the saved transcript for restoration
+        if let transcriptData = session.transcriptData,
+           let transcript = try? JSONDecoder().decode(Transcript.self, from: transcriptData),
+           let model = selectedModel {
+            Task {
+                try? await interactor.startConversation(
+                    model: model,
+                    instructions: session.instructions,
+                    truncationStrategy: session.truncationStrategy,
+                    transcript: transcript
+                )
+            }
+        }
+
+        // If no transcriptData (legacy sessions), the conversation will start
+        // fresh on the next submitPrompt() — previous messages are shown in
+        // the UI but won't be in the model's context.
     }
 
     func modelSelectionChanged(to modelName: String) {
@@ -161,18 +202,41 @@ final class PlaygroundViewModel {
         let prompt = userPrompt
         userPrompt = ""
 
+        // Start conversation if not already active
+        if !interactor.hasActiveConversation {
+            guard let model = selectedModel else {
+                self.error = String(localized: "No model selected")
+                isLoading = false
+                return
+            }
+            do {
+                try await interactor.startConversation(
+                    model: model,
+                    instructions: instructions,
+                    truncationStrategy: session.truncationStrategy
+                )
+            } catch {
+                self.error = error.localizedDescription
+                isLoading = false
+                return
+            }
+        }
+
         let messageId = session.addMessage(prompt: prompt, outcome: .noResponse)
         // Persist immediately so the prompt is saved even if the response fails.
         try? sessionRepository.saveSession(session)
 
         do {
-            let response = try await interactor.execute(
-                prompt: prompt,
-                instructions: instructions
-            )
+            let response = try await interactor.sendMessage(prompt)
 
             aiResponse = response
             session.updateMessage(id: messageId, outcome: .success(response))
+
+            // Save transcript data for session restoration
+            if let transcript = await interactor.currentTranscript(),
+               let encoded = try? JSONEncoder().encode(transcript) {
+                session.transcriptData = encoded
+            }
 
         } catch {
             let errorMessage = error.localizedDescription
@@ -186,11 +250,22 @@ final class PlaygroundViewModel {
     }
 
     func clearPrompts() {
+        // Save transcript before ending the conversation
+        Task { [weak self] in
+            guard let self else { return }
+            if let transcript = await self.interactor.currentTranscript(),
+               let encoded = try? JSONEncoder().encode(transcript) {
+                self.session.transcriptData = encoded
+            }
+        }
+
         // Save the current session to disk before clearing.
         let oldSession = session
         Task { [weak self] in
             try? self?.sessionRepository.saveSession(oldSession)
         }
+
+        interactor.endConversation()
 
         instructions = ""
         userPrompt = ""
