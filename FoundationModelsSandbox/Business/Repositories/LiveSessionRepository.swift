@@ -109,6 +109,13 @@ final class LiveSessionRepository: SessionRepository {
         return try rows.map { try decodeRow($0) }
     }
 
+    func lastSession() throws -> ConversationSession? {
+        let rows = try database.read { db in
+            try Row.fetchAll(db, sql: "SELECT * FROM sessionRow ORDER BY createdAt DESC LIMIT 1")
+        }
+        return try rows.first.map { try decodeRow($0) }
+    }
+
     /// Decodes a GRDB `Row` into a domain `ConversationSession`.
     private func decodeRow(_ row: Row) throws -> ConversationSession {
         guard let id = UUID(uuidString: row["id"] as? String ?? "") else {

@@ -17,6 +17,9 @@ protocol SessionRepository: Sendable {
     /// Returns all sessions ordered by creation date (newest first).
     func allSessions() throws -> [ConversationSession]
 
+    /// Returns the most recent session, or `nil` if no sessions exist.
+    func lastSession() throws -> ConversationSession?
+
     /// Deletes a single session.
     func deleteSession(id: UUID) throws
 
