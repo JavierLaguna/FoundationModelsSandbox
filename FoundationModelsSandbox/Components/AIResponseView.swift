@@ -5,21 +5,21 @@ struct AIResponseView: View {
     let messages: [MessageEntry]
     let isLoading: Bool
     let onCopyMessage: (MessageEntry) -> Void
-
+    
     @State private var canScrollToBottom: Bool = false
-
+    
     /// Threshold in points: button appears when the user is more than this away from the bottom.
     private static let scrollThreshold: CGFloat = 240
-
+    
     var body: some View {
         VStack(spacing: 0) {
             ToolbarView(
                 title: "AI Response",
                 statusColor: Color.successGreen
             )
-
+            
             Divider()
-
+            
             if messages.isEmpty && !isLoading {
                 emptyState
             } else {
@@ -29,7 +29,7 @@ struct AIResponseView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.appBackground)
     }
-
+    
     @ViewBuilder
     private var conversationView: some View {
         ScrollViewReader { proxy in
@@ -43,7 +43,7 @@ struct AIResponseView: View {
                             )
                             .id(message.id)
                         }
-
+                        
                         if isLoading {
                             HStack {
                                 Spacer()
@@ -52,7 +52,7 @@ struct AIResponseView: View {
                     }
                     .padding(Spacing.lg)
                     .frame(maxWidth: .infinity)
-
+                    
                     // Bottom sentinel — OUTSIDE the LazyVStack, after its padding,
                     // at the true end of the scrollable content
                     Color.clear
@@ -107,20 +107,20 @@ struct AIResponseView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     private var emptyState: some View {
         VStack(spacing: Spacing.md) {
             Spacer()
-
+            
             Image(systemName: "text.bubble")
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
-
+            
             Text("Enter a prompt to generate an AI response")
                 .font(.title3)
                 .foregroundStyle(.secondary)
-
+            
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -137,19 +137,19 @@ private enum ContentSegment {
 private struct MessageBubble: View {
     let message: MessageEntry
     let onCopyMessage: (MessageEntry) -> Void
-
+    
     /// Pre-computed content segments (text ↔ code block) in display order.
     private let contentSegments: [ContentSegment]
-
+    
     /// Code blocks subset for fast copy access (parallel index with `contentSegments` code blocks).
     private let codeBlocks: [(language: String?, code: String)]
-
+    
     /// Maps segment index to code block index (-1 for text segments).
     private let codeBlockIndexForSegment: [Int]
-
+    
     @State private var isMessageCopied = false
     @State private var copiedCodeBlockIndex: Int?
-
+    
     init(
         message: MessageEntry,
         onCopyMessage: @escaping (MessageEntry) -> Void
@@ -173,7 +173,7 @@ private struct MessageBubble: View {
             self.codeBlockIndexForSegment = []
         }
     }
-
+    
     var body: some View {
         GlassEffectContainer(spacing: Spacing.sm) {
             VStack(alignment: .trailing, spacing: Spacing.sm) {
@@ -182,18 +182,18 @@ private struct MessageBubble: View {
             }
         }
     }
-
+    
     private func copyMessageContent() {
         onCopyMessage(message)
-
+        
         isMessageCopied = true
-
+        
         Task {
             try? await Task.sleep(for: .seconds(2))
             isMessageCopied = false
         }
     }
-
+    
     @ViewBuilder
     private var promptBubble: some View {
         HStack {
@@ -207,16 +207,16 @@ private struct MessageBubble: View {
         }
         .padding(.leading, Spacing.xl)
     }
-
+    
     @ViewBuilder
     private var responseBubble: some View {
         switch message.outcome {
         case .success(let response):
             responseSuccessView(response)
-
+            
         case .failure(let errorMessage):
             errorView(errorMessage)
-
+            
         case .noResponse:
             LoadingAppleIntelligence(
                 text: "Waiting for response...",
@@ -226,7 +226,7 @@ private struct MessageBubble: View {
             .padding(.vertical, Spacing.xs)
         }
     }
-
+    
     @ViewBuilder
     private func responseSuccessView(_ response: AIResponse) -> some View {
         HStack {
@@ -234,7 +234,7 @@ private struct MessageBubble: View {
                 ForEach(contentSegments.indices, id: \.self) { index in
                     contentSegmentView(at: index)
                 }
-
+                
                 metricsFooter(response)
             }
             .padding(Spacing.md)
@@ -253,7 +253,7 @@ private struct MessageBubble: View {
         }
         .padding(.trailing, Spacing.xl)
     }
-
+    
     @ViewBuilder
     private func contentSegmentView(at index: Int) -> some View {
         switch contentSegments[index] {
@@ -262,6 +262,7 @@ private struct MessageBubble: View {
                 .font(.body)
                 .lineSpacing(4)
                 .foregroundStyle(Color.primaryText)
+            
         case .codeBlock(let language, let code):
             let cbIndex = codeBlockIndexForSegment[index]
             codeBlock(
@@ -273,22 +274,22 @@ private struct MessageBubble: View {
             )
         }
     }
-
+    
     private func copyCodeBlock(at index: Int) {
         guard index < codeBlocks.count else { return }
         let code = codeBlocks[index].code
-
+        
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(code, forType: .string)
-
+        
         copiedCodeBlockIndex = index
-
+        
         Task {
             try? await Task.sleep(for: .seconds(2))
             copiedCodeBlockIndex = nil
         }
     }
-
+    
     @ViewBuilder
     private func errorView(_ errorMessage: String) -> some View {
         HStack {
@@ -296,12 +297,12 @@ private struct MessageBubble: View {
                 HStack(spacing: Spacing.sm) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.red)
-
+                    
                     Text("Error")
                         .font(.headline)
                         .foregroundStyle(.red)
                 }
-
+                
                 Text(errorMessage)
                     .font(.body)
                     .foregroundStyle(Color.secondaryText)
@@ -310,13 +311,13 @@ private struct MessageBubble: View {
             .padding(Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.errorRed.opacity(0.1))
-                .compositingGroup()
-                .clipShape(.rect(cornerRadius: CornerRadius.medium))
+            .compositingGroup()
+            .clipShape(.rect(cornerRadius: CornerRadius.medium))
             Spacer()
         }
         .padding(.trailing, Spacing.xl)
     }
-
+    
     @ViewBuilder
     private func codeBlock(language: String?, code: String, index: Int, isCopied: Bool, onCopy: @escaping () -> Void) -> some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -324,9 +325,9 @@ private struct MessageBubble: View {
                 Text(language?.capitalized ?? "Code")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.secondaryText)
-
+                
                 Spacer()
-
+                
                 Button(action: onCopy) {
                     Label(isCopied ? "Copied" : "Copy", systemImage: isCopied ? "checkmark" : "doc.on.doc")
                         .font(.caption)
@@ -337,55 +338,54 @@ private struct MessageBubble: View {
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)
             .background(Color.appSecondaryBackground)
-
+            
             Divider()
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                SyntaxHighlightedCode(code: code)
-                    .padding(Spacing.md)
-            }
-            .background(Color.codeBackground)
+            
+            SyntaxHighlightedCode(code: code)
+                .padding(Spacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.codeBackground)
         }
         .compositingGroup()
         .clipShape(.rect(cornerRadius: CornerRadius.small))
     }
-
+    
     @ViewBuilder
     private func metricsFooter(_ metrics: AIResponse) -> some View {
         HStack(spacing: Spacing.md) {
             Label(metrics.formattedDuration, systemImage: "clock")
                 .font(.caption)
                 .foregroundStyle(Color.tertiaryText)
-
+            
             Divider()
                 .frame(height: 12)
-
+            
             Label(metrics.formattedTokenCounts, systemImage: "text.alignleft")
                 .font(.caption)
                 .foregroundStyle(Color.tertiaryText)
-
+            
             Spacer()
         }
     }
-
+    
     private static func parseContentSegments(from response: String) -> [ContentSegment] {
         let pattern = "```(\\w*)\\n([\\s\\S]*?)```"
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [.text(response)] }
-
+        
         let nsString = response as NSString
         let nsRange = NSRange(location: 0, length: nsString.length)
         let matches = regex.matches(in: response, range: nsRange)
-
+        
         var segments: [ContentSegment] = []
         var currentLocation = 0
-
+        
         for match in matches {
             // Text before this code block
             if match.range.location > currentLocation {
                 let textRange = NSRange(location: currentLocation, length: match.range.location - currentLocation)
                 segments.append(.text(nsString.substring(with: textRange)))
             }
-
+            
             // Code block
             let language: String?
             let langRange = match.range(at: 1)
@@ -395,26 +395,26 @@ private struct MessageBubble: View {
             } else {
                 language = nil
             }
-
+            
             let codeRange = match.range(at: 2)
             let code = nsString.substring(with: codeRange)
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             segments.append(.codeBlock(language: language, code: code))
-
+            
             currentLocation = match.range.location + match.range.length
         }
-
+        
         // Text after last code block
         if currentLocation < nsString.length {
             let textRange = NSRange(location: currentLocation, length: nsString.length - currentLocation)
             segments.append(.text(nsString.substring(with: textRange)))
         }
-
+        
         // If no matches, return the whole content as text
         if segments.isEmpty {
             segments.append(.text(response))
         }
-
+        
         return segments
     }
 }
@@ -425,7 +425,7 @@ private struct MessageBubble: View {
         MessageEntry(prompt: "Show me an example", outcome: .success(AIResponse(content: "Here's an example:\n```swift\nfunc fetchData() async throws -> Data {\n    let (data, _) = try await URLSession.shared.data(from: url)\n    return data\n}", duration: 2.0, promptTokenCount: 5, responseTokenCount: 40, contextSize: nil))),
         MessageEntry(prompt: "What about error handling?", outcome: .failure("Network request failed"))
     ]
-
+    
     AIResponseView(
         messages: messages,
         isLoading: false,
