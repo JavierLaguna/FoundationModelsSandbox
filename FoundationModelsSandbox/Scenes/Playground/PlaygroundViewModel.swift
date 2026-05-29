@@ -83,7 +83,10 @@ final class PlaygroundViewModel {
 
     /// Context usage information for UI display.
     var contextUsageFooter: String? {
-        guard interactor.hasActiveConversation else { return nil }
+        // Use the ViewModel's own sync flag, not interactor.hasActiveConversation,
+        // because loadSession sets isConversationActive synchronously while the
+        // interactor's conversation starts asynchronously in a Task.
+        guard isConversationActive else { return nil }
         let contextSize = interactor.contextSize
         // Estimate: count prompts from the session messages as a rough token approximation.
         // In production, this uses transcripts and actual token counts.
