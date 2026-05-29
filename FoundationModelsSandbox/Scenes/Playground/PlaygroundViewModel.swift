@@ -36,7 +36,10 @@ final class PlaygroundViewModel {
 
     // MARK: - Context Management
     var truncationStrategy: ContextTruncationStrategy = .dropOldest {
-        didSet { session.truncationStrategy = truncationStrategy }
+        didSet {
+            session.truncationStrategy = truncationStrategy
+            interactor.updateTruncationStrategy(truncationStrategy)
+        }
     }
 
     // MARK: - Copy State
@@ -48,6 +51,12 @@ final class PlaygroundViewModel {
     private(set) var selectedModel: SystemLanguageModel?
 
     // MARK: - Computed Properties
+
+    /// Whether a conversation session is active. When true, instructions and model cannot be changed.
+    var isConversationActive: Bool {
+        interactor.hasActiveConversation
+    }
+
     var canSubmitPrompt: Bool {
         !userPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !selectedModelName.isEmpty
     }

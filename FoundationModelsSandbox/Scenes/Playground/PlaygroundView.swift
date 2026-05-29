@@ -72,6 +72,7 @@ struct PlaygroundView: View {
                 selectedModelName: $viewModel.selectedModelName,
                 availableModelNames: viewModel.availableModelNames,
                 isLoading: viewModel.isLoading,
+                isConversationActive: viewModel.isConversationActive,
                 onSubmit: {
                     Task {
                         await viewModel.submitPrompt()
