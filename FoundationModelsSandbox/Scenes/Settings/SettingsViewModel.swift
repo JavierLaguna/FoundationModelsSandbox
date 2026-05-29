@@ -10,6 +10,7 @@ final class SettingsViewModel {
 
     private let languageInteractor: any AppLanguageInteractor
     private let modelInteractor: any DefaultModelInteractor
+    private let truncationStrategyInteractor: any DefaultTruncationStrategyInteractor
     private let modelsLister: any ListAvailableModelsInteractor
     private let userDefaults: UserDefaults
 
@@ -31,6 +32,12 @@ final class SettingsViewModel {
         }
     }
 
+    var selectedTruncationStrategy: ContextTruncationStrategy {
+        didSet {
+            truncationStrategyInteractor.setDefaultTruncationStrategy(selectedTruncationStrategy)
+        }
+    }
+
     let availableLanguages: [AppLanguage]
     let availableThemes: [AppTheme] = AppTheme.allCases
     let availableModels: [SystemLanguageModel]
@@ -44,11 +51,13 @@ final class SettingsViewModel {
     init(
         languageInteractor: any AppLanguageInteractor = AppLanguageInteractorDefault(),
         modelInteractor: any DefaultModelInteractor = DefaultModelInteractorDefault(),
+        truncationStrategyInteractor: any DefaultTruncationStrategyInteractor = DefaultTruncationStrategyInteractorDefault(),
         modelsLister: any ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault(),
         userDefaults: UserDefaults = .standard
     ) {
         self.languageInteractor = languageInteractor
         self.modelInteractor = modelInteractor
+        self.truncationStrategyInteractor = truncationStrategyInteractor
         self.modelsLister = modelsLister
         self.userDefaults = userDefaults
         self.selectedLanguage = languageInteractor.getCurrentLanguage()
@@ -57,6 +66,7 @@ final class SettingsViewModel {
         let storedTheme = userDefaults.string(forKey: UserDefaultsKeys.appThemePreference)
             ?? AppTheme.system.rawValue
         self.selectedTheme = AppTheme(rawValue: storedTheme) ?? .system
+        self.selectedTruncationStrategy = truncationStrategyInteractor.getDefaultTruncationStrategy()
         let models = modelsLister.execute()
         self.availableModels = models
         self.availableModelNames = models.isEmpty ? [] : ["default"]

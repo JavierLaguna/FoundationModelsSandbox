@@ -11,7 +11,8 @@ struct PromptPanelView: View {
     let isConversationActive: Bool
     let onSubmit: () -> Void
     let onModelChanged: ((String) -> Void)?
-    
+    @Binding var truncationStrategy: ContextTruncationStrategy
+
     @ViewBuilder
     private var instructionsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -23,7 +24,8 @@ struct PromptPanelView: View {
                 text: $instructions,
                 placeholder: Text("Enter instructions..."),
                 onSubmit: onSubmit,
-                isEnabled: !isConversationActive
+                isEnabled: !isConversationActive,
+                accessibilityIdentifier: "prompt-instructions-editor"
             )
             .font(.body)
             .scrollContentBackground(.hidden)
@@ -47,7 +49,8 @@ struct PromptPanelView: View {
             SubmitOnEnterTextEditor(
                 text: $userPrompt,
                 placeholder: Text("Enter your prompt..."),
-                onSubmit: onSubmit
+                onSubmit: onSubmit,
+                accessibilityIdentifier: "prompt-user-prompt-editor"
             )
             .font(.body)
             .scrollContentBackground(.hidden)
@@ -60,8 +63,6 @@ struct PromptPanelView: View {
     @ViewBuilder
     private var bottomBar: some View {
         HStack(spacing: Spacing.md) {
-            Spacer()
-            
             // Model Picker
             Picker("Model", selection: $selectedModelName) {
                 ForEach(availableModelNames, id: \.self) { name in
@@ -74,6 +75,19 @@ struct PromptPanelView: View {
             .onChange(of: selectedModelName) { _, newValue in
                 onModelChanged?(newValue)
             }
+            .accessibilityIdentifier("prompt-model-picker")
+            
+            Picker("Context compactation strategy", selection: $truncationStrategy) {
+                ForEach(ContextTruncationStrategy.allCases, id: \.self) { strategy in
+                    switch strategy {
+                    case .dropOldest: Text("Auto-truncate").tag(strategy)
+                    case .summarize: Text("Summarize").tag(strategy)
+                    }
+                }
+            }
+            .pickerStyle(.menu)
+            
+            Spacer()
             
             // Send Button
             Button(action: onSubmit) {
@@ -89,6 +103,7 @@ struct PromptPanelView: View {
             }
             .buttonStyle(.borderedProminent)
             .disabled(isLoading)
+            .accessibilityIdentifier("prompt-send-button")
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.md)

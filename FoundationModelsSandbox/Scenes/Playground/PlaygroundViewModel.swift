@@ -13,6 +13,7 @@ final class PlaygroundViewModel {
     private let modelsLister: ListAvailableModelsInteractor
     private let clipboard: ClipboardInteractor
     private let defaultModelInteractor: DefaultModelInteractor
+    private let truncationStrategyInteractor: any DefaultTruncationStrategyInteractor
     private let sessionRepository: any SessionRepository
 
     // MARK: - Availability State
@@ -39,10 +40,11 @@ final class PlaygroundViewModel {
     private(set) var session: ConversationSession
 
     // MARK: - Context Management
-    var truncationStrategy: ContextTruncationStrategy = .dropOldest {
+    var truncationStrategy: ContextTruncationStrategy {
         didSet {
             session.truncationStrategy = truncationStrategy
             interactor.updateTruncationStrategy(truncationStrategy)
+            try? sessionRepository.saveSession(session)
         }
     }
 
@@ -106,6 +108,7 @@ final class PlaygroundViewModel {
         modelsLister: ListAvailableModelsInteractor = ListAvailableModelsInteractorDefault(),
         clipboard: ClipboardInteractor = ClipboardInteractorDefault(),
         defaultModelInteractor: DefaultModelInteractor = DefaultModelInteractorDefault(),
+        truncationStrategyInteractor: any DefaultTruncationStrategyInteractor = DefaultTruncationStrategyInteractorDefault(),
         sessionRepository: any SessionRepository = LiveSessionRepository.makeDefault(),
         shouldRestoreLastSession: Bool = true
     ) {
@@ -114,8 +117,11 @@ final class PlaygroundViewModel {
         self.modelsLister = modelsLister
         self.clipboard = clipboard
         self.defaultModelInteractor = defaultModelInteractor
+        self.truncationStrategyInteractor = truncationStrategyInteractor
         self.sessionRepository = sessionRepository
-        self.session = ConversationSession()
+        let defaultStrategy = truncationStrategyInteractor.getDefaultTruncationStrategy()
+        self.session = ConversationSession(truncationStrategy: defaultStrategy)
+        self.truncationStrategy = defaultStrategy
 
         loadModels()
         checkAvailability()
@@ -158,6 +164,7 @@ final class PlaygroundViewModel {
     /// Loads a specific session into the ViewModel.
     func loadSession(_ session: ConversationSession) {
         self.session = session
+        truncationStrategy = session.truncationStrategy
         instructions = session.instructions
         if !session.modelName.isEmpty {
             selectedModelName = session.modelName
@@ -290,6 +297,7 @@ final class PlaygroundViewModel {
         aiResponse = nil
         error = nil
         session = ConversationSession(modelName: selectedModelName, instructions: "")
+        truncationStrategy = truncationStrategyInteractor.getDefaultTruncationStrategy()
     }
 
     func copyMessageToClipboard(_ message: MessageEntry) {
