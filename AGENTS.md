@@ -14,7 +14,7 @@
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' test`
 - Run only unit tests target:
   - `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -only-testing:FoundationModelsSandboxTests test`
-- Test status: **209 tests** (all Swift Testing, no XCTest). Run with `-parallel-testing-enabled NO` for stable results.
+- Test status: **212 tests** (all Swift Testing, no XCTest). Run with `-parallel-testing-enabled NO` for stable results.
 - Run a specific test suite: `xcodebuild -project "FoundationModelsSandbox.xcodeproj" -scheme "FoundationModelsSandbox" -destination 'platform=macOS' -skipMacroValidation -parallel-testing-enabled NO -only-testing:FoundationModelsSandboxTests/HistoryViewModelTests test`
 
 ## Command-order / defaults that can bite
@@ -57,7 +57,9 @@
   - All types must be `Sendable` unless explicitly marked otherwise.
   - Use `@MainActor` for UI-bound state and actors for shared mutable state.
   - `nonisolated` for immutable computed properties in actors.
-  - `@unchecked Sendable` only when truly safe (document why).
+- **🚫 STRICTLY PROHIBITED** — `@unchecked Sendable` and `@preconcurrency` are **never acceptable**:
+  - If the compiler rejects Sendable conformance, fix the root cause (use `@MainActor`, an `actor`, or `let` + value types). Never silence the checker.
+  - Apple SDK types that are already `@unchecked Sendable` (e.g., `LanguageModelSession`) are fine to *use* — we just can't add our own `@unchecked` on top.
 - **In tests**: Use `@MainActor` on test structs when the source types have `@MainActor`-isolated properties (common with SwiftUI models).
 
 ## Installed skills (high-priority for this repo)
