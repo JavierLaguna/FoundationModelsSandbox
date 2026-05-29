@@ -4,8 +4,6 @@ import SwiftUI
 struct AIResponseView: View {
     let messages: [MessageEntry]
     let isLoading: Bool
-    let isCodeCopied: Bool
-    let onCopyCode: () -> Void
     let onCopyMessage: (MessageEntry) -> Void
 
     @State private var canScrollToBottom: Bool = false
@@ -41,8 +39,6 @@ struct AIResponseView: View {
                         ForEach(messages) { message in
                             MessageBubble(
                                 message: message,
-                                isCodeCopied: isCodeCopied,
-                                onCopyCode: onCopyCode,
                                 onCopyMessage: onCopyMessage
                             )
                             .id(message.id)
@@ -134,30 +130,25 @@ struct AIResponseView: View {
 // MARK: - Message Bubble
 private struct MessageBubble: View {
     let message: MessageEntry
-    let isCodeCopied: Bool
-    let onCopyCode: () -> Void
     let onCopyMessage: (MessageEntry) -> Void
 
-    /// Pre-computed code block info to avoid regex in body evaluations.
-    private let codeBlockInfo: (language: String?, code: String)?
+    /// Pre-computed code blocks info to avoid regex in body evaluations.
+    private let codeBlocksInfo: [(language: String?, code: String)]
 
     @State private var isMessageCopied = false
+    @State private var copiedCodeBlockIndex: Int?
 
     init(
         message: MessageEntry,
-        isCodeCopied: Bool,
-        onCopyCode: @escaping () -> Void,
         onCopyMessage: @escaping (MessageEntry) -> Void
     ) {
         self.message = message
-        self.isCodeCopied = isCodeCopied
-        self.onCopyCode = onCopyCode
         self.onCopyMessage = onCopyMessage
-        // Extract code block info once at init to avoid regex in body
+        // Extract all code blocks once at init to avoid regex in body
         if case .success(let response) = message.outcome {
-            self.codeBlockInfo = Self.extractCodeBlockInfo(from: response.content)
+            self.codeBlocksInfo = Self.extractCodeBlocksInfo(from: response.content)
         } else {
-            self.codeBlockInfo = nil
+            self.codeBlocksInfo = []
         }
     }
 
@@ -223,8 +214,14 @@ private struct MessageBubble: View {
                     .lineSpacing(4)
                     .foregroundStyle(Color.primaryText)
 
-                if let info = codeBlockInfo {
-                    codeBlock(language: info.language, code: info.code)
+                ForEach(Array(codeBlocksInfo.enumerated()), id: \.offset) { index, info in
+                    codeBlock(
+                        language: info.language,
+                        code: info.code,
+                        index: index,
+                        isCopied: copiedCodeBlockIndex == index,
+                        onCopy: { copyCodeBlock(at: index) }
+                    )
                 }
 
                 metricsFooter(response)
@@ -244,6 +241,21 @@ private struct MessageBubble: View {
             Spacer()
         }
         .padding(.trailing, Spacing.xl)
+    }
+
+    private func copyCodeBlock(at index: Int) {
+        guard index < codeBlocksInfo.count else { return }
+        let code = codeBlocksInfo[index].code
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(code, forType: .string)
+
+        copiedCodeBlockIndex = index
+
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            copiedCodeBlockIndex = nil
+        }
     }
 
     @ViewBuilder
@@ -275,7 +287,7 @@ private struct MessageBubble: View {
     }
 
     @ViewBuilder
-    private func codeBlock(language: String?, code: String) -> some View {
+    private func codeBlock(language: String?, code: String, index: Int, isCopied: Bool, onCopy: @escaping () -> Void) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(language?.capitalized ?? "Code")
@@ -284,12 +296,12 @@ private struct MessageBubble: View {
 
                 Spacer()
 
-                Button(action: onCopyCode) {
-                    Label(isCodeCopied ? "Copied" : "Copy", systemImage: isCodeCopied ? "checkmark" : "doc.on.doc")
+                Button(action: onCopy) {
+                    Label(isCopied ? "Copied" : "Copy", systemImage: isCopied ? "checkmark" : "doc.on.doc")
                         .font(.caption)
                 }
                 .buttonStyle(.borderless)
-                .accessibilityIdentifier("response-copy-code")
+                .accessibilityIdentifier("response-copy-code-\(index)")
             }
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)
@@ -325,22 +337,25 @@ private struct MessageBubble: View {
         }
     }
 
-    private static func extractCodeBlockInfo(from response: String) -> (language: String?, code: String)? {
+    private static func extractCodeBlocksInfo(from response: String) -> [(language: String?, code: String)] {
         let pattern = "```(\\w*)\\n([\\s\\S]*?)```"
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: response, range: NSRange(response.startIndex..., in: response)),
-              let codeRange = Range(match.range(at: 2), in: response) else {
-            return nil
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+
+        let nsRange = NSRange(response.startIndex..., in: response)
+        let matches = regex.matches(in: response, range: nsRange)
+
+        return matches.compactMap { match -> (language: String?, code: String)? in
+            guard let codeRange = Range(match.range(at: 2), in: response) else { return nil }
+            let language: String?
+            if let langRange = Range(match.range(at: 1), in: response) {
+                let lang = String(response[langRange])
+                language = lang.isEmpty ? nil : lang
+            } else {
+                language = nil
+            }
+            let code = String(response[codeRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+            return (language, code)
         }
-        let language: String?
-        if let langRange = Range(match.range(at: 1), in: response) {
-            let lang = String(response[langRange])
-            language = lang.isEmpty ? nil : lang
-        } else {
-            language = nil
-        }
-        let code = String(response[codeRange]).trimmingCharacters(in: .whitespacesAndNewlines)
-        return (language, code)
     }
 }
 
@@ -354,8 +369,6 @@ private struct MessageBubble: View {
     AIResponseView(
         messages: messages,
         isLoading: false,
-        isCodeCopied: false,
-        onCopyCode: {},
         onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
@@ -365,8 +378,6 @@ private struct MessageBubble: View {
     AIResponseView(
         messages: [],
         isLoading: false,
-        isCodeCopied: false,
-        onCopyCode: {},
         onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)
@@ -379,8 +390,6 @@ private struct MessageBubble: View {
             MessageEntry(prompt: "Tell me a joke", outcome: .noResponse)
         ],
         isLoading: true,
-        isCodeCopied: false,
-        onCopyCode: {},
         onCopyMessage: { _ in }
     )
     .frame(width: 450, height: 700)

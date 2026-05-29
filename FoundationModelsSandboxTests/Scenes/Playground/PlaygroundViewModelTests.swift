@@ -113,51 +113,6 @@ struct PlaygroundViewModelTests {
         #expect(sut.responseContent == Self.successResponse.content)
     }
 
-    // MARK: responseCode
-
-    @Test
-    func responseCode_nilResponse_returnsEmpty() {
-        let sut = Self.makeSUT()
-
-        #expect(sut.responseCode == "")
-    }
-
-    @Test
-    func responseCode_withMarkdownCodeBlock_extractsCode() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = Self.successResponse
-
-        #expect(sut.responseCode == "let x = 1")
-    }
-
-    @Test
-    func responseCode_noCodeBlock_returnsEmpty() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = Self.plainTextResponse
-
-        #expect(sut.responseCode == "")
-    }
-
-    @Test
-    func responseCode_multipleCodeBlocks_extractsFirst() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = Self.multiCodeBlockResponse
-
-        #expect(sut.responseCode == "let a = 1")
-    }
-
-    @Test
-    func responseCode_emptyContent_returnsEmpty() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = Self.emptyResponse
-
-        #expect(sut.responseCode == "")
-    }
-
     // MARK: metricsFooter
 
     @Test
@@ -541,35 +496,6 @@ struct PlaygroundViewModelTests {
         verify(mockClipboard).copy(.any).called(.never)
     }
 
-    // MARK: copyCodeToClipboard
-
-    @Test
-    func copyCodeToClipboard_emptyCode_doesNothing() {
-        let mockClipboard = MockClipboardInteractor()
-
-        let sut = Self.makeSUT(clipboard: mockClipboard)
-
-        sut.aiResponse = Self.plainTextResponse
-
-        sut.copyCodeToClipboard()
-
-        verify(mockClipboard).copy(.any).called(.never)
-    }
-
-    @Test
-    func copyCodeToClipboard_withCode_copiesAndSetsIsCodeCopied() {
-        let mockClipboard = MockClipboardInteractor()
-
-        let sut = Self.makeSUT(clipboard: mockClipboard)
-
-        sut.aiResponse = Self.successResponse
-
-        sut.copyCodeToClipboard()
-
-        verify(mockClipboard).copy(.value("let x = 1")).called(.once)
-        #expect(sut.isCodeCopied == true)
-    }
-
     @Test
     func modelSelectionChanged_updatesModelAndRechecksAvailability() {
         let availabilityChecker = MockCheckFoundationModelsAvailabilityInteractor()
@@ -596,83 +522,6 @@ struct PlaygroundViewModelTests {
 
         #expect(sut.selectedModelName == "default")
         #expect(sut.selectedModel != nil)
-    }
-
-    // MARK: - Phase 5: extractCodeBlock (via responseCode)
-
-    @Test
-    func extractCodeBlock_markdownSwiftBlock_extractedCorrectly() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = AIResponse(
-            content: "Some text\n```swift\nlet x = 42\nlet y = 100\n```\nMore text",
-            duration: 1.0,
-            promptTokenCount: 5,
-            responseTokenCount: 10,
-            contextSize: nil
-        )
-
-        #expect(sut.responseCode == "let x = 42\nlet y = 100")
-    }
-
-    @Test
-    func extractCodeBlock_noCodeBlock_returnsEmpty() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = AIResponse(
-            content: "Plain text without any code fences",
-            duration: 0.5,
-            promptTokenCount: 5,
-            responseTokenCount: 10,
-            contextSize: nil
-        )
-
-        #expect(sut.responseCode == "")
-    }
-
-    @Test
-    func extractCodeBlock_emptyString_returnsEmpty() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = AIResponse(
-            content: "",
-            duration: 0.1,
-            promptTokenCount: 0,
-            responseTokenCount: 0,
-            contextSize: nil
-        )
-
-        #expect(sut.responseCode == "")
-    }
-
-    @Test
-    func extractCodeBlock_multipleCodeBlocks_extractsFirst() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = AIResponse(
-            content: "```swift\nfirst block\n```\n```python\nsecond block\n```",
-            duration: 2.0,
-            promptTokenCount: 10,
-            responseTokenCount: 20,
-            contextSize: nil
-        )
-
-        #expect(sut.responseCode == "first block")
-    }
-
-    @Test
-    func extractCodeBlock_codeBlockNoLanguage_extractedCorrectly() {
-        let sut = Self.makeSUT()
-
-        sut.aiResponse = AIResponse(
-            content: "```\ncode without language\n```",
-            duration: 1.0,
-            promptTokenCount: 5,
-            responseTokenCount: 10,
-            contextSize: nil
-        )
-
-        #expect(sut.responseCode == "code without language")
     }
 
     // MARK: - Test Fixtures
@@ -748,16 +597,6 @@ struct PlaygroundViewModelTests {
             duration: 0.8,
             promptTokenCount: 15,
             responseTokenCount: 25,
-            contextSize: 128_000
-        )
-    }
-
-    private static var multiCodeBlockResponse: AIResponse {
-        AIResponse(
-            content: "First block:\n```swift\nlet a = 1\n```\nSecond block:\n```python\nprint('hello')\n```",
-            duration: 2.0,
-            promptTokenCount: 20,
-            responseTokenCount: 40,
             contextSize: 128_000
         )
     }

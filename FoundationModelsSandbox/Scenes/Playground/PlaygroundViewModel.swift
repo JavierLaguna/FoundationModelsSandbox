@@ -48,9 +48,6 @@ final class PlaygroundViewModel {
         }
     }
 
-    // MARK: - Copy State
-    var isCodeCopied: Bool = false
-
     // MARK: - Available Models
     private(set) var availableModelNames: [String] = []
     private(set) var availableModels: [SystemLanguageModel] = []
@@ -69,12 +66,6 @@ final class PlaygroundViewModel {
     /// Convenience accessor for response content
     var responseContent: String {
         aiResponse?.content ?? ""
-    }
-
-    /// Convenience accessor for extracted code
-    var responseCode: String {
-        guard let response = aiResponse else { return "" }
-        return extractCodeBlock(from: response.content)
     }
 
     /// Convenience accessor for metrics footer
@@ -306,29 +297,5 @@ final class PlaygroundViewModel {
         clipboard.copy(response.content)
     }
 
-    func copyCodeToClipboard() {
-        guard !responseCode.isEmpty else { return }
-
-        clipboard.copy(responseCode)
-
-        isCodeCopied = true
-
-        // Reset the copied state after 2 seconds
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            isCodeCopied = false
-        }
-    }
-
     // MARK: - Private Helpers
-
-    private func extractCodeBlock(from response: String) -> String {
-        let pattern = "```(?:\\w+)?\\n([\\s\\S]*?)```"
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: response, range: NSRange(response.startIndex..., in: response)),
-              let range = Range(match.range(at: 1), in: response) else {
-            return ""
-        }
-        return String(response[range]).trimmingCharacters(in: .whitespacesAndNewlines)
-    }
 }

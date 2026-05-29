@@ -21,10 +21,6 @@ struct PlaygroundView: View {
                 AIResponseView(
                     messages: viewModel.session.messages,
                     isLoading: viewModel.isLoading,
-                    isCodeCopied: viewModel.isCodeCopied,
-                    onCopyCode: {
-                        viewModel.copyCodeToClipboard()
-                    },
                     onCopyMessage: {
                         message in viewModel.copyMessageToClipboard(message)
                     }
