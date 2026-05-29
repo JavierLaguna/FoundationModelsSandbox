@@ -8,6 +8,7 @@ struct PromptPanelView: View {
     @Binding var selectedModelName: String
     let availableModelNames: [String]
     let isLoading: Bool
+    let isConversationActive: Bool
     let onSubmit: () -> Void
     let onModelChanged: ((String) -> Void)?
     
@@ -21,7 +22,8 @@ struct PromptPanelView: View {
             SubmitOnEnterTextEditor(
                 text: $instructions,
                 placeholder: Text("Enter instructions..."),
-                onSubmit: onSubmit
+                onSubmit: onSubmit,
+                isEnabled: !isConversationActive
             )
             .font(.body)
             .scrollContentBackground(.hidden)
@@ -68,6 +70,7 @@ struct PromptPanelView: View {
             }
             .pickerStyle(.menu)
             .frame(width: 160)
+            .disabled(isConversationActive)
             .onChange(of: selectedModelName) { _, newValue in
                 onModelChanged?(newValue)
             }

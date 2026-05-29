@@ -2,30 +2,31 @@ import Foundation
 import FoundationModels
 import Mockable
 
-/// Lightweight response type that wraps the data extracted from a `LanguageModelSession.Response`.
-/// It is fully constructable in tests, unlike the system framework's response type.
-struct SessionResponse: Sendable, Equatable {
-    let content: String
-    let duration: Double
-    let promptTokenCount: Int
-    let responseTokenCount: Int
-}
-
-/// Protocol that wraps `LanguageModelSession.respond(to:options:)` so it can be mocked in tests.
+/// Protocol that wraps `LanguageModelSession` so it can be mocked in tests.
 @Mockable
 protocol AIModelSession: Sendable {
     func respond(to prompt: Prompt, options: GenerationOptions) async throws -> SessionResponse
+    var transcript: Transcript { get }
 }
 
 /// Default implementation that delegates to a real `LanguageModelSession`
 /// and extracts metrics via reflection.
-struct LiveModelSession: AIModelSession {
+final class LiveModelSession: AIModelSession {
+    
     private let session: LanguageModelSession
 
     init(model: SystemLanguageModel, instructions: String) {
         self.session = LanguageModelSession(
             model: model,
             instructions: instructions
+        )
+    }
+
+    /// Creates a session from an existing transcript (for restoration or truncation).
+    init(model: SystemLanguageModel, transcript: Transcript) {
+        self.session = LanguageModelSession(
+            model: model,
+            transcript: transcript
         )
     }
 
@@ -38,9 +39,13 @@ struct LiveModelSession: AIModelSession {
             responseTokenCount: extractTokenCount(from: response, label: "responseTokenCount")
         )
     }
+
+    var transcript: Transcript {
+        session.transcript
+    }
 }
 
-// MARK: - Mirror-based extraction (moved from FoundationModelsInteractorDefault)
+// MARK: - Mirror-based extraction
 
 private extension LiveModelSession {
 

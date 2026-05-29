@@ -65,6 +65,22 @@
         }
       }
     },
+    "Auto-truncate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-truncate"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automático"
+          }
+        }
+      }
+    },
     "Choose the appearance for the app interface" : {
       "localizations" : {
         "en" : {
@@ -467,6 +483,38 @@
         }
       }
     },
+    "No active conversation. Start a new conversation first." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No active conversation. Start a new conversation first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay una conversación activa. Inicia una nueva conversación primero."
+          }
+        }
+      }
+    },
+    "No model selected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No model selected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ningún modelo seleccionado"
+          }
+        }
+      }
+    },
     "No sessions yet" : {
       "localizations" : {
         "en" : {
@@ -484,7 +532,20 @@
       }
     },
     "Open session" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open session"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir sesión"
+          }
+        }
+      }
     },
     "Platform" : {
       "localizations" : {
@@ -535,7 +596,20 @@
       }
     },
     "Search sessions…" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search sessions…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar sesiones…"
+          }
+        }
+      }
     },
     "Sections" : {
       "localizations" : {
@@ -602,19 +676,53 @@
         }
       }
     },
-    "system_language" : {
-      "comment" : "System language option",
+    "Strategy" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "System"
+            "value" : "Strategy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sistema"
+            "value" : "Estrategia"
+          }
+        }
+      }
+    },
+    "Summarize" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Summarize"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumir"
+          }
+        }
+      }
+    },
+    "system_language" : {
+      "comment" : "System language option"
+    },
+    "The conversation context is full. Try clearing some messages." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The conversation context is full. Try clearing some messages."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El contexto de la conversación está lleno. Intenta borrar algunos mensajes."
           }
         }
       }
