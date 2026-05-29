@@ -77,6 +77,60 @@ struct HistoryViewModelTests {
         #expect(sut.error != nil)
     }
 
+    // MARK: - toggleFavorite
+
+    @Test
+    func toggleFavorite_marksSessionAsFavorite() async {
+        let session = ConversationSession(id: UUID())
+        let mock = MockSessionRepository()
+        given(mock).allSessions().willReturn([session])
+
+        let sut = HistoryViewModel(sessionRepository: mock)
+
+        await Task.yield()
+
+        sut.toggleFavorite(id: session.id)
+
+        await Task.yield()
+
+        #expect(sut.sessions.first?.isFavorite == true)
+    }
+
+    @Test
+    func toggleFavorite_unfavoritesSession() async {
+        var session = ConversationSession(id: UUID())
+        session.isFavorite = true
+        let mock = MockSessionRepository()
+        given(mock).allSessions().willReturn([session])
+
+        let sut = HistoryViewModel(sessionRepository: mock)
+
+        await Task.yield()
+
+        sut.toggleFavorite(id: session.id)
+
+        await Task.yield()
+
+        #expect(sut.sessions.first?.isFavorite == false)
+    }
+
+    @Test
+    func toggleFavorite_unknownId_doesNothing() async {
+        let session = ConversationSession(id: UUID())
+        let mock = MockSessionRepository()
+        given(mock).allSessions().willReturn([session])
+
+        let sut = HistoryViewModel(sessionRepository: mock)
+
+        await Task.yield()
+
+        sut.toggleFavorite(id: UUID())
+
+        await Task.yield()
+
+        #expect(sut.sessions.first?.isFavorite == false)
+    }
+
     // MARK: - deleteSession
 
     // MARK: - deleteAllSessions

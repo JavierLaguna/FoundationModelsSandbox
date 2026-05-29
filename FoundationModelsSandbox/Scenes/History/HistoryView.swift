@@ -3,9 +3,10 @@ import FoundationModels
 
 // MARK: - History View
 struct HistoryView: View {
+    
     @Bindable var viewModel: HistoryViewModel
     let onSelectSession: ((ConversationSession) -> Void)?
-
+    
     init(
         viewModel: HistoryViewModel = HistoryViewModel(),
         onSelectSession: ((ConversationSession) -> Void)? = nil
@@ -13,28 +14,32 @@ struct HistoryView: View {
         self.viewModel = viewModel
         self.onSelectSession = onSelectSession
     }
-
+    
     var body: some View {
         Group {
             if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
             } else if let error = viewModel.error {
                 ContentUnavailableView(
                     "Error",
                     systemImage: "exclamationmark.triangle",
                     description: Text(error)
                 )
+                
             } else if !viewModel.isSearching && viewModel.sessions.isEmpty {
                 ContentUnavailableView(
                     "No sessions yet",
                     systemImage: "clock.arrow.circlepath",
                     description: Text("Your conversation history will appear here")
                 )
+                
             } else if viewModel.isSearching && viewModel.filteredSessions.isEmpty {
                 ContentUnavailableView.search(
                     text: viewModel.searchQuery
                 )
+                
             } else {
                 sessionList
             }
@@ -49,9 +54,9 @@ struct HistoryView: View {
             viewModel.loadSessions()
         }
     }
-
+    
     // MARK: - Session List
-
+    
     private var sessionList: some View {
         List {
             ForEach(viewModel.filteredSessions) { session in
@@ -59,6 +64,12 @@ struct HistoryView: View {
                     session: session,
                     onSelect: {
                         onSelectSession?(session)
+                    },
+                    onToggleFavorite: {
+                        viewModel.toggleFavorite(id: session.id)
+                    },
+                    onDelete: {
+                        viewModel.deleteSession(id: session.id)
                     }
                 )
                 .listRowInsets(EdgeInsets())
@@ -80,55 +91,85 @@ struct HistoryView: View {
 private struct SessionCard: View {
     let session: ConversationSession
     let onSelect: () -> Void
-
+    let onToggleFavorite: () -> Void
+    let onDelete: () -> Void
+    
     var body: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: Spacing.sm) {
-                header
-
-                promptPreview
-
-                lastResponsePreview
-
-                statsFooter
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            header
+            
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: Spacing.sm) {
+                    promptPreview
+                    
+                    lastResponsePreview
+                    
+                    statsFooter
+                }
+                
+                Spacer()
+                
+                Button(action: onSelect) {
+                    Image(systemName: "arrow.right.circle")
+                        .font(.title2)
+                        .accessibilityHidden(true)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .help("Open session")
+                .accessibilityIdentifier("history-open-session")
             }
-
-            Spacer()
-
-            Button(action: onSelect) {
-                Image(systemName: "arrow.right.circle")
-                    .font(.title2)
-                    .accessibilityHidden(true)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .help("Open session")
         }
         .padding(Spacing.md)
         .glassEffect(in: .rect(cornerRadius: CornerRadius.large))
         .padding(.bottom, Spacing.md)
+        .contextMenu {
+            Button(role: .destructive) {
+                onDelete()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
-
+    
     // MARK: - Header
-
+    
     private var header: some View {
         HStack(spacing: Spacing.xs) {
             Image(systemName: "calendar")
                 .font(.system(size: 14))
                 .foregroundStyle(.tertiary)
-
+            
             Text(session.createdAt, style: .date)
                 .font(.system(size: 14))
                 .foregroundStyle(.secondary)
-
+            
             Text(session.createdAt, style: .time)
                 .font(.system(size: 14))
                 .foregroundStyle(.tertiary)
+            
+            Spacer()
+            
+            Button(action: onToggleFavorite) {
+                if session.isFavorite {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(.yellow)
+                    
+                } else {
+                    Image(systemName: "star")
+                        .font(.system(size: 16))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .buttonStyle(.plain)
+            .help(session.isFavorite ? "Remove from favorites" : "Add to favorites")
+            .accessibilityIdentifier("history-toggle-favorite")
         }
     }
-
+    
     // MARK: - Prompt Preview
-
+    
     @ViewBuilder
     private var promptPreview: some View {
         if let prompt = session.firstPrompt {
@@ -136,6 +177,7 @@ private struct SessionCard: View {
                 .font(.body)
                 .lineLimit(2)
                 .foregroundStyle(.primary)
+            
         } else {
             Text("Empty session")
                 .font(.body)
@@ -143,9 +185,9 @@ private struct SessionCard: View {
                 .italic()
         }
     }
-
+    
     // MARK: - Last Response Preview
-
+    
     @ViewBuilder
     private var lastResponsePreview: some View {
         if let preview = session.lastResponsePreview {
@@ -155,9 +197,9 @@ private struct SessionCard: View {
                 .lineLimit(5)
         }
     }
-
+    
     // MARK: - Stats Footer
-
+    
     private var statsFooter: some View {
         HStack(spacing: Spacing.md) {
             if !session.modelName.isEmpty {
@@ -174,12 +216,28 @@ private struct SessionCard: View {
                 .background(.quaternary, in: Capsule())
             }
             
+            // Truncation strategy
+            HStack(spacing: Spacing.xxs) {
+                Image(systemName: "arrow.triangle.branch")
+                    .font(.system(size: 12))
+                
+                switch session.truncationStrategy {
+                case .dropOldest: Text("Auto-truncate")
+                case .summarize: Text("Summarize")
+                }
+            }
+            .foregroundStyle(.secondary)
+            .font(.system(size: 14))
+            .padding(.horizontal, Spacing.sm)
+            .padding(.vertical, Spacing.xxs)
+            .background(.quaternary, in: Capsule())
+            
             // User prompts count
             statBadge(
                 icon: "text.bubble",
                 count: session.messageCount
             )
-
+            
             // AI responses count
             if session.hasResponses {
                 statBadge(
@@ -189,11 +247,12 @@ private struct SessionCard: View {
             }
         }
     }
-
+    
     private func statBadge(icon: String, count: Int) -> some View {
         HStack(spacing: Spacing.xxs) {
             Image(systemName: icon)
                 .font(.system(size: 14))
+            
             Text("\(count)")
                 .font(.system(size: 14))
                 .fontWeight(.semibold)

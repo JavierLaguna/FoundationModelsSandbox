@@ -11,6 +11,8 @@ struct ConversationSession: Identifiable, Sendable {
     var truncationStrategy: ContextTruncationStrategy = .dropOldest
     /// JSON-encoded `Transcript` data for session restoration.
     var transcriptData: Data?
+    /// Whether the session is marked as a favorite.
+    var isFavorite: Bool = false
 
     init(
         id: UUID = UUID(),

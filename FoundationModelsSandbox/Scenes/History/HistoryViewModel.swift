@@ -36,6 +36,14 @@ final class HistoryViewModel {
         loadSessions()
     }
 
+    // MARK: - Toggle Favorite
+
+    func toggleFavorite(id: UUID) {
+        guard let index = sessions.firstIndex(where: { $0.id == id }) else { return }
+        sessions[index].isFavorite.toggle()
+        try? sessionRepository.updateSession(sessions[index])
+    }
+
     // MARK: - Actions
     func loadSessions() {
         isLoading = true
