@@ -22,8 +22,12 @@ struct PlaygroundView: View {
                     messages: viewModel.session.messages,
                     isLoading: viewModel.isLoading,
                     isCodeCopied: viewModel.isCodeCopied,
-                    onCopyCode: { viewModel.copyCodeToClipboard() },
-                    onCopyMessage: { message in viewModel.copyMessageToClipboard(message) }
+                    onCopyCode: {
+                        viewModel.copyCodeToClipboard()
+                    },
+                    onCopyMessage: {
+                        message in viewModel.copyMessageToClipboard(message)
+                    }
                 )
                 
             } else {
@@ -39,8 +43,13 @@ struct PlaygroundView: View {
                     Text(footer)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    
                     Spacer()
-                    Picker("Strategy", selection: $viewModel.truncationStrategy) {
+                    
+                    Picker(
+                        "Strategy",
+                        selection: $viewModel.truncationStrategy
+                    ) {
                         ForEach(ContextTruncationStrategy.allCases, id: \.self) { strategy in
                             Text(descriptiveName(for: strategy)).tag(strategy)
                         }
@@ -59,7 +68,6 @@ struct PlaygroundView: View {
     private func descriptiveName(for strategy: ContextTruncationStrategy) -> String {
         switch strategy {
         case .dropOldest: String(localized: "Auto-truncate")
-        case .manual: String(localized: "Manual")
         case .summarize: String(localized: "Summarize")
         }
     }

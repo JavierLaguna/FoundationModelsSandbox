@@ -106,8 +106,6 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor {
         switch truncationStrategy {
         case .dropOldest:
             try await applyDropOldest()
-        case .manual:
-            throw FoundationModelsInteractorError.contextOverflow
         case .summarize:
             // Not yet implemented
             throw FoundationModelsInteractorError.contextOverflow
