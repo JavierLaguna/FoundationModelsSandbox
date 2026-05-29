@@ -51,6 +51,9 @@ protocol FoundationModelsInteractor: Sendable {
 
     /// The maximum context size (token limit) for the current model.
     var contextSize: Int { get }
+
+    /// Updates the truncation strategy for the active conversation.
+    func updateTruncationStrategy(_ strategy: ContextTruncationStrategy)
 }
 
 // MARK: - Protocol extension for convenience overload without transcript
@@ -163,6 +166,10 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor, @unch
         activeModel?.contextSize ?? defaultModel.contextSize
     }
 
+    func updateTruncationStrategy(_ strategy: ContextTruncationStrategy) {
+        truncationStrategy = strategy
+    }
+
     // MARK: - Context Management
 
     /// Attempts to free context by truncating the transcript according to the current strategy.
@@ -183,7 +190,7 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor, @unch
         guard let session = activeSession, let model = activeModel else { return }
 
         let currentTranscript = session.transcript
-        var entries = Array(currentTranscript)
+        let entries = Array(currentTranscript)
 
         // Always keep instructions entry (usually the first one)
         let instructionsEntries = entries.filter { entry in
