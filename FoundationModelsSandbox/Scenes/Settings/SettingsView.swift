@@ -54,8 +54,10 @@ struct SettingsView: View {
 
                 Picker("Default truncation strategy", selection: $viewModel.selectedTruncationStrategy) {
                     ForEach(ContextTruncationStrategy.allCases, id: \.self) { strategy in
-                        Text(strategy.displayName)
-                            .tag(strategy)
+                        switch strategy {
+                        case .dropOldest: Text("Auto-truncate").tag(strategy)
+                        case .summarize: Text("Summarize").tag(strategy)
+                        }
                     }
                 }
                 .pickerStyle(.menu)
