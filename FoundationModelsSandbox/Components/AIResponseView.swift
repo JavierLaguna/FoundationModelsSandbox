@@ -127,13 +127,25 @@ struct AIResponseView: View {
     }
 }
 
+// MARK: - Content Segment
+private enum ContentSegment {
+    case text(String)
+    case codeBlock(language: String?, code: String)
+}
+
 // MARK: - Message Bubble
 private struct MessageBubble: View {
     let message: MessageEntry
     let onCopyMessage: (MessageEntry) -> Void
 
-    /// Pre-computed code blocks info to avoid regex in body evaluations.
-    private let codeBlocksInfo: [(language: String?, code: String)]
+    /// Pre-computed content segments (text ↔ code block) in display order.
+    private let contentSegments: [ContentSegment]
+
+    /// Code blocks subset for fast copy access (parallel index with `contentSegments` code blocks).
+    private let codeBlocks: [(language: String?, code: String)]
+
+    /// Maps segment index to code block index (-1 for text segments).
+    private let codeBlockIndexForSegment: [Int]
 
     @State private var isMessageCopied = false
     @State private var copiedCodeBlockIndex: Int?
@@ -144,11 +156,21 @@ private struct MessageBubble: View {
     ) {
         self.message = message
         self.onCopyMessage = onCopyMessage
-        // Extract all code blocks once at init to avoid regex in body
+        // Parse all segments once at init to avoid regex in body
         if case .success(let response) = message.outcome {
-            self.codeBlocksInfo = Self.extractCodeBlocksInfo(from: response.content)
+            let segments = Self.parseContentSegments(from: response.content)
+            self.contentSegments = segments
+            self.codeBlocks = segments.compactMap { segment in
+                if case .codeBlock(let language, let code) = segment { return (language, code) } else { return nil }
+            }
+            var idx = -1
+            self.codeBlockIndexForSegment = segments.map { segment in
+                if case .codeBlock = segment { idx += 1; return idx } else { return -1 }
+            }
         } else {
-            self.codeBlocksInfo = []
+            self.contentSegments = []
+            self.codeBlocks = []
+            self.codeBlockIndexForSegment = []
         }
     }
 
@@ -209,19 +231,8 @@ private struct MessageBubble: View {
     private func responseSuccessView(_ response: AIResponse) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: Spacing.sm) {
-                Text(response.content)
-                    .font(.body)
-                    .lineSpacing(4)
-                    .foregroundStyle(Color.primaryText)
-
-                ForEach(Array(codeBlocksInfo.enumerated()), id: \.offset) { index, info in
-                    codeBlock(
-                        language: info.language,
-                        code: info.code,
-                        index: index,
-                        isCopied: copiedCodeBlockIndex == index,
-                        onCopy: { copyCodeBlock(at: index) }
-                    )
+                ForEach(contentSegments.indices, id: \.self) { index in
+                    contentSegmentView(at: index)
                 }
 
                 metricsFooter(response)
@@ -243,9 +254,29 @@ private struct MessageBubble: View {
         .padding(.trailing, Spacing.xl)
     }
 
+    @ViewBuilder
+    private func contentSegmentView(at index: Int) -> some View {
+        switch contentSegments[index] {
+        case .text(let text):
+            Text(text)
+                .font(.body)
+                .lineSpacing(4)
+                .foregroundStyle(Color.primaryText)
+        case .codeBlock(let language, let code):
+            let cbIndex = codeBlockIndexForSegment[index]
+            codeBlock(
+                language: language,
+                code: code,
+                index: cbIndex,
+                isCopied: copiedCodeBlockIndex == cbIndex,
+                onCopy: { copyCodeBlock(at: cbIndex) }
+            )
+        }
+    }
+
     private func copyCodeBlock(at index: Int) {
-        guard index < codeBlocksInfo.count else { return }
-        let code = codeBlocksInfo[index].code
+        guard index < codeBlocks.count else { return }
+        let code = codeBlocks[index].code
 
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(code, forType: .string)
@@ -337,25 +368,54 @@ private struct MessageBubble: View {
         }
     }
 
-    private static func extractCodeBlocksInfo(from response: String) -> [(language: String?, code: String)] {
+    private static func parseContentSegments(from response: String) -> [ContentSegment] {
         let pattern = "```(\\w*)\\n([\\s\\S]*?)```"
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [.text(response)] }
 
-        let nsRange = NSRange(response.startIndex..., in: response)
+        let nsString = response as NSString
+        let nsRange = NSRange(location: 0, length: nsString.length)
         let matches = regex.matches(in: response, range: nsRange)
 
-        return matches.compactMap { match -> (language: String?, code: String)? in
-            guard let codeRange = Range(match.range(at: 2), in: response) else { return nil }
+        var segments: [ContentSegment] = []
+        var currentLocation = 0
+
+        for match in matches {
+            // Text before this code block
+            if match.range.location > currentLocation {
+                let textRange = NSRange(location: currentLocation, length: match.range.location - currentLocation)
+                segments.append(.text(nsString.substring(with: textRange)))
+            }
+
+            // Code block
             let language: String?
-            if let langRange = Range(match.range(at: 1), in: response) {
-                let lang = String(response[langRange])
+            let langRange = match.range(at: 1)
+            if langRange.location != NSNotFound, langRange.length > 0 {
+                let lang = nsString.substring(with: langRange)
                 language = lang.isEmpty ? nil : lang
             } else {
                 language = nil
             }
-            let code = String(response[codeRange]).trimmingCharacters(in: .whitespacesAndNewlines)
-            return (language, code)
+
+            let codeRange = match.range(at: 2)
+            let code = nsString.substring(with: codeRange)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            segments.append(.codeBlock(language: language, code: code))
+
+            currentLocation = match.range.location + match.range.length
         }
+
+        // Text after last code block
+        if currentLocation < nsString.length {
+            let textRange = NSRange(location: currentLocation, length: nsString.length - currentLocation)
+            segments.append(.text(nsString.substring(with: textRange)))
+        }
+
+        // If no matches, return the whole content as text
+        if segments.isEmpty {
+            segments.append(.text(response))
+        }
+
+        return segments
     }
 }
 
