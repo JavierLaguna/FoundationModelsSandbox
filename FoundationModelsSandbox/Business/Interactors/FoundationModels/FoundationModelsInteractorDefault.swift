@@ -8,22 +8,41 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor {
     private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
     private let defaultModel: SystemLanguageModel
     private let sessionProvider: SessionProvider
+    private let truncationStrategyFactory: (ContextTruncationStrategy) -> ContextTruncationStrategyHandler
 
     // MARK: - State
     private var activeSession: AIModelSession?
-    private var truncationStrategy: ContextTruncationStrategy = .dropOldest
+    private var truncationHandler: ContextTruncationStrategyHandler
     private var activeModel: SystemLanguageModel?
+
+    var hasActiveConversation: Bool {
+        activeSession != nil
+    }
+
+    var contextSize: Int {
+        activeModel?.contextSize ?? defaultModel.contextSize
+    }
 
     // MARK: - Init
 
     init(
         availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault(),
         model: SystemLanguageModel = CheckFoundationModelsAvailabilityInteractorDefault.model,
-        sessionProvider: SessionProvider = LiveSessionProvider()
+        sessionProvider: SessionProvider = LiveSessionProvider(),
+        truncationStrategyFactory: @escaping (ContextTruncationStrategy) -> ContextTruncationStrategyHandler = { strategy in
+            switch strategy {
+            case .dropOldest:
+                DropOldestStrategy()
+            case .summarize:
+                SummarizeStrategy()
+            }
+        }
     ) {
         self.availabilityChecker = availabilityChecker
         self.defaultModel = model
         self.sessionProvider = sessionProvider
+        self.truncationStrategyFactory = truncationStrategyFactory
+        self.truncationHandler = truncationStrategyFactory(.dropOldest)
     }
 
     // MARK: - FoundationModelsInteractor
@@ -40,7 +59,7 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor {
         }
 
         activeModel = model
-        self.truncationStrategy = truncationStrategy
+        truncationHandler = truncationStrategyFactory(truncationStrategy)
 
         if let transcript {
             activeSession = sessionProvider.makeSession(model: model, transcript: transcript)
@@ -86,57 +105,26 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor {
         activeModel = nil
     }
 
-    var hasActiveConversation: Bool {
-        activeSession != nil
-    }
-
-    var contextSize: Int {
-        activeModel?.contextSize ?? defaultModel.contextSize
-    }
-
     func updateTruncationStrategy(_ strategy: ContextTruncationStrategy) {
-        truncationStrategy = strategy
+        truncationHandler = truncationStrategyFactory(strategy)
     }
+}
 
-    // MARK: - Context Management
+// MARK: - Private methods
 
-    /// Attempts to free context by truncating the transcript according to the current strategy.
+private extension FoundationModelsInteractorDefault {
+
+    /// Attempts to free context by delegating to the current truncation handler.
     /// After truncation, the active session is replaced with a new one using the trimmed transcript.
-    private func handleContextOverflow() async throws {
-        switch truncationStrategy {
-        case .dropOldest:
-            try await applyDropOldest()
-        case .summarize:
-            // Not yet implemented
-            throw FoundationModelsInteractorError.contextOverflow
-        }
-    }
-
-    private func applyDropOldest() async throws {
+    func handleContextOverflow() async throws {
         guard let session = activeSession, let model = activeModel else { return }
 
-        let currentTranscript = session.transcript
-        let entries = Array(currentTranscript)
+        let newTranscript = try await truncationHandler.truncateTranscript(
+            session.transcript,
+            model: model,
+            sessionProvider: sessionProvider
+        )
 
-        // Always keep instructions entry (usually the first one)
-        let instructionsEntries = entries.filter { entry in
-            if case .instructions = entry { return true }
-            return false
-        }
-
-        // Drop oldest prompt+response pairs, keep the most recent ones
-        let nonInstructionEntries = entries.filter { entry in
-            if case .instructions = entry { return false }
-            return true
-        }
-
-        // Drop half of the non-instruction entries (oldest first)
-        let entriesToKeep = nonInstructionEntries.suffix(nonInstructionEntries.count / 2)
-        let trimmedEntries = instructionsEntries + entriesToKeep
-
-        let trimmedTranscript = Transcript(entries: trimmedEntries)
-
-        // Replace the session with one using the trimmed transcript
-        activeSession = sessionProvider.makeSession(model: model, transcript: trimmedTranscript)
+        activeSession = sessionProvider.makeSession(model: model, transcript: newTranscript)
     }
 }
