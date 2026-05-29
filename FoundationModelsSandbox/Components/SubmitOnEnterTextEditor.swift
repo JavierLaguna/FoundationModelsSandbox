@@ -8,12 +8,14 @@ struct SubmitOnEnterTextEditor: View {
     var placeholder: Text
     let onSubmit: () -> Void
     var isEnabled: Bool = true
+    var accessibilityIdentifier: String = ""
     
     var body: some View {
         SubmitOnEnterTextEditorRepresentable(
             text: $text,
             onSubmit: onSubmit,
-            isEnabled: isEnabled
+            isEnabled: isEnabled,
+            accessibilityIdentifier: accessibilityIdentifier
         )
         .overlay(alignment: .topLeading) {
             if text.isEmpty {
@@ -60,6 +62,7 @@ struct SubmitOnEnterTextEditorRepresentable: NSViewRepresentable {
     @Binding var text: String
     let onSubmit: () -> Void
     var isEnabled: Bool = true
+    var accessibilityIdentifier: String = ""
     
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
@@ -105,6 +108,10 @@ struct SubmitOnEnterTextEditorRepresentable: NSViewRepresentable {
             }
             textView.isEditable = isEnabled
             textView.isSelectable = isEnabled
+        }
+        
+        if !accessibilityIdentifier.isEmpty {
+            nsView.setAccessibilityIdentifier(accessibilityIdentifier)
         }
     }
     
