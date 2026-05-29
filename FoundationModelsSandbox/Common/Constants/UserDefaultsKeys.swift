@@ -14,4 +14,7 @@ enum UserDefaultsKeys {
 
     /// Key for storing the app's theme preference (system/light/dark)
     static let appThemePreference = "app_theme_preference"
+
+    /// Key for storing the default truncation strategy preference
+    static let defaultTruncationStrategyPreference = "default_truncation_strategy_preference"
 }

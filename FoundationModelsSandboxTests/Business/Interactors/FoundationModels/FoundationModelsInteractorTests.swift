@@ -262,6 +262,81 @@ struct FoundationModelsInteractorTests {
         #expect(sut.contextSize == 4096)
     }
 
+    // MARK: - sendMessage — overflow delegation
+
+    @Test
+    func sendMessage_withOverflow_delegatesToCustomHandler() async throws {
+        // Given a custom handler that replaces the transcript
+        let handler = MockContextTruncationStrategyHandler()
+        given(handler).truncateTranscript(.any, model: .any, sessionProvider: .any).willReturn(
+            Transcript(entries: [
+                .instructions(
+                    Transcript.Instructions(
+                        segments: [.text(Transcript.TextSegment(content: "Be helpful."))],
+                        toolDefinitions: []
+                    )
+                )
+            ])
+        )
+
+        let overflowError = LanguageModelSession.GenerationError.exceededContextWindowSize(
+            LanguageModelSession.GenerationError.Context(debugDescription: "overflow")
+        )
+
+        let initialSession = MockAIModelSession()
+        given(initialSession).respond(to: .any, options: .any).willThrow(overflowError)
+        given(initialSession).transcript.willReturn(
+            Transcript(entries: [
+                .instructions(
+                    Transcript.Instructions(
+                        segments: [.text(Transcript.TextSegment(content: "Be helpful."))],
+                        toolDefinitions: []
+                    )
+                ),
+                .prompt(
+                    Transcript.Prompt(
+                        segments: [.text(Transcript.TextSegment(content: "Hi"))],
+                        options: GenerationOptions()
+                    )
+                ),
+                .response(
+                    Transcript.Response(
+                        assetIDs: [],
+                        segments: [.text(Transcript.TextSegment(content: "Hello!"))]
+                    )
+                )
+            ])
+        )
+
+        let finalSession = MockAIModelSession()
+        given(finalSession).respond(to: .any, options: .any).willReturn(
+            SessionResponse(content: "Truncated response.", duration: 0.3, promptTokenCount: 5, responseTokenCount: 10)
+        )
+
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(initialSession)
+        given(mockProvider).makeSession(model: .any, transcript: .any).willReturn(finalSession)
+
+        let sut = FoundationModelsInteractorDefault(
+            availabilityChecker: Self.makeAvailableChecker(),
+            sessionProvider: mockProvider,
+            truncationStrategyFactory: { _ in handler }
+        )
+
+        try await sut.startConversation(
+            model: SystemLanguageModel.default,
+            instructions: "Be helpful.",
+            truncationStrategy: .dropOldest
+        )
+
+        // When
+        let result = try await sut.sendMessage("Test")
+
+        // Then — the handler was called and the retry succeeded
+        #expect(result.content == "Truncated response.")
+        verify(handler).truncateTranscript(.any, model: .any, sessionProvider: .any).called(.once)
+    }
+
     // MARK: - Test Fixtures
 
     private static func makeAvailableChecker() -> CheckFoundationModelsAvailabilityInteractor {

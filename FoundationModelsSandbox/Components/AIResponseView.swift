@@ -106,6 +106,7 @@ struct AIResponseView: View {
                     .buttonStyle(.borderless)
                     .padding(.bottom, Spacing.sm)
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    .accessibilityIdentifier("response-scroll-to-bottom")
                 }
             }
         }
@@ -238,6 +239,7 @@ private struct MessageBubble: View {
                 }
                 .buttonStyle(.borderless)
                 .padding(Spacing.sm)
+                .accessibilityIdentifier("response-copy-message")
             }
             Spacer()
         }
@@ -287,6 +289,7 @@ private struct MessageBubble: View {
                         .font(.caption)
                 }
                 .buttonStyle(.borderless)
+                .accessibilityIdentifier("response-copy-code")
             }
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)

@@ -63,6 +63,15 @@ struct MainView: View {
                         shouldRestoreLastSession: false
                     )
                     selectedSection = .playground
+                },
+                favoriteSessions: historyViewModel.sessions.filter(\.isFavorite),
+                onSelectFavorite: { session in
+                    playgroundViewModel = PlaygroundViewModel(
+                        sessionRepository: sessionRepository,
+                        shouldRestoreLastSession: false
+                    )
+                    playgroundViewModel.loadSession(session)
+                    selectedSection = .playground
                 }
             )
         } detail: {

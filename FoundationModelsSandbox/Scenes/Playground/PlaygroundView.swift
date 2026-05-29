@@ -39,36 +39,14 @@ struct PlaygroundView: View {
 
             // Context usage footer
             if let footer = viewModel.contextUsageFooter {
-                HStack {
-                    Text(footer)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    Spacer()
-                    
-                    Picker(
-                        "Strategy",
-                        selection: $viewModel.truncationStrategy
-                    ) {
-                        ForEach(ContextTruncationStrategy.allCases, id: \.self) { strategy in
-                            Text(descriptiveName(for: strategy)).tag(strategy)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
+                Text(footer)
                     .font(.caption)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 6)
-                .background(.ultraThinMaterial)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial)
             }
-        }
-    }
-
-    private func descriptiveName(for strategy: ContextTruncationStrategy) -> String {
-        switch strategy {
-        case .dropOldest: String(localized: "Auto-truncate")
-        case .summarize: String(localized: "Summarize")
         }
     }
     
@@ -88,7 +66,8 @@ struct PlaygroundView: View {
                 },
                 onModelChanged: { modelName in
                     viewModel.modelSelectionChanged(to: modelName)
-                }
+                },
+                truncationStrategy: $viewModel.truncationStrategy
             )
             .frame(minWidth: 380, maxHeight: .infinity)
             

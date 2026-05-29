@@ -21,6 +21,7 @@ final class LiveSessionRepository: SessionRepository {
         var messagesData: String
         var transcriptData: String?
         var truncationStrategy: String?
+        var isFavorite: Bool?
     }
 
     // MARK: - Properties
@@ -75,6 +76,13 @@ final class LiveSessionRepository: SessionRepository {
                 try db.execute(sql: "ALTER TABLE sessionRow ADD COLUMN truncationStrategy TEXT DEFAULT 'dropOldest'")
             }
         }
+        migrator.registerMigration("addIsFavoriteColumn") { db in
+            let columns = try Row.fetchAll(db, sql: "PRAGMA table_info('sessionRow')")
+            let columnNames = Set(columns.compactMap { $0["name"] as? String })
+            if !columnNames.contains("isFavorite") {
+                try db.execute(sql: "ALTER TABLE sessionRow ADD COLUMN isFavorite INTEGER DEFAULT 0")
+            }
+        }
         try? migrator.migrate(database)
     }
 
@@ -85,10 +93,10 @@ final class LiveSessionRepository: SessionRepository {
         try database.write { db in
             try db.execute(
                 sql: """
-                    INSERT OR REPLACE INTO sessionRow (id, createdAt, modelName, instructions, messagesData, transcriptData, truncationStrategy)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO sessionRow (id, createdAt, modelName, instructions, messagesData, transcriptData, truncationStrategy, isFavorite)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """,
-                arguments: [row.id, row.createdAt, row.modelName, row.instructions, row.messagesData, row.transcriptData, row.truncationStrategy]
+                arguments: [row.id, row.createdAt, row.modelName, row.instructions, row.messagesData, row.transcriptData, row.truncationStrategy, row.isFavorite]
             )
         }
     }
@@ -99,10 +107,10 @@ final class LiveSessionRepository: SessionRepository {
             try db.execute(
                 sql: """
                     UPDATE sessionRow
-                    SET createdAt = ?, modelName = ?, instructions = ?, messagesData = ?, transcriptData = ?, truncationStrategy = ?
+                    SET createdAt = ?, modelName = ?, instructions = ?, messagesData = ?, transcriptData = ?, truncationStrategy = ?, isFavorite = ?
                     WHERE id = ?
                     """,
-                arguments: [row.createdAt, row.modelName, row.instructions, row.messagesData, row.transcriptData, row.truncationStrategy, row.id]
+                arguments: [row.createdAt, row.modelName, row.instructions, row.messagesData, row.transcriptData, row.truncationStrategy, row.isFavorite, row.id]
             )
         }
     }
@@ -153,6 +161,7 @@ final class LiveSessionRepository: SessionRepository {
         )
         session.messages = messages
         session.transcriptData = transcriptData
+        session.isFavorite = (row["isFavorite"] as? Int64).map { $0 != 0 } ?? false
         return session
     }
 
@@ -169,7 +178,8 @@ final class LiveSessionRepository: SessionRepository {
             instructions: session.instructions,
             messagesData: jsonString,
             transcriptData: transcriptString,
-            truncationStrategy: strategyString
+            truncationStrategy: strategyString,
+            isFavorite: session.isFavorite
         )
     }
 

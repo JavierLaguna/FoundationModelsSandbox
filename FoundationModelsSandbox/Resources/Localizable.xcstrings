@@ -33,6 +33,22 @@
         }
       }
     },
+    "Add to favorites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to favorites"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a favoritos"
+          }
+        }
+      }
+    },
     "AI Response" : {
       "localizations" : {
         "en" : {
@@ -66,6 +82,7 @@
       }
     },
     "Auto-truncate" : {
+      "comment" : "Auto-truncate strategy option",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -76,7 +93,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automático"
+            "value" : "Auto-truncar"
           }
         }
       }
@@ -130,6 +147,22 @@
         }
       }
     },
+    "Context compactation strategy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Context compactation strategy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estrategia de compactación de contexto"
+          }
+        }
+      }
+    },
     "Copied" : {
       "localizations" : {
         "en" : {
@@ -178,6 +211,22 @@
         }
       }
     },
+    "Default truncation strategy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default truncation strategy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estrategia de truncado predeterminada"
+          }
+        }
+      }
+    },
     "Defines the AI assistant behavior and context" : {
       "localizations" : {
         "en" : {
@@ -190,6 +239,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Define el comportamiento y contexto del asistente de IA"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
           }
         }
       }
@@ -307,6 +372,22 @@
         }
       }
     },
+    "Favourites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favourites"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoritos"
+          }
+        }
+      }
+    },
     "Foundation Models are available" : {
       "localizations" : {
         "en" : {
@@ -383,6 +464,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Idioma"
+          }
+        }
+      }
+    },
+    "macOS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS"
           }
         }
       }
@@ -595,6 +692,22 @@
         }
       }
     },
+    "Remove from favorites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from favorites"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar de favoritos"
+          }
+        }
+      }
+    },
     "Search sessions…" : {
       "localizations" : {
         "en" : {
@@ -676,23 +789,24 @@
         }
       }
     },
-    "Strategy" : {
+    "Strategy used by default for new conversations" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Strategy"
+            "value" : "Strategy used by default for new conversations"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estrategia"
+            "value" : "Estrategia usada por defecto para nuevas conversaciones"
           }
         }
       }
     },
     "Summarize" : {
+      "comment" : "Summarize strategy option",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -709,7 +823,21 @@
       }
     },
     "system_language" : {
-      "comment" : "System language option"
+      "comment" : "System language option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sistema"
+          }
+        }
+      }
     },
     "The conversation context is full. Try clearing some messages." : {
       "localizations" : {

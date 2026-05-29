@@ -394,6 +394,67 @@ struct PlaygroundViewModelTests {
         #expect(sut.session.messages[0].prompt == "original prompt text")
     }
 
+    // MARK: - loadSession / truncationStrategy
+
+    @Test
+    func loadSession_withSummarizeStrategy_updatesTruncationStrategy() {
+        let sut = Self.makeSUT()
+
+        var session = ConversationSession()
+        session.truncationStrategy = .summarize
+
+        sut.loadSession(session)
+
+        #expect(sut.truncationStrategy == .summarize)
+        #expect(sut.session.truncationStrategy == .summarize)
+    }
+
+    @Test
+    func loadSession_withDropOldestStrategy_keepsTruncationStrategy() {
+        let sut = Self.makeSUT()
+
+        var session = ConversationSession()
+        session.truncationStrategy = .dropOldest
+
+        sut.loadSession(session)
+
+        #expect(sut.truncationStrategy == .dropOldest)
+        #expect(sut.session.truncationStrategy == .dropOldest)
+    }
+
+    @Test
+    func truncationStrategy_didSet_savesSessionToRepository() {
+        let mockRepo = MockSessionRepository()
+        let sut = Self.makeSUT(sessionRepository: mockRepo)
+
+        sut.truncationStrategy = .summarize
+
+        #expect(sut.session.truncationStrategy == .summarize)
+        verify(mockRepo).saveSession(.any).called(.once)
+    }
+
+    @Test
+    func init_readsDefaultTruncationStrategyFromInteractor() {
+        let truncationInteractor = MockDefaultTruncationStrategyInteractor()
+        given(truncationInteractor).getDefaultTruncationStrategy().willReturn(.summarize)
+
+        let sut = Self.makeSUT(truncationStrategyInteractor: truncationInteractor)
+
+        #expect(sut.truncationStrategy == .summarize)
+        #expect(sut.session.truncationStrategy == .summarize)
+    }
+
+    @Test
+    func init_withInteractorDefault_usesDropOldest() {
+        let truncationInteractor = MockDefaultTruncationStrategyInteractor()
+        given(truncationInteractor).getDefaultTruncationStrategy().willReturn(.dropOldest)
+
+        let sut = Self.makeSUT(truncationStrategyInteractor: truncationInteractor)
+
+        #expect(sut.truncationStrategy == .dropOldest)
+        #expect(sut.session.truncationStrategy == .dropOldest)
+    }
+
     // MARK: - Phase 4: Other Actions
 
     @Test
@@ -404,6 +465,7 @@ struct PlaygroundViewModelTests {
         sut.userPrompt = "prompt"
         sut.aiResponse = Self.successResponse
         sut.error = "some error"
+        sut.truncationStrategy = .summarize
 
         sut.clearPrompts()
 
@@ -411,6 +473,8 @@ struct PlaygroundViewModelTests {
         #expect(sut.userPrompt == "")
         #expect(sut.aiResponse == nil)
         #expect(sut.error == nil)
+        #expect(sut.truncationStrategy == .dropOldest)
+        #expect(sut.session.truncationStrategy == .dropOldest)
     }
 
     @Test
@@ -636,6 +700,11 @@ struct PlaygroundViewModelTests {
             given(mock).getDefaultModelName().willReturn("default")
             return mock
         }(),
+        truncationStrategyInteractor: DefaultTruncationStrategyInteractor = {
+            let mock = MockDefaultTruncationStrategyInteractor()
+            given(mock).getDefaultTruncationStrategy().willReturn(.dropOldest)
+            return mock
+        }(),
         sessionRepository: SessionRepository = {
             let mock = MockSessionRepository()
             given(mock).lastSession().willReturn(nil)
@@ -648,6 +717,7 @@ struct PlaygroundViewModelTests {
             modelsLister: modelsLister,
             clipboard: clipboard,
             defaultModelInteractor: defaultModelInteractor,
+            truncationStrategyInteractor: truncationStrategyInteractor,
             sessionRepository: sessionRepository
         )
     }

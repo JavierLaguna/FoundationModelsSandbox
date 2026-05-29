@@ -7,6 +7,16 @@ enum ContextTruncationStrategy: String, CaseIterable, Codable, Sendable {
 
     /// Summarizes old messages to fit within the context window (future implementation).
     case summarize
-    
+
     // Temporarily disabled — case manual
+
+    /// Localized display name for the strategy.
+    var displayName: String {
+        switch self {
+        case .dropOldest:
+            NSLocalizedString("Auto-truncate", comment: "Auto-truncate strategy option")
+        case .summarize:
+            NSLocalizedString("Summarize", comment: "Summarize strategy option")
+        }
+    }
 }

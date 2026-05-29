@@ -197,6 +197,46 @@ struct SettingsViewModelTests {
         #expect(stored == AppTheme.dark.rawValue)
     }
 
+    // MARK: - Truncation Strategy
+
+    @Test
+    func init_readsTruncationStrategyFromInteractor() {
+        let strategyInteractor = MockDefaultTruncationStrategyInteractor()
+        given(strategyInteractor).getDefaultTruncationStrategy().willReturn(.summarize)
+
+        let sut = makeSUT(truncationStrategyInteractor: strategyInteractor)
+
+        #expect(sut.selectedTruncationStrategy == .summarize)
+    }
+
+    @Test
+    func init_withDefaultInteractorValue_returnsDropOldest() {
+        let sut = makeSUT()
+
+        #expect(sut.selectedTruncationStrategy == .dropOldest)
+    }
+
+    @Test
+    func selectedTruncationStrategyDidSet_callsInteractor() {
+        let strategyInteractor = MockDefaultTruncationStrategyInteractor()
+        given(strategyInteractor).getDefaultTruncationStrategy().willReturn(.dropOldest)
+
+        let sut = makeSUT(truncationStrategyInteractor: strategyInteractor)
+
+        sut.selectedTruncationStrategy = .summarize
+
+        verify(strategyInteractor).setDefaultTruncationStrategy(.value(.summarize)).called(.once)
+    }
+
+    @Test
+    func selectedTruncationStrategyDidSet_changesProperty() {
+        let sut = makeSUT()
+
+        sut.selectedTruncationStrategy = .summarize
+
+        #expect(sut.selectedTruncationStrategy == .summarize)
+    }
+
     // MARK: - Test Helpers
 
     private func makeSUT(
@@ -211,6 +251,11 @@ struct SettingsViewModelTests {
             given(mock).getDefaultModelName().willReturn("")
             return mock
         }(),
+        truncationStrategyInteractor: MockDefaultTruncationStrategyInteractor = {
+            let mock = MockDefaultTruncationStrategyInteractor()
+            given(mock).getDefaultTruncationStrategy().willReturn(.dropOldest)
+            return mock
+        }(),
         modelsLister: MockListAvailableModelsInteractor = {
             let mock = MockListAvailableModelsInteractor()
             given(mock).execute().willReturn([])
@@ -221,6 +266,7 @@ struct SettingsViewModelTests {
         SettingsViewModel(
             languageInteractor: languageInteractor,
             modelInteractor: modelInteractor,
+            truncationStrategyInteractor: truncationStrategyInteractor,
             modelsLister: modelsLister,
             userDefaults: userDefaults
         )
