@@ -18,9 +18,12 @@ struct FoundationModelsInteractorTests {
         let checker = MockCheckFoundationModelsAvailabilityInteractor()
         given(checker).execute(model: .any).willReturn(.unavailable(.deviceNotEligible))
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(MockAIModelSession())
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: checker,
-            sessionFactory: { _, _ in MockAIModelSession() }
+            sessionProvider: mockProvider
         )
 
         await #expect(throws: AppleIntelligenceNotAvailableError.deviceNotEligible) {
@@ -39,9 +42,12 @@ struct FoundationModelsInteractorTests {
         let checker = MockCheckFoundationModelsAvailabilityInteractor()
         given(checker).execute(model: .any).willReturn(.unavailable(.appleIntelligenceNotEnabled))
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(MockAIModelSession())
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: checker,
-            sessionFactory: { _, _ in MockAIModelSession() }
+            sessionProvider: mockProvider
         )
 
         await #expect(throws: AppleIntelligenceNotAvailableError.appleIntelligenceNotEnabled) {
@@ -58,9 +64,12 @@ struct FoundationModelsInteractorTests {
         let checker = MockCheckFoundationModelsAvailabilityInteractor()
         given(checker).execute(model: .any).willReturn(.unavailable(.modelNotReady))
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(MockAIModelSession())
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: checker,
-            sessionFactory: { _, _ in MockAIModelSession() }
+            sessionProvider: mockProvider
         )
 
         await #expect(throws: AppleIntelligenceNotAvailableError.modelNotReady) {
@@ -77,10 +86,12 @@ struct FoundationModelsInteractorTests {
     @Test
     func startConversation_whenAvailable_setsHasActiveConversation() async throws {
         let session = MockAIModelSession()
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(session)
 
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: Self.makeAvailableChecker(),
-            sessionFactory: { _, _ in session }
+            sessionProvider: mockProvider
         )
 
         #expect(sut.hasActiveConversation == false)
@@ -107,9 +118,12 @@ struct FoundationModelsInteractorTests {
         )
         given(session).respond(to: .any, options: .any).willReturn(expectedResponse)
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(session)
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: Self.makeAvailableChecker(),
-            sessionFactory: { _, _ in session }
+            sessionProvider: mockProvider
         )
 
         try await sut.startConversation(
@@ -145,9 +159,12 @@ struct FoundationModelsInteractorTests {
             SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
         )
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(session)
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: Self.makeAvailableChecker(),
-            sessionFactory: { _, _ in session }
+            sessionProvider: mockProvider
         )
 
         try await sut.startConversation(
@@ -168,9 +185,12 @@ struct FoundationModelsInteractorTests {
             SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
         )
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(session)
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: Self.makeAvailableChecker(),
-            sessionFactory: { _, _ in session }
+            sessionProvider: mockProvider
         )
 
         try await sut.startConversation(
@@ -195,9 +215,12 @@ struct FoundationModelsInteractorTests {
             SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
         )
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(session)
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: Self.makeAvailableChecker(),
-            sessionFactory: { _, _ in session }
+            sessionProvider: mockProvider
         )
 
         try await sut.startConversation(
@@ -222,9 +245,12 @@ struct FoundationModelsInteractorTests {
             SessionResponse(content: "", duration: 0, promptTokenCount: 0, responseTokenCount: 0)
         )
 
+        let mockProvider = MockSessionProvider()
+        given(mockProvider).makeSession(model: .any, instructions: .any).willReturn(session)
+
         let sut = FoundationModelsInteractorDefault(
             availabilityChecker: Self.makeAvailableChecker(),
-            sessionFactory: { _, _ in session }
+            sessionProvider: mockProvider
         )
 
         try await sut.startConversation(

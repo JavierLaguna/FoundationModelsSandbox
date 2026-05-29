@@ -1,83 +1,13 @@
 import Foundation
 import FoundationModels
-import Mockable
 
-/// Errors that can occur during a conversation session.
-enum FoundationModelsInteractorError: Error, LocalizedError, Equatable {
-    case noActiveConversation
-    case contextOverflow
-
-    var errorDescription: String? {
-        switch self {
-        case .noActiveConversation:
-            String(localized: "No active conversation. Start a new conversation first.")
-        case .contextOverflow:
-            String(localized: "The conversation context is full. Try clearing some messages.")
-        }
-    }
-}
-
-@Mockable
-protocol FoundationModelsInteractor: Sendable {
-    /// Starts a new conversation with the given model and instructions.
-    /// - Parameter transcript: Optional transcript to restore a previous conversation.
-    func startConversation(
-        model: SystemLanguageModel,
-        instructions: String,
-        truncationStrategy: ContextTruncationStrategy,
-        transcript: Transcript?
-    ) async throws
-
-    /// Starts a new conversation without a transcript.
-    func startConversation(
-        model: SystemLanguageModel,
-        instructions: String,
-        truncationStrategy: ContextTruncationStrategy
-    ) async throws
-
-    /// Sends a prompt to the active conversation and returns the response.
-    /// - Throws: `FoundationModelsInteractorError.noActiveConversation` if no session is active.
-    /// - Throws: `FoundationModelsInteractorError.contextOverflow` if context is full and strategy is `.manual`.
-    func sendMessage(_ prompt: String) async throws -> AIResponse
-
-    /// Returns the current transcript for serialization.
-    func currentTranscript() async -> Transcript?
-
-    /// Ends the active conversation.
-    func endConversation()
-
-    /// Whether a conversation session is active.
-    var hasActiveConversation: Bool { get }
-
-    /// The maximum context size (token limit) for the current model.
-    var contextSize: Int { get }
-
-    /// Updates the truncation strategy for the active conversation.
-    func updateTruncationStrategy(_ strategy: ContextTruncationStrategy)
-}
-
-// MARK: - Protocol extension for convenience overload without transcript
-extension FoundationModelsInteractor {
-    func startConversation(
-        model: SystemLanguageModel,
-        instructions: String,
-        truncationStrategy: ContextTruncationStrategy
-    ) async throws {
-        try await startConversation(
-            model: model,
-            instructions: instructions,
-            truncationStrategy: truncationStrategy,
-            transcript: nil
-        )
-    }
-}
-
-final class FoundationModelsInteractorDefault: FoundationModelsInteractor, @unchecked Sendable {
+@MainActor
+final class FoundationModelsInteractorDefault: FoundationModelsInteractor {
 
     // MARK: - Dependencies
     private let availabilityChecker: CheckFoundationModelsAvailabilityInteractor
     private let defaultModel: SystemLanguageModel
-    private let sessionFactory: (SystemLanguageModel, String) -> AIModelSession
+    private let sessionProvider: SessionProvider
 
     // MARK: - State
     private var activeSession: AIModelSession?
@@ -89,13 +19,11 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor, @unch
     init(
         availabilityChecker: CheckFoundationModelsAvailabilityInteractor = CheckFoundationModelsAvailabilityInteractorDefault(),
         model: SystemLanguageModel = CheckFoundationModelsAvailabilityInteractorDefault.model,
-        sessionFactory: @escaping (SystemLanguageModel, String) -> AIModelSession = { model, instructions in
-            LiveModelSession(model: model, instructions: instructions)
-        }
+        sessionProvider: SessionProvider = LiveSessionProvider()
     ) {
         self.availabilityChecker = availabilityChecker
         self.defaultModel = model
-        self.sessionFactory = sessionFactory
+        self.sessionProvider = sessionProvider
     }
 
     // MARK: - FoundationModelsInteractor
@@ -115,9 +43,9 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor, @unch
         self.truncationStrategy = truncationStrategy
 
         if let transcript {
-            activeSession = LiveModelSession(model: model, transcript: transcript)
+            activeSession = sessionProvider.makeSession(model: model, transcript: transcript)
         } else {
-            activeSession = sessionFactory(model, instructions)
+            activeSession = sessionProvider.makeSession(model: model, instructions: instructions)
         }
     }
 
@@ -211,6 +139,6 @@ final class FoundationModelsInteractorDefault: FoundationModelsInteractor, @unch
         let trimmedTranscript = Transcript(entries: trimmedEntries)
 
         // Replace the session with one using the trimmed transcript
-        activeSession = LiveModelSession(model: model, transcript: trimmedTranscript)
+        activeSession = sessionProvider.makeSession(model: model, transcript: trimmedTranscript)
     }
 }
