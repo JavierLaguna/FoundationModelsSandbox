@@ -22,13 +22,13 @@ struct PromptPanelView: View {
             SubmitOnEnterTextEditor(
                 text: $instructions,
                 placeholder: Text("Enter instructions..."),
-                onSubmit: onSubmit
+                onSubmit: onSubmit,
+                isEnabled: !isConversationActive
             )
             .font(.body)
             .scrollContentBackground(.hidden)
             .padding(Spacing.md)
             .liquidGlass(cornerRadius: CornerRadius.medium)
-            .disabled(isConversationActive)
             
             Text("Defines the AI assistant behavior and context")
                 .font(.caption)

@@ -7,11 +7,13 @@ struct SubmitOnEnterTextEditor: View {
     @Binding var text: String
     var placeholder: Text
     let onSubmit: () -> Void
+    var isEnabled: Bool = true
     
     var body: some View {
         SubmitOnEnterTextEditorRepresentable(
             text: $text,
-            onSubmit: onSubmit
+            onSubmit: onSubmit,
+            isEnabled: isEnabled
         )
         .overlay(alignment: .topLeading) {
             if text.isEmpty {
@@ -22,6 +24,7 @@ struct SubmitOnEnterTextEditor: View {
                     .allowsHitTesting(false)
             }
         }
+        .opacity(isEnabled ? 1 : 0.4)
     }
 }
 
@@ -56,6 +59,7 @@ struct SubmitOnEnterTextEditorRepresentable: NSViewRepresentable {
     
     @Binding var text: String
     let onSubmit: () -> Void
+    var isEnabled: Bool = true
     
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
@@ -99,6 +103,8 @@ struct SubmitOnEnterTextEditorRepresentable: NSViewRepresentable {
             if textView.string != text {
                 textView.string = text
             }
+            textView.isEditable = isEnabled
+            textView.isSelectable = isEnabled
         }
     }
     

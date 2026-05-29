@@ -26,6 +26,10 @@ final class PlaygroundViewModel {
     var userPrompt: String = ""
     var selectedModelName: String = ""
 
+    // MARK: - Conversation State
+    /// Whether a conversation is active. Controls disabled state for instructions and model picker.
+    private(set) var isConversationActive: Bool = false
+
     // MARK: - Response State
     var aiResponse: AIResponse?
     var isLoading: Bool = false
@@ -51,11 +55,6 @@ final class PlaygroundViewModel {
     private(set) var selectedModel: SystemLanguageModel?
 
     // MARK: - Computed Properties
-
-    /// Whether a conversation session is active. When true, instructions and model cannot be changed.
-    var isConversationActive: Bool {
-        interactor.hasActiveConversation
-    }
 
     var canSubmitPrompt: Bool {
         !userPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !selectedModelName.isEmpty
@@ -167,6 +166,11 @@ final class PlaygroundViewModel {
         // End any existing conversation
         interactor.endConversation()
 
+        // A loaded session is an existing conversation — model and instructions cannot change.
+        // Set synchronously so the UI disables fields immediately, even though
+        // the async session restoration may not have completed yet.
+        isConversationActive = !session.messages.isEmpty
+
         // Start a new conversation with the saved transcript for restoration
         if let transcriptData = session.transcriptData,
            let transcript = try? JSONDecoder().decode(Transcript.self, from: transcriptData),
@@ -224,6 +228,7 @@ final class PlaygroundViewModel {
                     instructions: instructions,
                     truncationStrategy: session.truncationStrategy
                 )
+                isConversationActive = true
             } catch {
                 self.error = error.localizedDescription
                 isLoading = false
@@ -275,6 +280,7 @@ final class PlaygroundViewModel {
         }
 
         interactor.endConversation()
+        isConversationActive = false
 
         instructions = ""
         userPrompt = ""
