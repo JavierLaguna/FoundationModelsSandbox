@@ -2,15 +2,6 @@ import Foundation
 import FoundationModels
 import Mockable
 
-/// Lightweight response type that wraps the data extracted from a `LanguageModelSession.Response`.
-/// It is fully constructable in tests, unlike the system framework's response type.
-struct SessionResponse: Sendable, Equatable {
-    let content: String
-    let duration: Double
-    let promptTokenCount: Int
-    let responseTokenCount: Int
-}
-
 /// Protocol that wraps `LanguageModelSession` so it can be mocked in tests.
 @Mockable
 protocol AIModelSession: Sendable {
@@ -20,8 +11,9 @@ protocol AIModelSession: Sendable {
 
 /// Default implementation that delegates to a real `LanguageModelSession`
 /// and extracts metrics via reflection.
-final class LiveModelSession: AIModelSession, @unchecked Sendable {
-    private var session: LanguageModelSession
+final class LiveModelSession: AIModelSession {
+    
+    private let session: LanguageModelSession
 
     init(model: SystemLanguageModel, instructions: String) {
         self.session = LanguageModelSession(
